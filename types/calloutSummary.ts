@@ -37,6 +37,22 @@ export const imageForType = (type: calloutType): ImageRequireSource => {
     }
 }
 
+export const textForType = (type?: calloutType): string => {
+
+    if (type == null) {
+        return "N/A";
+    }
+
+    switch (type as calloutType) {
+        case calloutType.SEARCH:
+            return "Search";
+        case calloutType.RESCUE:
+            return "Rescue";
+        case calloutType.INFORMATION:
+            return "Information";
+    }
+}
+
 export const colorForResponseType = (type?: responseType): string => {
 
     if (type == null) {

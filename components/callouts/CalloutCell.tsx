@@ -5,12 +5,18 @@ import colors from '../../styles/colors';
 import { getTimeString } from '../../utility/dateHelper';
 
 type CalloutCellProps = {
-    summary: calloutSummary
+    summary: calloutSummary,
+    onPress: (calloutSummary: calloutSummary) => void
 }
 
-const CalloutCell = ({summary}: CalloutCellProps) => {
+const CalloutCell = ({summary, onPress}: CalloutCellProps) => {
+
+    const cellPressed = () => {
+        onPress(summary);
+    }
+
     return (
-        <TouchableOpacity activeOpacity={0.5}>
+        <TouchableOpacity activeOpacity={0.5} onPress={cellPressed}>
             <View style={[elements.tray,styles.container]}>
                 <View style={[styles.sideBar, {backgroundColor: colorForType(summary.type)}]}>
                     <Image source={imageForType(summary.type)} style={styles.sideBarImage} />

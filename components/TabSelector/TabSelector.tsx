@@ -4,7 +4,7 @@ import colors from '../../styles/colors';
 
 type TabSelectorProps = {
     tabs: string[],
-    onTabChange: (values: any) => void;
+    onTabChange: (values: any) => void
 }
 
 const TabSelector = ({tabs, onTabChange}: TabSelectorProps) => {

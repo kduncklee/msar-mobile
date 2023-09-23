@@ -33,5 +33,49 @@ export const elements = StyleSheet.create({
     whiteButtonText: {
         fontWeight: "500",
         color: colors.black,
+    },
+    inputContainer: {
+        flexDirection: "row",
+        padding: 4,
+        borderColor: colors.grayText,
+        borderWidth: 1,
+        borderRadius: 8
+    },
+    fieldTitle: {
+        fontSize: 14,
+        fontWeight: "500",
+        color: colors.secondaryYellow,
+        marginBottom: 6
+    },
+    fieldPlaceholder: {
+        fontSize: 14,
+        fontWeight: "300",
+        color: colors.grayText,
+    },
+    fieldText: {
+        fontSize: 14,
+        fontWeight: "300",
+        color: colors.primaryText,
+    },
+    mediumText: {
+        fontSize: 20,
+        fontWeight: "400",
+        color: colors.primaryText
+    },
+    fieldImage: {
+        resizeMode: "contain",
+        width: 40,
+        height: 40
+    },
+    fieldCheckImage: {
+        resizeMode: "contain",
+        width: 20,
+        height: 20
+    },
+    informationDiv: {
+        marginVertical: 8,
+        marginHorizontal: 12,
+        borderBottomColor: colors.primaryBg,
+        borderBottomWidth: 0.75
     }
 })

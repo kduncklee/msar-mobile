@@ -36,14 +36,18 @@ const Page = () => {
         router.push({ pathname: 'edit-callout', params: { } })
     }
 
+    const viewCallout = (calloutSummary: calloutSummary) => {
+        router.push({ pathname: 'view-callout', params: { id: calloutSummary.id} })
+    }
+
   return (
     <SafeAreaView style={styles.container}>
         <Header title="Callouts"/>
         <TabSelector tabs={['Active','Archived']} onTabChange={tabChanged} />
         <View style={styles.contentContainer}>
         <ScrollView style={styles.scrollView}>
-            <CalloutCell summary={summary} />
-            <CalloutCell summary={summary} />
+            <CalloutCell summary={summary} onPress={viewCallout}/>
+            <CalloutCell summary={summary} onPress={viewCallout}/>
             <View style={{height: 100}} />
         </ScrollView>
         <TouchableOpacity

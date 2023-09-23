@@ -1,13 +1,42 @@
-import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpacity, Text, View } from 'react-native';
+import { useState } from 'react';
+import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpacity, Text, View, KeyboardAvoidingView } from 'react-native';
 import Header from '../components/Header';
 import colors from '../styles/colors';
 import { elements } from '../styles/elements';
 import { router, useLocalSearchParams } from 'expo-router';
+import { calloutType } from '../types/enums';
+import DropdownSelector from '../components/inputs/DropdownSelector';
+import FormTextInput from '../components/inputs/FormTextInput';
+import FormTextArea from '../components/inputs/FormTextArea';
+import FormCheckbox from '../components/inputs/FormCheckbox';
 
 const Page = () => {
+
+
+    const [ten22, setTen22] = useState(false);
+
+    if (Platform.OS === 'ios') {
+        StatusBar.setBarStyle('light-content');
+    } else if (Platform.OS === 'android') {
+        StatusBar.setBackgroundColor(colors.primaryBg);
+    }
+
     const params = useLocalSearchParams();
     var calloutId: number = null;
     var headerTitle: string = "Create Callout";
+
+    let callOutTypeSelect = [
+        { label: "Search", enum: calloutType.SEARCH, value: '0' },
+        { label: "Rescue", enum: calloutType.RESCUE, value: '1' },
+        { label: "Information", enum: calloutType.INFORMATION, value: '2' }
+    ]
+
+    let radioFrequencySelect = [
+        { label: "LHS Metro", value: '0' },
+        { label: "Malibu Metro", value: '1' },
+        { label: "L-Tac", value: '2' },
+        { label: "MRA MAL", value: '3' }
+    ]
 
     if (params.calloutId && typeof params.calloutId === 'string') {
         calloutId = parseInt(params.calloutId, 10);
@@ -18,20 +47,106 @@ const Page = () => {
 
     }
 
+    const calloutTypeSelected = (item: any) => {
+        console.log(item.enum);
+    }
+
+    const locationChanged = (text: string) => {
+        console.log(text);
+    }
+
+    const locationButtonPressed = () => {
+        console.log("location pressed");
+    }
+
+    const subjectChanged = (text: string) => {
+        console.log(text);
+    }
+
+    const informantChanged = (text: string) => {
+        console.log(text);
+    }
+
+    const informantContactChanged = (text: string) => {
+        console.log(text);
+    }
+
+    const radioFreqSelected = (item: any) => {
+        console.log(item.label);
+    }
+
+    const on1022Toggle = (checked: boolean) => {
+        setTen22(checked);
+        if (!checked) {
+            //clear 10-22 reason
+        }
+    }
+
+    const ten22NoteChanged = (text: string) => {
+        console.log(text);
+    }
+
     return (
         <SafeAreaView style={styles.container}>
             <Header title={headerTitle} backButton={true} timestamp={new Date()} />
-            <View style={styles.contentContainer}>
-        <ScrollView style={styles.scrollView}>
-            <View style={{height: 100}} />
-        </ScrollView>
-        <TouchableOpacity
-            activeOpacity={0.8}
-            style={[elements.capsuleButton, styles.submitCalloutButton]}
-            onPress={() => createCallout()}>
-            <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>{headerTitle}</Text>
-        </TouchableOpacity>
-        </View>
+            <KeyboardAvoidingView
+                style={styles.contentContainer}
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -500} // Adjust the offset as needed
+            >
+                <ScrollView style={styles.scrollView}>
+                    <DropdownSelector
+                        title={'Callout Type'}
+                        options={callOutTypeSelect}
+                        placeholder={'Select type'}
+                        onSelect={calloutTypeSelected} />
+                    <FormTextInput
+                        title={'Location'}
+                        rightButton={require('../assets/icons/map.png')}
+                        onRightPress={locationButtonPressed}
+                        onChange={subjectChanged}
+                        placeholder='Location' />
+                    <FormTextInput
+                        title={'Subject'}
+                        onChange={subjectChanged}
+                        placeholder='Subject' />
+                    <FormTextInput
+                        title={'Informant'}
+                        onChange={informantChanged}
+                        placeholder='Informant' />
+                    <FormTextInput
+                        icon={require('../assets/icons/phone.png')}
+                        onChange={informantContactChanged}
+                        placeholder='Informant Contact' />
+                    <FormTextArea
+                        title={'Circumstances'}
+                        height={100}
+                        onChange={informantContactChanged}
+                        placeholder='Circumstances' />
+                    <DropdownSelector
+                        title={'Radio Frequency'}
+                        options={radioFrequencySelect}
+                        placeholder={'Select Frequency'}
+                        onSelect={radioFreqSelected} />
+                    <FormCheckbox
+                        title={'10-22'}
+                        checked={ten22}
+                        onToggle={on1022Toggle} />
+                    {ten22 &&
+                        <FormTextArea
+                            height={100}
+                            onChange={informantContactChanged}
+                            placeholder='10-22 Notes' />
+                    }
+                    <TouchableOpacity
+                        activeOpacity={0.8}
+                        style={[elements.capsuleButton, styles.submitCalloutButton]}
+                        onPress={() => createCallout()}>
+                        <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>{headerTitle}</Text>
+                    </TouchableOpacity>
+                    <View style={{height: 40}} />
+                </ScrollView>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     )
 }
@@ -47,15 +162,14 @@ const styles = StyleSheet.create({
     scrollView: {
         marginTop: 0,
         flex: 1,
-        paddingTop: 10,
+        paddingTop: 0,
+        paddingHorizontal: 20
     },
     submitCalloutButton: {
-        margin: 20,
+        marginVertical: 20,
         height: 60,
-        position: "absolute",
         left: 0,
         right: 0,
-        bottom: 0
     }
 });
 
