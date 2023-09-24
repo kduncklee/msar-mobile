@@ -62,6 +62,12 @@ export const elements = StyleSheet.create({
         fontWeight: "400",
         color: colors.primaryText
     },
+    buttonText: {
+        fontSize: 16,
+        textAlign: "center",
+        fontWeight: "500",
+        color: colors.black
+    },
     fieldImage: {
         resizeMode: "contain",
         width: 40,

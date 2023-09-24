@@ -14,6 +14,7 @@ const Page = () => {
 
 
     const [ten22, setTen22] = useState(false);
+    const [locationText, setLocationText] = useState('');
 
     if (Platform.OS === 'ios') {
         StatusBar.setBarStyle('light-content');
@@ -52,11 +53,11 @@ const Page = () => {
     }
 
     const locationChanged = (text: string) => {
-        console.log(text);
+        setLocationText(text);
     }
 
     const locationButtonPressed = () => {
-        console.log("location pressed");
+        router.push({ pathname: 'edit-location', params: { locationDescription: locationText } })
     }
 
     const subjectChanged = (text: string) => {
@@ -104,7 +105,7 @@ const Page = () => {
                         title={'Location'}
                         rightButton={require('../assets/icons/map.png')}
                         onRightPress={locationButtonPressed}
-                        onChange={subjectChanged}
+                        onChange={locationChanged}
                         placeholder='Location' />
                     <FormTextInput
                         title={'Subject'}
