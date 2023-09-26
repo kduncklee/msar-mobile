@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpacity, Text, View } from 'react-native';
 import Header from '../components/Header';
 import CalloutCell from '../components/callouts/CalloutCell';
@@ -10,11 +11,13 @@ import { router } from 'expo-router';
 
 const Page = () => {
 
-    if (Platform.OS === 'ios') {
-        StatusBar.setBarStyle('light-content');
-    } else if (Platform.OS === 'android') {
-        StatusBar.setBackgroundColor(colors.primaryBg);
-    }
+    useEffect(() => {
+        if (Platform.OS === 'ios') {
+            StatusBar.setBarStyle('light-content');
+        } else if (Platform.OS === 'android') {
+            StatusBar.setBackgroundColor(colors.primaryBg);
+        }
+    }, []);
 
     let summary: calloutSummary = {
         id: 1,
@@ -39,29 +42,29 @@ const Page = () => {
     }
 
     const viewCallout = (calloutSummary: calloutSummary) => {
-        router.push({ pathname: 'view-callout', params: { callout: calloutSummary.id} })
+        router.push({ pathname: 'view-callout', params: { callout: calloutSummary.id } })
     }
 
-  return (
-    <SafeAreaView style={styles.container}>
-        <Header title="Callouts"/>
-        <TabSelector tabs={['Active','Archived']} onTabChange={tabChanged} />
-        <View style={styles.contentContainer}>
-        <ScrollView style={styles.scrollView}>
-            <CalloutCell summary={summary} onPress={viewCallout}/>
-            <CalloutCell summary={summary} onPress={viewCallout}/>
-            <View style={{height: 100}} />
-        </ScrollView>
-        <TouchableOpacity
-            activeOpacity={0.8}
-            style={[elements.capsuleButton, styles.createCalloutButton]}
-            onPress={() => createCallout()}>
-            <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>Create Callout</Text>
-        </TouchableOpacity>
-        </View>
-       
-    </SafeAreaView>
-  )
+    return (
+        <SafeAreaView style={styles.container}>
+            <Header title="Callouts" />
+            <TabSelector tabs={['Active', 'Archived']} onTabChange={tabChanged} />
+            <View style={styles.contentContainer}>
+                <ScrollView style={styles.scrollView}>
+                    <CalloutCell summary={summary} onPress={viewCallout} />
+                    <CalloutCell summary={summary} onPress={viewCallout} />
+                    <View style={{ height: 100 }} />
+                </ScrollView>
+                <TouchableOpacity
+                    activeOpacity={0.8}
+                    style={[elements.capsuleButton, styles.createCalloutButton]}
+                    onPress={() => createCallout()}>
+                    <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>Create Callout</Text>
+                </TouchableOpacity>
+            </View>
+
+        </SafeAreaView>
+    )
 }
 
 const styles = StyleSheet.create({

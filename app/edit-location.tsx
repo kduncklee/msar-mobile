@@ -13,6 +13,14 @@ const Page = () => {
     const [currentCoordinate, setCurrentCoordinate] = useState<LatLng>(null);
     var initialCoordinate: LatLng = null;
 
+    useEffect(() => {
+        if (Platform.OS === 'ios') {
+            StatusBar.setBarStyle('light-content');
+        } else if (Platform.OS === 'android') {
+            StatusBar.setBackgroundColor(colors.primaryBg);
+        }
+    }, []);
+
     var defaultRegion: Region = {
         latitude: 34.050783236893395,
         longitude: -118.83192890478199,

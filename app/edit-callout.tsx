@@ -48,6 +48,14 @@ const Page = () => {
     }
 
     useEffect(() => {
+        if (Platform.OS === 'ios') {
+            StatusBar.setBarStyle('light-content');
+        } else if (Platform.OS === 'android') {
+            StatusBar.setBackgroundColor(colors.primaryBg);
+        }
+    }, []);
+
+    useEffect(() => {
         if (location) {
           console.log(location);
           router.back();
