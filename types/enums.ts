@@ -10,3 +10,9 @@ export enum responseType {
     TEN19,
     TEN22,
 }
+
+export enum locationType {
+    DESCRIPTION,
+    COORDINATES,
+    ADDRESS
+}

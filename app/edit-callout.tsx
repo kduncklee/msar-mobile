@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpacity, Text, View, KeyboardAvoidingView } from 'react-native';
 import Header from '../components/Header';
 import colors from '../styles/colors';
 import { elements } from '../styles/elements';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams, useGlobalSearchParams } from 'expo-router';
 import { calloutType } from '../types/enums';
 import DropdownSelector from '../components/inputs/DropdownSelector';
 import FormTextInput from '../components/inputs/FormTextInput';
@@ -11,7 +11,7 @@ import FormTextArea from '../components/inputs/FormTextArea';
 import FormCheckbox from '../components/inputs/FormCheckbox';
 
 const Page = () => {
-
+    
 
     const [ten22, setTen22] = useState(false);
     const [locationText, setLocationText] = useState('');
@@ -22,7 +22,9 @@ const Page = () => {
         StatusBar.setBackgroundColor(colors.primaryBg);
     }
 
-    const params = useLocalSearchParams();
+
+    const {callout} = useLocalSearchParams();
+    const {location} = useGlobalSearchParams();
     var calloutId: number = null;
     var headerTitle: string = "Create Callout";
 
@@ -39,10 +41,19 @@ const Page = () => {
         { label: "MRA MAL", value: '3' }
     ]
 
-    if (params.calloutId && typeof params.calloutId === 'string') {
-        calloutId = parseInt(params.calloutId, 10);
+    if (callout && typeof callout === 'string') {
+        //console.log(callout);
+        calloutId = parseInt(callout, 10);
         headerTitle = "Update Callout";
     }
+
+    useEffect(() => {
+        if (location) {
+          console.log(location);
+          router.back();
+          setLocationText(`${location}`);
+        }
+      }, [location]);
 
     const createCallout = () => {
 
@@ -57,7 +68,7 @@ const Page = () => {
     }
 
     const locationButtonPressed = () => {
-        router.push({ pathname: 'edit-location', params: { locationDescription: locationText } })
+        router.push({ pathname: 'edit-location', params: { locationDescription: locationText, location: '' } });
     }
 
     const subjectChanged = (text: string) => {
@@ -106,7 +117,8 @@ const Page = () => {
                         rightButton={require('../assets/icons/map.png')}
                         onRightPress={locationButtonPressed}
                         onChange={locationChanged}
-                        placeholder='Location' />
+                        placeholder='Location'
+                        value={locationText} />
                     <FormTextInput
                         title={'Subject'}
                         onChange={subjectChanged}

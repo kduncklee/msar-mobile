@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpacity, Text, View, KeyboardAvoidingView } from 'react-native';
+import { SafeAreaView, StyleSheet, StatusBar, Platform, TouchableOpacity, Text, View, Alert } from 'react-native';
 import Header from '../components/Header';
 import colors from '../styles/colors';
 import { elements } from '../styles/elements';
@@ -32,13 +32,47 @@ const Page = () => {
     }
 
     useEffect(() => {
-        if (initialCoordinate != null ) {
+        if (initialCoordinate != null) {
             setCurrentCoordinate(initialCoordinate);
         }
     }, []);
 
+    const backPressed = () => {
+
+        if (initialCoordinate != null && currentCoordinate != null) {
+            if (initialCoordinate.latitude != currentCoordinate.latitude ||
+                initialCoordinate.longitude != currentCoordinate.longitude) {
+                showChangeAlert();
+                return;
+            }
+        }
+
+        router.back();
+    }
+
+    const showChangeAlert = () => {
+        Alert.alert(
+            'Location Changed',
+            'Going back without setting the location will lose this change. Do you want to proceed?',
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Yes',
+                    onPress: () => {
+                        router.back();
+                    },
+                },
+            ],
+            { cancelable: false }
+        );
+    };
+
+
     const onMapLongPress = (event: LongPressEvent) => {
-        console.log(event.nativeEvent.coordinate);
+        //console.log(event.nativeEvent.coordinate);
         setCurrentCoordinate(event.nativeEvent.coordinate);
     }
 
@@ -47,12 +81,12 @@ const Page = () => {
     }
 
     const onLocationSelect = () => {
-        console.log('selected location: ' + currentCoordinate);
+        router.setParams({ location: `${currentCoordinate.latitude}, ${currentCoordinate.longitude}` });
     }
 
     return (
         <SafeAreaView style={styles.container}>
-            <Header title={'Select Location'} backButton={true} />
+            <Header title={'Select Location'} backButton={true} onBackPressed={backPressed} />
             <View style={styles.contentContainer}>
                 <MapView
                     style={styles.map}
@@ -69,7 +103,7 @@ const Page = () => {
                     {!currentCoordinate &&
                         <>
                             <Text style={styles.selectInstructionText}>Long press on map to a drop pin</Text>
-                            <View style={[styles.selectButton, { backgroundColor: colors.grayText}]}>
+                            <View style={[styles.selectButton, { backgroundColor: colors.grayText }]}>
                                 <Text style={[elements.buttonText]}>Select Location</Text>
                             </View>
                         </>

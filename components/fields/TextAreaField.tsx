@@ -2,7 +2,6 @@ import React, { useState, } from 'react';
 import { StyleSheet, View, Text, Image, ImageRequireSource } from 'react-native';
 import { elements } from '../../styles/elements';
 import colors from '../../styles/colors'
-import { TouchableOpacity } from 'react-native-gesture-handler';
 
 type TextAreaFieldProps = {
     title?: string,

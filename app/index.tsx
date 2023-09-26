@@ -22,7 +22,9 @@ const Page = () => {
         type: calloutType.SEARCH,
         responder_count: 3,
         timestamp: new Date(),
-        location: "1234 Main Street",
+        location: {
+            description: "1234 Main Street"
+        },
         log_count: 12,
         my_response: responseType.TEN8
     }
@@ -33,11 +35,11 @@ const Page = () => {
     }
 
     const createCallout = () => {
-        router.push({ pathname: 'edit-callout', params: { } })
+        router.push({ pathname: 'edit-callout', params: {} })
     }
 
     const viewCallout = (calloutSummary: calloutSummary) => {
-        router.push({ pathname: 'view-callout', params: { id: calloutSummary.id} })
+        router.push({ pathname: 'view-callout', params: { callout: calloutSummary.id} })
     }
 
   return (

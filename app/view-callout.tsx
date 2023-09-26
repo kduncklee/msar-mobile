@@ -10,6 +10,8 @@ import TabSelector from '../components/TabSelector/TabSelector';
 import InformationTray from '../components/fields/InformationTray';
 import InformationField from '../components/fields/InformationField';
 import TextAreaField from '../components/fields/TextAreaField';
+import LocationField from '../components/fields/LocationField';
+import CalloutRespond from '../components/callouts/CalloutRespond';
 
 const Page = () => {
 
@@ -22,7 +24,12 @@ const Page = () => {
         type: calloutType.SEARCH,
         responder_count: 3,
         timestamp: new Date(),
-        location: "1234 Main Street",
+        location: {
+            coordinates: {
+                latitude: "34.09454155005811",
+                longitude: "-118.94362251701045"
+            }
+        },
         log_count: 12,
         my_response: responseType.TEN8
     }
@@ -37,6 +44,10 @@ const Page = () => {
 
     const editDetailsPressed = () => {
         console.log('edit details');
+    }
+
+    const responseSelected = (response: responseType) => {
+        console.log(textForResponseType(response));
     }
 
     return (
@@ -91,17 +102,20 @@ const Page = () => {
                         titleBarColor={colors.blue}
                         editButton={true}
                         onEditPress={editDetailsPressed}>
-
+                            <LocationField location={summary.location} />
                         </InformationTray>
 
                     <View style={{ height: 100 }} />
                 </ScrollView>
                 <TouchableOpacity
                     activeOpacity={0.8}
-                    style={[elements.capsuleButton, styles.createCalloutButton]}
+                    style={[elements.capsuleButton, styles.respondCalloutButton]}
                     onPress={() => respondToCallout()}>
                     <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>Respond</Text>
                 </TouchableOpacity>
+                <View style={styles.respondTray}>
+                    <CalloutRespond onCancel={() => console.log("cancel")} onSelect={responseSelected} />
+                </View>
             </View>
 
         </SafeAreaView>
@@ -121,9 +135,16 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingTop: 10,
     },
-    createCalloutButton: {
+    respondCalloutButton: {
         margin: 20,
         height: 60,
+        position: "absolute",
+        left: 0,
+        right: 0,
+        bottom: 0
+    },
+    respondTray: {
+        margin: 0,
         position: "absolute",
         left: 0,
         right: 0,

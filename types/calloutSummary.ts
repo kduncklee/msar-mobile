@@ -1,4 +1,5 @@
 import { ImageRequireSource } from "react-native";
+import { location } from "./location";
 import colors from "../styles/colors"
 import { calloutType, responseType } from "./enums"
 
@@ -8,7 +9,7 @@ export type calloutSummary = {
     type: calloutType,
     responder_count: number,
     timestamp?: Date,
-    location: string,
+    location: location,
     log_count: number,
     my_response?: responseType
 }

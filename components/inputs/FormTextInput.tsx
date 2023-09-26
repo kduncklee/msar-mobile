@@ -7,17 +7,15 @@ type FormTextInputProps = {
     title?: string,
     icon?: ImageRequireSource
     placeholder: string,
+    value?: string,
     rightButton?: ImageRequireSource,
     onRightPress?: (value: any) => void,
     onChange: (text: string) => void
 }
 
-const FormTextInput = ({ title, placeholder, icon, rightButton, onRightPress, onChange }: FormTextInputProps) => {
-
-    const [text, setText] = useState('');
+const FormTextInput = ({ title, placeholder, value, icon, rightButton, onRightPress, onChange }: FormTextInputProps) => {
 
     const textChanged = (text: string) => {
-        setText(text);
         onChange(text);
     }
 
@@ -37,7 +35,7 @@ const FormTextInput = ({ title, placeholder, icon, rightButton, onRightPress, on
                 <TextInput
                     style={[elements.fieldText, { flex: 1, padding: 8 }]}
                     onChangeText={textChanged}
-                    value={text}
+                    value={value}
                     returnKeyType='done'
                     onSubmitEditing={handleDoneButtonPress}
                     placeholder={placeholder}

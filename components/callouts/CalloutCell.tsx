@@ -3,6 +3,7 @@ import { calloutSummary, colorForResponseType, colorForType, imageForType, textF
 import { elements } from '../../styles/elements';
 import colors from '../../styles/colors';
 import { getTimeString } from '../../utility/dateHelper';
+import { locationToString } from '../../types/location';
 
 type CalloutCellProps = {
     summary: calloutSummary,
@@ -29,7 +30,7 @@ const CalloutCell = ({summary, onPress}: CalloutCellProps) => {
                         <Text style={[styles.responseText, {color: colorForResponseType(summary.my_response)}]}>{textForResponseType(summary.my_response)}</Text>
                     </View>
                     <View style={styles.contentMiddle}>
-                        <Text style={styles.locationText}>{summary.location}</Text>
+                        <Text style={styles.locationText}>{locationToString(summary.location)}</Text>
                         <Image source={require('assets/icons/forward_narrow.png')} style={styles.arrowImage} />
                     </View>
                     <View style={styles.contentBottom}>

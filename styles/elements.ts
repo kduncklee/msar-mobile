@@ -57,6 +57,11 @@ export const elements = StyleSheet.create({
         fontWeight: "300",
         color: colors.primaryText,
     },
+    smallText: {
+        fontSize: 12,
+        fontWeight: "300",
+        color: colors.primaryText,
+    },
     mediumText: {
         fontSize: 20,
         fontWeight: "400",
@@ -77,6 +82,11 @@ export const elements = StyleSheet.create({
         resizeMode: "contain",
         width: 20,
         height: 20
+    },
+    buttonIcon: {
+        resizeMode: "contain",
+        width: 30,
+        height: 30
     },
     informationDiv: {
         marginVertical: 8,

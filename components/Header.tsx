@@ -5,17 +5,26 @@ import { elements } from '../styles/elements';
 import { getTimeString } from '../utility/dateHelper';
 
 type HeaderProps = {
-    title: string;
-    backButton?: boolean;
-    timestamp?: Date;
+    title: string,
+    backButton?: boolean,
+    onBackPressed?: () => void,
+    timestamp?: Date
 }
 
-const Header = ({title, backButton = false, timestamp = null}: HeaderProps) => {
+const Header = ({title, backButton = false, onBackPressed, timestamp = null}: HeaderProps) => {
+
+    const backPressed = () => {
+        if (onBackPressed) {
+            onBackPressed();
+        } else {
+            router.back();
+        }
+    }
 
     return (
         <View style={styles.container}>
             {backButton && 
-                <TouchableOpacity activeOpacity={0.2} style={styles.backContainer} onPress={() => router.back()}>
+                <TouchableOpacity activeOpacity={0.2} style={styles.backContainer} onPress={() => backPressed()}>
                         <Image source={require('assets/icons/back.png')} style={styles.backImage}></Image>
                 </TouchableOpacity>
             }
