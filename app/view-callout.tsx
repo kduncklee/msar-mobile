@@ -14,6 +14,9 @@ import LocationField from '../components/fields/LocationField';
 import CalloutRespond from '../components/callouts/CalloutRespond';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, Easing } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import CalloutInformationTab from '../components/callouts/CalloutInformationTab';
+import CalloutLogTab from '../components/callouts/CalloutLogTab';
+import CalloutPersonnelTab from '../components/callouts/CalloutPersonnelTab';
 
 const Page = () => {
 
@@ -25,6 +28,7 @@ const Page = () => {
     const opacity = useSharedValue(0);
 
     const [modalVisible, setModalVisible] = useState(false);
+    const [currentTab, setCurrentTab] = useState(0);
 
     useEffect(() => {
         if (Platform.OS === 'ios') {
@@ -51,7 +55,7 @@ const Page = () => {
     }
 
     const tabChanged = (index: number) => {
-        console.log(index);
+        setCurrentTab(index);
     }
 
     const respondToCallout = () => {
@@ -68,10 +72,6 @@ const Page = () => {
         });
         opacity.value = withTiming(0, { duration: 500 });
 
-    }
-
-    const editDetailsPressed = () => {
-        console.log('edit details');
     }
 
     const responseSelected = (response: responseType) => {
@@ -101,63 +101,27 @@ const Page = () => {
                 <TabSelector tabs={['Information', 'Log', 'Personnel']} onTabChange={tabChanged} />
                 <View style={styles.contentContainer}>
                     <ScrollView style={styles.scrollView}>
-                        <InformationTray
-                            title={'Details'}
-                            titleBarColor={colors.red}
-                            editButton={true}
-                            onEditPress={editDetailsPressed}>
-                            <View style={{ marginTop: 8 }} />
-                            <InformationField
-                                title={'Status'}
-                                value={'Active'} />
-                            <View style={elements.informationDiv} />
-                            <InformationField
-                                title={'My Response'}
-                                value={textForResponseType(summary.my_response)}
-                                valueColor={colorForResponseType(summary.my_response)} />
-                            <View style={elements.informationDiv} />
-                            <InformationField
-                                title={'Type'}
-                                value={textForType(summary.type)} />
-                            <View style={elements.informationDiv} />
-                            <InformationField
-                                title={'Subject'}
-                                value={summary.subject} />
-                            <View style={elements.informationDiv} />
-                            <InformationField
-                                title={'Informant'}
-                                value={'John Doe'} />
-                            <InformationField
-                                value={'310-555-1223'}
-                                icon={require('../assets/icons/phone_yellow.png')}
-                                onIconPress={() => console.log('pressed icon')} />
-                            <View style={elements.informationDiv} />
-                            <InformationField
-                                title={'Radio Frequency'}
-                                value={'Malibu Metro'} />
-                            <View style={elements.informationDiv} />
-                            <TextAreaField
-                                title={'Circumstances'}
-                                value={'This is a test of a multiline piece of text that is very long and will go on to more lines than just one.'}
-                            />
-                            <View style={{ height: 10 }} />
-                        </InformationTray>
-                        <InformationTray
-                            title={'Location'}
-                            titleBarColor={colors.blue}
-                            editButton={true}
-                            onEditPress={editDetailsPressed}>
-                            <LocationField location={summary.location} />
-                        </InformationTray>
-
-                        <View style={{ height: 100 }} />
+                        {currentTab === 0 &&
+                            <CalloutInformationTab
+                                summary={summary} />
+                        }
+                        {currentTab === 1 &&
+                            <CalloutLogTab
+                                summary={summary} />
+                        }
+                        {currentTab === 2 &&
+                            <CalloutPersonnelTab
+                                summary={summary} />
+                        }
                     </ScrollView>
-                    <TouchableOpacity
-                        activeOpacity={0.8}
-                        style={[elements.capsuleButton, styles.respondCalloutButton]}
-                        onPress={() => respondToCallout()}>
-                        <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>Respond</Text>
-                    </TouchableOpacity>
+                    {currentTab === 0 &&
+                        <TouchableOpacity
+                            activeOpacity={0.8}
+                            style={[elements.capsuleButton, styles.respondCalloutButton]}
+                            onPress={() => respondToCallout()}>
+                            <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>Respond</Text>
+                        </TouchableOpacity>
+                    }
                 </View>
             </SafeAreaView>
             <Animated.View style={[styles.respondTray, trayAnimatedStyle]}>
@@ -166,7 +130,7 @@ const Page = () => {
             </Animated.View>
             {modalVisible &&
                 <Animated.View style={[styles.modalBackground, modalAnimatedStyle]}>
-                    <TouchableOpacity onPress={cancelRespondModal} style={{flex: 1}}/>
+                    <TouchableOpacity onPress={cancelRespondModal} style={{ flex: 1 }} />
                 </Animated.View>
             }
 

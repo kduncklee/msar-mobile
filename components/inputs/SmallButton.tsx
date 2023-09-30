@@ -13,15 +13,19 @@ type SmallButtonProps = {
 
 const SmallButton = ({ title, icon, backgroundColor, textColor, onPress}: SmallButtonProps) => {
 
+    let titlePaddingLeft = 12
+    if (icon) {
+        titlePaddingLeft = 0
+    }
     return (
         
             <TouchableOpacity activeOpacity={0.5} onPress={onPress}>
-                <View style={[styles.container, {backgroundColor: backgroundColor}]}>
+                <View style={[styles.container, {backgroundColor: backgroundColor, justifyContent: "center"}]}>
                 {icon &&
                     <Image source={icon} style={[elements.buttonIcon]} />
                 }
                 {title &&
-                    <Text style={[elements.fieldText, {color: textColor, paddingVertical: 8, paddingRight: 12, fontWeight: "400"}]}>{title}</Text>
+                    <Text style={[elements.fieldText, {color: textColor, paddingVertical: 8, paddingLeft: titlePaddingLeft ,paddingRight: 12, fontWeight: "400"}]}>{title}</Text>
                 }
                 </View>
             </TouchableOpacity>

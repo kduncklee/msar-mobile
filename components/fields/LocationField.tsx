@@ -54,7 +54,7 @@ const LocationField = ({ location }: LocationFieldProps) => {
                     </Text>
                     <View style={styles.buttonTray}>
                         <SmallButton
-                            title={'Navigate'}
+                            title={'Open Map'}
                             icon={require('../../assets/icons/navigation.png')}
                             backgroundColor={colors.blue}
                             textColor={colors.primaryText}

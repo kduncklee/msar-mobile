@@ -29,7 +29,11 @@ const TabSelector = ({tabs, onTabChange}: TabSelectorProps) => {
                     }
 
                     return (
-                        <TouchableOpacity key={index} activeOpacity={0.5} style={[styles.button,{ borderBottomColor: divColor, borderBottomWidth: 2}]} onPress={() => tabSelected(index)}>
+                        <TouchableOpacity
+                            key={index}
+                            activeOpacity={0.5}
+                            style={[styles.button,{ borderBottomColor: divColor, borderBottomWidth: 2}]}
+                            onPress={() => tabSelected(index)}>
                                 <Text style={[styles.buttonLabel,{color: textColor}]}>{tab}</Text>
                         </TouchableOpacity>
                     )

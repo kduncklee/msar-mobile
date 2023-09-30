@@ -10,7 +10,8 @@ const colors = {
     "blue": "#67ACED",
     "darkBlue": "#366087",
     "green": "#47C39A",
-    "lightText": "#E5F7F1"
+    "lightText": "#E5F7F1",
+    "clear": "#00000000"
 }
 
 export default colors;

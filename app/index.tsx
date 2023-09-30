@@ -1,76 +1,108 @@
-import { useEffect } from 'react';
-import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpacity, Text, View } from 'react-native';
-import Header from '../components/Header';
-import CalloutCell from '../components/callouts/CalloutCell';
-import { calloutSummary } from '../types/calloutSummary';
-import { calloutType, responseType } from '../types/enums';
+import { useEffect, useRef, useState } from 'react';
+import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, Image, View, KeyboardAvoidingView, Keyboard } from 'react-native';
 import colors from '../styles/colors';
-import TabSelector from '../components/TabSelector/TabSelector';
 import { elements } from '../styles/elements';
 import { router } from 'expo-router';
+import FormTextInput from '../components/inputs/FormTextInput';
+import SmallButton from '../components/inputs/SmallButton';
+import { apiGetToken } from '../remote/api';
+import { loginResponse } from '../remote/responses';
 
 const Page = () => {
 
+    const scrollViewRef = useRef(null);
+    const [username, setUsername] = useState('R07');
+    const [password, setPassword] = useState('L!u0fN*V^rcPe1hX')
+
     useEffect(() => {
         if (Platform.OS === 'ios') {
-            StatusBar.setBarStyle('light-content');
+            StatusBar.setBarStyle('dark-content');
         } else if (Platform.OS === 'android') {
             StatusBar.setBackgroundColor(colors.primaryBg);
         }
+
+        const keyboardDidShowListener = Keyboard.addListener(
+            'keyboardDidShow',
+            () => {
+                if (scrollViewRef) {
+                    scrollViewRef.current.scrollToEnd({ animated: true })
+                }
+            }
+        );
+
     }, []);
 
-    let summary: calloutSummary = {
-        id: 1,
-        subject: "Missing Hiker",
-        type: calloutType.SEARCH,
-        responder_count: 3,
-        timestamp: new Date(),
-        location: {
-            description: "1234 Main Street"
-        },
-        log_count: 12,
-        my_response: responseType.TEN8
+    const usernameChanged = (text: string) => {
+        setUsername(text);
     }
 
-
-    const tabChanged = (index: number) => {
-        console.log(index);
+    const passwordChanged = (text: string) => {
+        setPassword(text);
     }
 
-    const createCallout = () => {
-        router.push({ pathname: 'edit-callout', params: {} })
-    }
+    const login = async () => {
 
-    const viewCallout = (calloutSummary: calloutSummary) => {
-        router.push({ pathname: 'view-callout', params: { callout: calloutSummary.id } })
+        const response: loginResponse = await apiGetToken(username,password);
+        if (response.non_field_errors) {
+            let errorString: string = response.non_field_errors.join('\n');
+            alert('Problem logging in: \n' + errorString);
+        }
     }
 
     return (
-        <SafeAreaView style={styles.container}>
-            <Header title="Callouts" />
-            <TabSelector tabs={['Active', 'Archived']} onTabChange={tabChanged} />
-            <View style={styles.contentContainer}>
-                <ScrollView style={styles.scrollView}>
-                    <CalloutCell summary={summary} onPress={viewCallout} />
-                    <CalloutCell summary={summary} onPress={viewCallout} />
-                    <View style={{ height: 100 }} />
-                </ScrollView>
-                <TouchableOpacity
-                    activeOpacity={0.8}
-                    style={[elements.capsuleButton, styles.createCalloutButton]}
-                    onPress={() => createCallout()}>
-                    <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>Create Callout</Text>
-                </TouchableOpacity>
-            </View>
+        <>
+            <Image source={require('../assets/background.png')} style={styles.backgroundImage} />
+            <SafeAreaView style={styles.container}>
+                <KeyboardAvoidingView
+                    style={styles.contentContainer}
+                    behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                    keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -500} // Adjust the offset as needed
+                >
+                    <ScrollView 
+                        style={styles.scrollView}
+                        ref={scrollViewRef}>
+                        <Image source={require('../assets/msar_logo.png')} style={styles.logoImage} />
+                        <View style={[elements.tray, { padding: 20, margin: 20 }]}>
+                            <FormTextInput
+                                title={'Username'}
+                                icon={require('../assets/icons/user.png')}
+                                value={username}
+                                onChange={usernameChanged}
+                                placeholder={'Username'} />
+                            <FormTextInput
+                                title={'Password'}
+                                icon={require('../assets/icons/lock.png')}
+                                value={password}
+                                onChange={passwordChanged}
+                                placeholder={'Password'} />
+                            <View style={styles.buttonTray}>
+                                <SmallButton
+                                    title={'Login'}
+                                    backgroundColor={colors.yellow}
+                                    textColor={colors.black}
+                                    onPress={() => login()} />
+                            </View>
+                        </View>
+                    </ScrollView>
+                </KeyboardAvoidingView>
+            </SafeAreaView>
 
-        </SafeAreaView>
+        </>
     )
 }
 
 const styles = StyleSheet.create({
+    backgroundImage: {
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        zIndex: 1,
+        resizeMode: "cover"
+    },
     container: {
         flex: 1,
-        backgroundColor: colors.primaryBg
+        backgroundColor: colors.clear,
+        zIndex: 2
     },
     contentContainer: {
         flex: 1,
@@ -80,13 +112,17 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingTop: 10,
     },
-    createCalloutButton: {
+    logoImage: {
         margin: 20,
-        height: 60,
-        position: "absolute",
-        left: 0,
-        right: 0,
-        bottom: 0
+        alignSelf: "center",
+        width: 300,
+        height: 300,
+        resizeMode: "contain"
+    },
+    buttonTray: {
+        marginTop: 20,
+        width: 120,
+        alignSelf: "flex-end"
     }
 })
 

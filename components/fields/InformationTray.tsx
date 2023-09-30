@@ -7,17 +7,21 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 type InformationTrayProps = {
     title: string,
     titleBarColor: string,
+    titleTextColor?: string,
     editButton?: boolean,
     onEditPress?: () => void,
+    count?: number,
     children: React.ReactNode
 }
 
-const InformationTray = ({ title, titleBarColor, editButton, onEditPress, children }: InformationTrayProps) => {
+const InformationTray = ({ title, titleBarColor, titleTextColor, editButton, onEditPress, count, children }: InformationTrayProps) => {
+
+    var titleColor = titleTextColor ? titleTextColor : colors.primaryText;
 
     return (
         <View style={[elements.tray, {overflow: "hidden", margin: 20}]}>
             <View style={[styles.titleBar, { backgroundColor: titleBarColor }]}>
-                <Text style={styles.titleText}>
+                <Text style={[styles.titleText, {color: titleColor}]}>
                     {title}
                 </Text>
                 {onEditPress &&
@@ -25,6 +29,9 @@ const InformationTray = ({ title, titleBarColor, editButton, onEditPress, childr
                         {editButton == true &&
                             <Image source={require('../../assets/icons/pencil.png')} style={styles.editImage} />}
                     </TouchableOpacity>
+                }
+                {count &&
+                    <Text style={{color: titleColor, fontSize: 16, fontWeight: "500", marginRight: 8}}>{count}</Text>
                 }
             </View>
             {children}
