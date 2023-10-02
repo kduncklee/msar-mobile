@@ -1,17 +1,26 @@
 import { ImageRequireSource } from "react-native";
 import { location } from "./location";
 import colors from "../styles/colors"
-import { calloutType, responseType } from "./enums"
+import { calloutType, responseType, calloutStatus } from "./enums"
+import { respondedItem } from "./respondedItem";
+import { Type } from "typescript";
 
 export type calloutSummary = {
     id: number,
-    subject: string,
     type: calloutType,
-    responder_count: number,
-    timestamp?: Date,
-    location: location,
-    log_count: number,
+    title?: string,
+    description?: string,
+    radio_channel?: string,
+    resolution?: string,
     my_response?: responseType
+    responded?: respondedItem[]
+    timestamp: Date,
+    location: location,
+    status?: calloutStatus,
+
+    subject?: string,
+    responder_count?: number,
+    log_count?: number,
 }
 
 export const colorForType = (type: calloutType): string => {
@@ -88,4 +97,24 @@ export const textForResponseType = (type?: responseType): string => {
         case responseType.TEN22:
             return "10-22";
     }
+}
+
+export const processCalloutSummary = (data: any): calloutSummary => {
+
+    const summary: calloutSummary = {
+        id: data.id,
+        type: data.operation_type as calloutType,
+        title: data.title,
+        description: data.description,
+        radio_channel: data.radio_channel,
+        my_response: data.my_response as responseType,
+        resolution: data.resolution,
+        responded: data.responded as respondedItem[],
+        timestamp: new Date(data.created_at),
+        location: data.location as location,
+        status: data.status as calloutStatus
+    }
+
+    return summary
+
 }

@@ -125,7 +125,7 @@ const Page = () => {
                 </View>
             </SafeAreaView>
             <Animated.View style={[styles.respondTray, trayAnimatedStyle]}>
-                <View style={{ flex: 1, backgroundColor: "#ff0000" }} />
+                <View style={{ flex: 1}} />
                 <CalloutRespond onCancel={cancelRespondModal} onSelect={responseSelected} />
             </Animated.View>
             {modalVisible &&

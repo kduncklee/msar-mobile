@@ -1,14 +1,14 @@
 export enum calloutType {
-    SEARCH,
-    RESCUE,
-    INFORMATION
+    SEARCH = "search",
+    RESCUE = "rescue",
+    INFORMATION = "information"
 }
 
 export enum responseType {
-    TEN7,
-    TEN8,
-    TEN19,
-    TEN22,
+    TEN7 = "10-7",
+    TEN8 = "10-8",
+    TEN19 = "10-19",
+    TEN22 = "10-22",
 }
 
 export enum locationType {
@@ -23,6 +23,12 @@ export enum logType {
     MESSAGE_SELF,
     MESSAGE,
     MESSAGE_SYSTEM
+}
+
+export enum calloutStatus {
+    ACTIVE = "active",
+    RESOLVED = "resolved",
+    ARCHIVED = "archived"
 }
 
 export const isLogType = (object: any): boolean => {

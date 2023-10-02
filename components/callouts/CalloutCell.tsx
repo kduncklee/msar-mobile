@@ -2,8 +2,9 @@ import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
 import { calloutSummary, colorForResponseType, colorForType, imageForType, textForResponseType } from '../../types/calloutSummary';
 import { elements } from '../../styles/elements';
 import colors from '../../styles/colors';
-import { getTimeString } from '../../utility/dateHelper';
+import { getLongTimeString } from '../../utility/dateHelper';
 import { locationToString } from '../../types/location';
+import { respondedItem } from '../../types/respondedItem';
 
 type CalloutCellProps = {
     summary: calloutSummary,
@@ -16,26 +17,40 @@ const CalloutCell = ({summary, onPress}: CalloutCellProps) => {
         onPress(summary);
     }
 
+    const calculateResponseCount = (): number => {
+        if (!summary.responded) {
+            return 0;
+        }
+
+        var total = 0;
+        let responded = summary.responded as respondedItem[]
+        responded.forEach((item: respondedItem) => {
+            total += item.total;
+        })
+
+        return total;
+    }
+
     return (
         <TouchableOpacity activeOpacity={0.5} onPress={cellPressed}>
             <View style={[elements.tray,styles.container]}>
                 <View style={[styles.sideBar, {backgroundColor: colorForType(summary.type)}]}>
                     <Image source={imageForType(summary.type)} style={styles.sideBarImage} />
                     <View style={styles.sideBarDiv} />
-                    <Text style={styles.sideBarNumber}>{summary.responder_count}</Text>
+                    <Text style={styles.sideBarNumber}>{calculateResponseCount()}</Text>
                 </View>
                 <View style={styles.contentBar}>
                     <View style={styles.contentTop}>
-                        <Text style={styles.subjectText}>{summary.subject}</Text>
+                        <Text style={styles.subjectText} numberOfLines={1} ellipsizeMode='tail'>{summary.title}</Text>
                         <Text style={[styles.responseText, {color: colorForResponseType(summary.my_response)}]}>{textForResponseType(summary.my_response)}</Text>
                     </View>
                     <View style={styles.contentMiddle}>
-                        <Text style={styles.locationText}>{locationToString(summary.location)}</Text>
+                        <Text style={styles.locationText} numberOfLines={1} ellipsizeMode='tail'>{locationToString(summary.location)}</Text>
                         <Image source={require('assets/icons/forward_narrow.png')} style={styles.arrowImage} />
                     </View>
                     <View style={styles.contentBottom}>
                         <View style={[elements.capsule]}>
-                            <Text style={elements.smallYellowText}>{getTimeString(summary.timestamp)}</Text>
+                            <Text style={elements.smallYellowText}>{getLongTimeString(summary.timestamp)}</Text>
                         </View>
                         <View style={[elements.capsule, { marginLeft: 10}]}>
                             <Image source={require('assets/icons/log_yellow.png')} style={styles.logImage} />
@@ -81,8 +96,7 @@ const styles = StyleSheet.create({
     },
     contentBar: {
         flex: 1,
-        flexDirection: "column",
-        
+        flexDirection: "column"
     },
     contentTop: {
         flexDirection: "row",
@@ -97,7 +111,8 @@ const styles = StyleSheet.create({
     responseText: {
         fontSize: 12,
         fontWeight: "600",
-        marginRight: 24
+        marginLeft: 4,
+        marginRight: 20
     },
     contentMiddle: {
         flexDirection: "row",

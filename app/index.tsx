@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, Image, View, KeyboardAvoidingView, Keyboard } from 'react-native';
+import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, Image, View, KeyboardAvoidingView, Keyboard, Alert } from 'react-native';
 import colors from '../styles/colors';
 import { elements } from '../styles/elements';
 import { router } from 'expo-router';
@@ -7,12 +7,15 @@ import FormTextInput from '../components/inputs/FormTextInput';
 import SmallButton from '../components/inputs/SmallButton';
 import { apiGetToken } from '../remote/api';
 import { loginResponse } from '../remote/responses';
+import { storeCredentials } from '../storage/storage';
+import ActivityModal from '../components/modals/ActivityModal';
 
 const Page = () => {
 
     const scrollViewRef = useRef(null);
     const [username, setUsername] = useState('R07');
     const [password, setPassword] = useState('L!u0fN*V^rcPe1hX')
+    const [showSpinner, setShowSpinner] = useState(false);
 
     useEffect(() => {
         if (Platform.OS === 'ios') {
@@ -41,12 +44,24 @@ const Page = () => {
     }
 
     const login = async () => {
+        setShowSpinner(true);
 
         const response: loginResponse = await apiGetToken(username,password);
+        setShowSpinner(false);
         if (response.non_field_errors) {
             let errorString: string = response.non_field_errors.join('\n');
-            alert('Problem logging in: \n' + errorString);
+            Alert.alert('Problem logging in', errorString, [
+                {text: 'OK'},
+              ]);
+            return
         }
+
+        if (response.token) {
+            await storeCredentials(username, response.token);
+            router.push('callout-list');
+        }
+
+
     }
 
     return (
@@ -86,7 +101,9 @@ const Page = () => {
                     </ScrollView>
                 </KeyboardAvoidingView>
             </SafeAreaView>
-
+            {showSpinner &&
+                <ActivityModal message={"Logging in..."} />
+            }
         </>
     )
 }
