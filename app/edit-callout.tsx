@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpacity, Text, View, KeyboardAvoidingView } from 'react-native';
+import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpacity, Text, View, KeyboardAvoidingView, Alert } from 'react-native';
 import Header from '../components/Header';
 import colors from '../styles/colors';
 import { elements } from '../styles/elements';
@@ -11,7 +11,7 @@ import FormTextArea from '../components/inputs/FormTextArea';
 import FormCheckbox from '../components/inputs/FormCheckbox';
 
 const Page = () => {
-    
+
 
     const [ten22, setTen22] = useState(false);
     const [locationText, setLocationText] = useState('');
@@ -23,15 +23,15 @@ const Page = () => {
     }
 
 
-    const {callout} = useLocalSearchParams();
-    const {location} = useGlobalSearchParams();
+    const { callout } = useLocalSearchParams();
+    const { location } = useGlobalSearchParams();
     var calloutId: number = null;
     var headerTitle: string = "Create Callout";
 
     let callOutTypeSelect = [
         { label: "Search", enum: calloutType.SEARCH, value: '0' },
         { label: "Rescue", enum: calloutType.RESCUE, value: '1' },
-        { label: "Information", enum: calloutType.INFORMATION, value: '2' }
+        { label: "Information Only", enum: calloutType.INFORMATION, value: '2' }
     ]
 
     let radioFrequencySelect = [
@@ -57,13 +57,33 @@ const Page = () => {
 
     useEffect(() => {
         if (location) {
-          console.log(location);
-          router.back();
-          setLocationText(`${location}`);
+            console.log(location);
+            router.back();
+            setLocationText(`${location}`);
         }
-      }, [location]);
+    }, [location]);
+
+    const createCalloutPressed = () => {
+
+        if (ten22) {
+            Alert.alert('Confirm 10-22', "Are you sure you want to mark this callout 10-22?", [
+                {
+                    text: 'Yes',
+                    onPress: () => createCallout(),
+                    style: "destructive"
+                },
+                {
+                    text: 'No',
+                    style: "cancel"
+                }
+            ]);
+        } else {
+            createCallout();
+        }
+    }
 
     const createCallout = () => {
+        console.log('create call out');
 
     }
 
@@ -88,6 +108,10 @@ const Page = () => {
     }
 
     const informantContactChanged = (text: string) => {
+        console.log(text);
+    }
+
+    const subjectContactChanged = (text: string) => {
         console.log(text);
     }
 
@@ -132,6 +156,10 @@ const Page = () => {
                         onChange={subjectChanged}
                         placeholder='Subject' />
                     <FormTextInput
+                        icon={require('../assets/icons/phone.png')}
+                        onChange={subjectContactChanged}
+                        placeholder='Subject Contact' />
+                    <FormTextInput
                         title={'Informant'}
                         onChange={informantChanged}
                         placeholder='Informant' />
@@ -145,7 +173,7 @@ const Page = () => {
                         onChange={informantContactChanged}
                         placeholder='Circumstances' />
                     <DropdownSelector
-                        title={'Radio Frequency'}
+                        title={'Tactical Talkgroup'}
                         options={radioFrequencySelect}
                         placeholder={'Select Frequency'}
                         onSelect={radioFreqSelected} />
@@ -162,10 +190,10 @@ const Page = () => {
                     <TouchableOpacity
                         activeOpacity={0.8}
                         style={[elements.capsuleButton, styles.submitCalloutButton]}
-                        onPress={() => createCallout()}>
+                        onPress={() => createCalloutPressed()}>
                         <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>{headerTitle}</Text>
                     </TouchableOpacity>
-                    <View style={{height: 40}} />
+                    <View style={{ height: 40 }} />
                 </ScrollView>
             </KeyboardAvoidingView>
         </SafeAreaView>

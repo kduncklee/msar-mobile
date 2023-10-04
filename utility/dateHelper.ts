@@ -37,3 +37,27 @@ export const getLongTimeString = (date: Date): string => {
 
     return formattedDateTime;
 }
+
+export const getFullTimeString = (date: Date): string => {
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based, so add 1 and pad with '0'
+    const day = date.getDate().toString().padStart(2, '0'); // Pad with '0'
+    const year = date.getFullYear();
+
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+
+    // Determine AM or PM
+    const amOrPm = hours >= 12 ? 'PM' : 'AM';
+
+    // Convert hours to 12-hour format
+    const formattedHours = (hours % 12) || 12; // Handle midnight (0) as 12
+
+    // Format the date as "MM/DD/yyyy" and time as "hh:mm a"
+    const formattedDate = `${month}/${day}/${year}`;
+    const formattedTime = `${formattedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${amOrPm}`;
+
+    // Concatenate date and time with the desired format
+    const formattedDateTime = `${formattedDate} - ${formattedTime}`;
+
+    return formattedDateTime;
+}

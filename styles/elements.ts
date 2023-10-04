@@ -98,4 +98,20 @@ export const elements = StyleSheet.create({
         backgroundColor: colors.darkBlue,
         borderRadius: 8
     },
+    tabBadge: {
+        marginLeft: 8,
+        paddingHorizontal: 4,
+        height: 18,
+        width: "auto",
+        borderRadius: 4,
+        alignItems: "center",
+        justifyContent: "center"
+    },
+    tabBadgeText: {
+        fontSize: 10,
+        fontWeight: "600",
+        textAlign: "center",
+        textAlignVertical: "center"
+    }
+
 })

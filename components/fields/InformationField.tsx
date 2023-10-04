@@ -23,13 +23,16 @@ const InformationField = ({ title, value, valueColor, icon, onIconPress }: Infor
             }
             <View style={styles.valueContainer}>
                 {onIconPress &&
-                    <TouchableOpacity activeOpacity={0.5} onPress={onIconPress}>
+                    <TouchableOpacity activeOpacity={0.5} onPress={onIconPress} style={styles.button}>
                         {icon &&
                             <Image source={icon} style={styles.iconImage} />
                         }
+                        <Text style={[styles.valueText, {color: textColor}]}>{value}</Text>
                     </TouchableOpacity>
                 }
-                <Text style={[styles.valueText, {color: textColor}]}>{value}</Text>
+                {!onIconPress &&
+                    <Text style={[styles.valueText, {color: textColor}]}>{value}</Text>
+                }
             </View>
         </View>
     );
@@ -59,6 +62,10 @@ const styles = StyleSheet.create({
         textAlign: "right",
         fontWeight: "400",
         color: colors.secondaryYellow
+    },
+    button: {
+        flexDirection: "row",
+        alignItems: "center"
     },
     iconButton: {
         height: 40,

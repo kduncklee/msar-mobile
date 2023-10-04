@@ -1,13 +1,15 @@
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { useState } from 'react';
 import colors from '../../styles/colors';
+import { tabItem } from '../../types/tabItem';
+import { elements } from '../../styles/elements';
 
 type TabSelectorProps = {
-    tabs: string[],
+    tabs: tabItem[],
     onTabChange: (values: any) => void
 }
 
-const TabSelector = ({tabs, onTabChange}: TabSelectorProps) => {
+const TabSelector = ({ tabs, onTabChange }: TabSelectorProps) => {
 
     const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -19,10 +21,19 @@ const TabSelector = ({tabs, onTabChange}: TabSelectorProps) => {
     return (
         <View style={styles.container}>
             {
-                tabs.map((tab: string, index: number) => {
+                tabs.map((tab: tabItem, index: number) => {
 
                     var textColor: string = colors.grayText;
                     var divColor: string = colors.grayText;
+                    var badgeColor: string = colors.green;
+                    var badgeTextColor: string = colors.lightText;
+                    if (tab.badgeColor) {
+                        badgeColor = tab.badgeColor;
+                    }
+                    if (tab.badgeTextColor) {
+                        badgeTextColor = tab.badgeTextColor;
+                    }
+
                     if (index === selectedIndex) {
                         textColor = colors.yellow;
                         divColor = colors.yellow;
@@ -32,9 +43,14 @@ const TabSelector = ({tabs, onTabChange}: TabSelectorProps) => {
                         <TouchableOpacity
                             key={index}
                             activeOpacity={0.5}
-                            style={[styles.button,{ borderBottomColor: divColor, borderBottomWidth: 2}]}
+                            style={[styles.button, { borderBottomColor: divColor, borderBottomWidth: 2 }]}
                             onPress={() => tabSelected(index)}>
-                                <Text style={[styles.buttonLabel,{color: textColor}]}>{tab}</Text>
+                            <Text style={[styles.buttonLabel, { color: textColor }]}>{tab.title}</Text>
+                            {tab.badge &&
+                                <View style={[elements.tabBadge, {backgroundColor: badgeColor}]}>
+                                    <Text style={[elements.tabBadgeText, {color: badgeTextColor}]}>{tab.badge}</Text>
+                                </View>
+                            }
                         </TouchableOpacity>
                     )
                 })
@@ -50,12 +66,14 @@ const styles = StyleSheet.create({
         marginHorizontal: 0,
         marginTop: 10,
         overflow: "hidden",
-        
+
     },
     button: {
         flex: 1,
+        flexDirection: "row",
         alignContent: "center",
-        justifyContent: "center"
+        justifyContent: "center",
+        alignItems: "center"
     },
     buttonLabel: {
         fontSize: 16,

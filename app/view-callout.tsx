@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CalloutInformationTab from '../components/callouts/CalloutInformationTab';
 import CalloutLogTab from '../components/callouts/CalloutLogTab';
 import CalloutPersonnelTab from '../components/callouts/CalloutPersonnelTab';
+import { tabItem } from '../types/tabItem';
 
 const Page = () => {
 
@@ -29,6 +30,22 @@ const Page = () => {
 
     const [modalVisible, setModalVisible] = useState(false);
     const [currentTab, setCurrentTab] = useState(0);
+
+    const tabs: tabItem[] = [
+        {
+            title: "Information"
+        },
+        {
+            title: "Log",
+            badge: 64,
+            badgeColor: colors.red
+        },
+        {
+            title: "Personnel",
+            badge: 4,
+            badgeColor: colors.green
+        }
+    ]
 
     useEffect(() => {
         if (Platform.OS === 'ios') {
@@ -98,7 +115,7 @@ const Page = () => {
         <>
             <SafeAreaView style={styles.container}>
                 <Header title={summary.subject} backButton={true} timestamp={new Date()} />
-                <TabSelector tabs={['Information', 'Log', 'Personnel']} onTabChange={tabChanged} />
+                <TabSelector tabs={tabs} onTabChange={tabChanged} />
                 <View style={styles.contentContainer}>
                     <ScrollView style={styles.scrollView}>
                         {currentTab === 0 &&

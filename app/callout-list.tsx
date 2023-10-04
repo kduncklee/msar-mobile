@@ -10,6 +10,7 @@ import { elements } from '../styles/elements';
 import { router } from 'expo-router';
 import { apiGetCallouts } from '../remote/api';
 import ActivityModal from '../components/modals/ActivityModal';
+import { tabItem } from '../types/tabItem';
 
 const Page = () => {
 
@@ -17,6 +18,16 @@ const Page = () => {
     const [activeCalloutList, setActiveCalloutList] = useState<calloutSummary[]>([]);
     const [archivedCalloutList, setArchivedCalloutList] = useState<calloutSummary[]>([]);
 
+    const tabs: tabItem[] = [
+        {
+            title: "Active"
+        },
+        {
+            title: "Archive",
+            badge: 64,
+            badgeColor: colors.red
+        }
+    ]
     var status: string = "active";
 
 
@@ -84,7 +95,7 @@ const Page = () => {
         <>
             <SafeAreaView style={styles.container}>
                 <Header title="Callouts" />
-                <TabSelector tabs={['Active', 'Archived']} onTabChange={tabChanged} />
+                <TabSelector tabs={tabs} onTabChange={tabChanged} />
                 <View style={styles.contentContainer}>
                     <ScrollView style={styles.scrollView}>
                         {

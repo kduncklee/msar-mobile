@@ -10,6 +10,7 @@ import CalloutRespond from '../callouts/CalloutRespond';
 import colors from '../../styles/colors';
 import { elements } from '../../styles/elements';
 import { textForResponseType, colorForResponseType, textForType } from '../../types/calloutSummary';
+import { getFullTimeString } from '../../utility/dateHelper';
 
 type CalloutInformationTabProps = {
     summary: calloutSummary
@@ -30,13 +31,8 @@ const CalloutInformationTab = ({ summary }: CalloutInformationTabProps) => {
                 onEditPress={editDetailsPressed}>
                 <View style={{ marginTop: 8 }} />
                 <InformationField
-                    title={'Status'}
-                    value={'Active'} />
-                <View style={elements.informationDiv} />
-                <InformationField
-                    title={'My Response'}
-                    value={textForResponseType(summary.my_response)}
-                    valueColor={colorForResponseType(summary.my_response)} />
+                    title={'Time of Dispatch'}
+                    value={getFullTimeString(summary.timestamp)} />
                 <View style={elements.informationDiv} />
                 <InformationField
                     title={'Type'}
@@ -55,8 +51,15 @@ const CalloutInformationTab = ({ summary }: CalloutInformationTabProps) => {
                     onIconPress={() => console.log('pressed icon')} />
                 <View style={elements.informationDiv} />
                 <InformationField
-                    title={'Radio Frequency'}
+                    title={'Tactical Callgroup'}
                     value={'Malibu Metro'} />
+                <InformationField
+                    title={'Notifications Made'}
+                    value={'LAHS Desk, Fire'} />
+                <View style={elements.informationDiv} />
+                <InformationField
+                    title={'Handling Unit / Tag #'}
+                    value={'1234'} />
                 <View style={elements.informationDiv} />
                 <TextAreaField
                     title={'Circumstances'}
@@ -71,6 +74,28 @@ const CalloutInformationTab = ({ summary }: CalloutInformationTabProps) => {
                 onEditPress={editDetailsPressed}>
                 <LocationField location={summary.location} />
             </InformationTray>
+            <InformationTray
+                title={'Additional Information'}
+                titleBarColor={colors.secondaryYellow}
+                titleTextColor={colors.black}
+                editButton={true}
+                onEditPress={editDetailsPressed}>
+                <View style={{ marginTop: 8 }} />
+                <InformationField
+                    title={'Status'}
+                    value={'Active'} />
+                <View style={elements.informationDiv} />
+                <InformationField
+                    title={'My Response'}
+                    value={textForResponseType(summary.my_response)}
+                    valueColor={colorForResponseType(summary.my_response)} />
+                <View style={elements.informationDiv} />
+                <InformationField
+                    title={'Callout Created by'}
+                    value={'Michael Johnson'} />
+                <View style={{ height: 10 }} />
+            </InformationTray>
+
             <View style={{ height: 100 }} />
         </>
     );
