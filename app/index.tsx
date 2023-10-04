@@ -89,7 +89,8 @@ const Page = () => {
                                 icon={require('../assets/icons/lock.png')}
                                 value={password}
                                 onChange={passwordChanged}
-                                placeholder={'Password'} />
+                                placeholder={'Password'}
+                                secure={true} />
                             <View style={styles.buttonTray}>
                                 <SmallButton
                                     title={'Login'}

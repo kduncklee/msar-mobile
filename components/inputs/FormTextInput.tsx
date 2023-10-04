@@ -9,11 +9,12 @@ type FormTextInputProps = {
     placeholder: string,
     value?: string,
     rightButton?: ImageRequireSource,
+    secure?: boolean,
     onRightPress?: (value: any) => void,
     onChange: (text: string) => void
 }
 
-const FormTextInput = ({ title, placeholder, value, icon, rightButton, onRightPress, onChange }: FormTextInputProps) => {
+const FormTextInput = ({ title, placeholder, value, icon, rightButton, onRightPress, onChange, secure=false }: FormTextInputProps) => {
 
     const textChanged = (text: string) => {
         onChange(text);
@@ -39,7 +40,8 @@ const FormTextInput = ({ title, placeholder, value, icon, rightButton, onRightPr
                     returnKeyType='done'
                     onSubmitEditing={handleDoneButtonPress}
                     placeholder={placeholder}
-                    placeholderTextColor={colors.grayText} />
+                    placeholderTextColor={colors.grayText}
+                    secureTextEntry={secure} />
                 {onRightPress &&
                     <TouchableOpacity
                         activeOpacity={0.8}
