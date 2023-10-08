@@ -18,6 +18,7 @@ import CalloutInformationTab from '../components/callouts/CalloutInformationTab'
 import CalloutLogTab from '../components/callouts/CalloutLogTab';
 import CalloutPersonnelTab from '../components/callouts/CalloutPersonnelTab';
 import { tabItem } from '../types/tabItem';
+import LogInput from '../components/callouts/LogInput';
 
 const Page = () => {
 
@@ -30,6 +31,8 @@ const Page = () => {
 
     const [modalVisible, setModalVisible] = useState(false);
     const [currentTab, setCurrentTab] = useState(0);
+
+    const [logMessageText, setLogMessageText] = useState('');
 
     const tabs: tabItem[] = [
         {
@@ -97,6 +100,10 @@ const Page = () => {
         cancelRespondModal();
     }
 
+    const onLogMessageTextChanged = (text: string) => {
+        setLogMessageText(text);
+    }
+
     const trayAnimatedStyle = useAnimatedStyle(() => {
 
         return {
@@ -138,6 +145,13 @@ const Page = () => {
                             onPress={() => respondToCallout()}>
                             <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>Respond</Text>
                         </TouchableOpacity>
+                    }
+                    {currentTab === 1 &&
+                        <LogInput
+                            onTextChange={onLogMessageTextChanged}
+                            text={logMessageText}
+                            onSendPress={ () => console.log('send')}
+                            onPhotoPress={ () => console.log('photo')} />
                     }
                 </View>
             </SafeAreaView>

@@ -51,7 +51,7 @@ const CalloutInformationTab = ({ summary }: CalloutInformationTabProps) => {
                     onIconPress={() => console.log('pressed icon')} />
                 <View style={elements.informationDiv} />
                 <InformationField
-                    title={'Tactical Callgroup'}
+                    title={'Tactical Talkgroup'}
                     value={'Malibu Metro'} />
                 <InformationField
                     title={'Notifications Made'}

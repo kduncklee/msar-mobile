@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown'
+import { MultiSelect } from 'react-native-element-dropdown'
 import { elements } from '../../styles/elements';
 import colors from '../../styles/colors'
 
@@ -13,15 +13,15 @@ type DropdownMultiselectProps = {
 
 const DropdownMultiselect = ({ title, options, placeholder, onSelect }: DropdownMultiselectProps) => {
 
-    const [value, setValue] = useState(null);
+    const [selected, setSelected] = useState([]);
 
     return (
         <View style={styles.container}>
             {title &&
                 <Text style={elements.fieldTitle}>{title}</Text>
             }
-            <View style={elements.inputContainer}>
-                <Dropdown
+            <View style={[elements.inputContainer, {flexDirection: "column", paddingHorizontal: 8}]}>
+                <MultiSelect
                     style={[styles.dropdown]}
                     placeholderStyle={elements.fieldPlaceholder}
                     selectedTextStyle={elements.fieldText}
@@ -31,13 +31,14 @@ const DropdownMultiselect = ({ title, options, placeholder, onSelect }: Dropdown
                     labelField="label"
                     valueField="value"
                     placeholder={placeholder}
-                    value={value}
+                    value={selected}
                     containerStyle={{ overflow: "hidden", borderRadius: 8, borderColor: colors.grayText, borderWidth: 1, backgroundColor: colors.secondaryBg }}
                     itemContainerStyle={{ backgroundColor: colors.primaryBg }}
                     activeColor={colors.secondaryBg}
                     itemTextStyle={{ color: colors.primaryText }}
+                    selectedStyle={styles.selectedStyle}
                     onChange={item => {
-                        setValue(item.value);
+                        setSelected(item);
                         onSelect(item);
                     }} />
             </View>
@@ -52,13 +53,16 @@ const styles = StyleSheet.create({
     },
     dropdown: {
         flex: 1,
-        height: 40,
+        height: "auto",
         paddingHorizontal: 8,
     },
     iconStyle: {
         width: 20,
         height: 20,
     },
+    selectedStyle: {
+        borderRadius: 16
+    }
 });
 
 export default DropdownMultiselect;

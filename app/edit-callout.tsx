@@ -9,19 +9,14 @@ import DropdownSelector from '../components/inputs/DropdownSelector';
 import FormTextInput from '../components/inputs/FormTextInput';
 import FormTextArea from '../components/inputs/FormTextArea';
 import FormCheckbox from '../components/inputs/FormCheckbox';
+import DropdownMultiselect from '../components/inputs/DropdownMultiselect';
+import "../storage/global"
 
 const Page = () => {
 
 
     const [ten22, setTen22] = useState(false);
     const [locationText, setLocationText] = useState('');
-
-    if (Platform.OS === 'ios') {
-        StatusBar.setBarStyle('light-content');
-    } else if (Platform.OS === 'android') {
-        StatusBar.setBackgroundColor(colors.primaryBg);
-    }
-
 
     const { callout } = useLocalSearchParams();
     const { location } = useGlobalSearchParams();
@@ -41,6 +36,16 @@ const Page = () => {
         { label: "MRA MAL", value: '3' }
     ]
 
+    let notificationSelect = [
+        { label: "LAHS Desk", value: '0'},
+        { label: "Fire", value: '1'},
+        { label: "State Parks", value: '2'},
+        { label: "NPS", value: '3'},
+        { label: "MRCA", value: '4'},
+        { label: "CHP", value: '5'},
+        { label: "Drone Requested", value: '6'}
+    ]
+
     if (callout && typeof callout === 'string') {
         //console.log(callout);
         calloutId = parseInt(callout, 10);
@@ -53,11 +58,13 @@ const Page = () => {
         } else if (Platform.OS === 'android') {
             StatusBar.setBackgroundColor(colors.primaryBg);
         }
+
+        global.selectedLocation = null;
+
     }, []);
 
     useEffect(() => {
         if (location) {
-            console.log(location);
             router.back();
             setLocationText(`${location}`);
         }
@@ -119,6 +126,10 @@ const Page = () => {
         console.log(item.label);
     }
 
+    const notificationsSelected = (item: any) => {
+        console.log(item);
+    }
+
     const on1022Toggle = (checked: boolean) => {
         setTen22(checked);
         if (!checked) {
@@ -177,6 +188,11 @@ const Page = () => {
                         options={radioFrequencySelect}
                         placeholder={'Select Frequency'}
                         onSelect={radioFreqSelected} />
+                    <DropdownMultiselect
+                        title={'Notifications Made'}
+                        options={notificationSelect}
+                        placeholder={'Select Notifications'}
+                        onSelect={notificationsSelected} />
                     <FormCheckbox
                         title={'10-22'}
                         checked={ten22}

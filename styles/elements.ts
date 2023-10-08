@@ -94,6 +94,12 @@ export const elements = StyleSheet.create({
         borderBottomColor: colors.primaryBg,
         borderBottomWidth: 0.75
     },
+    standardDiv: {
+        marginVertical: 4,
+        marginHorizontal: 20,
+        borderBottomColor: colors.primaryBg,
+        borderBottomWidth: 0.75
+    },
     messageSelfTray: {
         backgroundColor: colors.darkBlue,
         borderRadius: 8

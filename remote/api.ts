@@ -53,6 +53,7 @@ export const apiGetCallouts = async (status?: string): Promise<any> => {
     })
     .then(response => response.json())
     .then(data => {
+        console.log(data);
         return data;
     })
     .catch(error => {
