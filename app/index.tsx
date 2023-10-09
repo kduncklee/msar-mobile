@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, Image, View, KeyboardAvoidingView, Keyboard, Alert } from 'react-native';
+import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, Image, View, KeyboardAvoidingView, Keyboard, Alert  } from 'react-native';
 import colors from '../styles/colors';
 import { elements } from '../styles/elements';
 import { router } from 'expo-router';
@@ -12,6 +12,8 @@ import ActivityModal from '../components/modals/ActivityModal';
 
 const Page = () => {
 
+    
+    const [topMargin,setTopMargin] = useState(0);
     const scrollViewRef = useRef(null);
     const [username, setUsername] = useState('R07');
     const [password, setPassword] = useState('L!u0fN*V^rcPe1hX')
@@ -20,8 +22,11 @@ const Page = () => {
     useEffect(() => {
         if (Platform.OS === 'ios') {
             StatusBar.setBarStyle('dark-content');
+            setTopMargin(0);
         } else if (Platform.OS === 'android') {
             StatusBar.setBackgroundColor(colors.primaryBg);
+            StatusBar.setBarStyle('light-content');
+            setTopMargin(StatusBar.currentHeight + 20);
         }
 
         const keyboardDidShowListener = Keyboard.addListener(
@@ -33,7 +38,9 @@ const Page = () => {
             }
         );
 
+        
     }, []);
+
 
     const usernameChanged = (text: string) => {
         setUsername(text);
@@ -76,7 +83,7 @@ const Page = () => {
                     <ScrollView 
                         style={styles.scrollView}
                         ref={scrollViewRef}>
-                        <Image source={require('../assets/msar_logo.png')} style={styles.logoImage} />
+                        <Image source={require('../assets/msar_logo.png')} style={[styles.logoImage,{marginTop: topMargin}]} />
                         <View style={[elements.tray, { padding: 20, margin: 20 }]}>
                             <FormTextInput
                                 title={'Username'}

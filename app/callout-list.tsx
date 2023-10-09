@@ -11,6 +11,7 @@ import { router } from 'expo-router';
 import { apiGetCallouts } from '../remote/api';
 import ActivityModal from '../components/modals/ActivityModal';
 import { tabItem } from '../types/tabItem';
+import '../storage/global';
 
 const Page = () => {
 
@@ -37,6 +38,8 @@ const Page = () => {
         } else if (Platform.OS === 'android') {
             StatusBar.setBackgroundColor(colors.primaryBg);
         }
+        
+        global.currentRoute = "callout-list";
     }, []);
 
     const loadCallouts = async () => {

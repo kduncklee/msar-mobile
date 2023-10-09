@@ -1,5 +1,6 @@
-import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
-import { router } from 'expo-router';
+import { useState, useEffect } from 'react';
+import { StyleSheet, View, Text, Image, TouchableOpacity, Platform, StatusBar, BackHandler } from 'react-native';
+import { router, useFocusEffect } from 'expo-router';
 import colors from '../styles/colors';
 import { elements } from '../styles/elements';
 import { getTimeString } from '../utility/dateHelper';
@@ -11,7 +12,33 @@ type HeaderProps = {
     timestamp?: Date
 }
 
-const Header = ({title, backButton = false, onBackPressed, timestamp = null}: HeaderProps) => {
+const Header = ({ title, backButton = false, onBackPressed, timestamp = null }: HeaderProps) => {
+
+    const [headerMargin, setHeaderMargin] = useState(0);
+
+    useEffect(() => {
+        if (Platform.OS === 'ios') {
+            setHeaderMargin(0);
+        } else if (Platform.OS === 'android') {
+            setHeaderMargin(StatusBar.currentHeight);
+        }
+    }, []);
+
+    useFocusEffect(() => {
+
+        //console.log('added back handler: ' + pathname)
+        BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+
+        return () => {
+            //console.log('removed back handler: ' + pathname);
+            BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
+        }
+    });
+
+    const handleBackButton = () => {
+        // Prevent default behavior of the back button
+        return !backButton;
+    };
 
     const backPressed = () => {
         if (onBackPressed) {
@@ -22,16 +49,16 @@ const Header = ({title, backButton = false, onBackPressed, timestamp = null}: He
     }
 
     return (
-        <View style={styles.container}>
-            {backButton && 
+        <View style={[styles.container, { marginTop: headerMargin }]}>
+            {backButton &&
                 <TouchableOpacity activeOpacity={0.2} style={styles.backContainer} onPress={() => backPressed()}>
-                        <Image source={require('assets/icons/back.png')} style={styles.backImage}></Image>
+                    <Image source={require('assets/icons/back.png')} style={styles.backImage}></Image>
                 </TouchableOpacity>
             }
-            <Text style={[styles.title,{paddingHorizontal: backButton ? 10 : 20}]}>
+            <Text style={[styles.title, { paddingHorizontal: backButton ? 10 : 20 }]}>
                 {title}
             </Text>
-            {timestamp != null && <View style={[elements.capsule, {marginRight: 20}]}>
+            {timestamp != null && <View style={[elements.capsule, { marginRight: 20 }]}>
                 <Text style={elements.smallYellowText}>{getTimeString(timestamp)}</Text>
             </View>
             }

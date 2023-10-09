@@ -58,7 +58,7 @@ const Page = () => {
         } else if (Platform.OS === 'android') {
             StatusBar.setBackgroundColor(colors.primaryBg);
         }
-
+        global.currentRoute = "edit-callout";
         global.selectedLocation = null;
 
     }, []);
