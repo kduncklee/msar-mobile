@@ -1,26 +1,49 @@
 import { ImageRequireSource } from "react-native";
 import { location } from "./location";
 import colors from "../styles/colors"
-import { calloutType, responseType, calloutStatus } from "./enums"
+import { calloutType, responseType, calloutStatus, stringToCalloutType, stringToResponseType, stringToCalloutStatus } from "./enums"
 import { respondedItem } from "./respondedItem";
 import { Type } from "typescript";
 
+// {
+//     "created_at": "2023-10-12T18:45:18.623621-07:00",
+//     "id": 6,
+//     "location": [Object
+//     ],
+//     "log_count": 2,
+//     "my_response": null,
+//     "operation_type": "rescue",
+//     "responded": [Array
+//     ],
+//     "status": "active",
+//     "title": "All fields, not 10-22"
+// }
+
 export type calloutSummary = {
     id: number,
-    type: calloutType,
+    operation_type: calloutType,
     title?: string,
-    description?: string,
-    radio_channel?: string,
-    resolution?: string,
     my_response?: responseType
     responded?: respondedItem[]
-    timestamp: Date,
+    created_at: Date,
     location: location,
     status?: calloutStatus,
+    log_count: number
+}
 
-    subject?: string,
-    responder_count?: number,
-    log_count?: number,
+export const calloutSummaryFromResponse = (data: any): calloutSummary => {
+
+    return {
+        id: data.id,
+        operation_type: stringToCalloutType(data.operation_type),
+        title: data.title,
+        my_response: stringToResponseType(data.my_response),
+        responded: data.responded,
+        created_at: new Date(data.created_at),
+        location: data.location,
+        status: stringToCalloutStatus(data.status),
+        log_count: data.log_count
+    }
 }
 
 export const colorForType = (type: calloutType): string => {
@@ -97,24 +120,4 @@ export const textForResponseType = (type?: responseType): string => {
         case responseType.TEN22:
             return "10-22";
     }
-}
-
-export const processCalloutSummary = (data: any): calloutSummary => {
-
-    const summary: calloutSummary = {
-        id: data.id,
-        type: data.operation_type as calloutType,
-        title: data.title,
-        description: data.description,
-        radio_channel: data.radio_channel,
-        my_response: data.my_response as responseType,
-        resolution: data.resolution,
-        responded: data.responded as respondedItem[],
-        timestamp: new Date(data.created_at),
-        location: data.location as location,
-        status: data.status as calloutStatus
-    }
-
-    return summary
-
 }

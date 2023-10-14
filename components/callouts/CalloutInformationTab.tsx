@@ -11,12 +11,14 @@ import colors from '../../styles/colors';
 import { elements } from '../../styles/elements';
 import { textForResponseType, colorForResponseType, textForType } from '../../types/calloutSummary';
 import { getFullTimeString } from '../../utility/dateHelper';
+import { callout } from '../../types/callout';
+import { stringToCalloutType, stringToResponseType } from '../../types/enums';
 
 type CalloutInformationTabProps = {
-    summary: calloutSummary
+    callout: callout
 }
 
-const CalloutInformationTab = ({ summary }: CalloutInformationTabProps) => {
+const CalloutInformationTab = ({ callout }: CalloutInformationTabProps) => {
 
     const editDetailsPressed = () => {
         console.log('edit details');
@@ -30,50 +32,78 @@ const CalloutInformationTab = ({ summary }: CalloutInformationTabProps) => {
                 editButton={true}
                 onEditPress={editDetailsPressed}>
                 <View style={{ marginTop: 8 }} />
-                <InformationField
-                    title={'Time of Dispatch'}
-                    value={getFullTimeString(summary.timestamp)} />
+                {callout.created_at &&
+                    <InformationField
+                        title={'Time of Dispatch'}
+                        value={getFullTimeString(callout.created_at)} />
+                }
                 <View style={elements.informationDiv} />
                 <InformationField
                     title={'Type'}
-                    value={textForType(summary.type)} />
+                    value={textForType(callout.operation_type)} />
                 <View style={elements.informationDiv} />
-                <InformationField
-                    title={'Subject'}
-                    value={summary.subject} />
+                {callout.subject &&
+                    <InformationField
+                        title={'Subject'}
+                        value={callout.subject} />
+                }
+                {callout.subject_contact &&
+                    <InformationField
+                        value={callout.subject_contact}
+                        icon={require('../../assets/icons/phone_yellow.png')}
+                        onIconPress={() => console.log('pressed icon')} />
+                }
+                {(callout.subject || callout.subject_contact) &&
+                    <View style={elements.informationDiv} />
+                }
+                {callout.informant &&
+                    <InformationField
+                        title={'Informant'}
+                        value={callout.informant} />
+                }
+                {callout.informant_contact &&
+                    <InformationField
+                        value={callout.informant_contact}
+                        icon={require('../../assets/icons/phone_yellow.png')}
+                        onIconPress={() => console.log('pressed icon')} />
+                }
+                {(callout.informant || callout.informant_contact) &&
+                    <View style={elements.informationDiv} />
+                }
+                {callout.radio_channel &&
+                    <InformationField
+                        title={'Tactical Talkgroup'}
+                        value={callout.radio_channel} />
+                }
+                {callout.notifications_made &&
+                    <InformationField
+                        title={'Notifications Made'}
+                        value={'LAHS Desk, Fire'} />
+                }
                 <View style={elements.informationDiv} />
-                <InformationField
-                    title={'Informant'}
-                    value={'John Doe'} />
-                <InformationField
-                    value={'310-555-1223'}
-                    icon={require('../../assets/icons/phone_yellow.png')}
-                    onIconPress={() => console.log('pressed icon')} />
+                {callout.handling_unit &&
+                    <InformationField
+                        title={'Handling Unit / Tag #'}
+                        value={callout.handling_unit} />
+                }
                 <View style={elements.informationDiv} />
-                <InformationField
-                    title={'Tactical Talkgroup'}
-                    value={'Malibu Metro'} />
-                <InformationField
-                    title={'Notifications Made'}
-                    value={'LAHS Desk, Fire'} />
-                <View style={elements.informationDiv} />
-                <InformationField
-                    title={'Handling Unit / Tag #'}
-                    value={'1234'} />
-                <View style={elements.informationDiv} />
-                <TextAreaField
-                    title={'Circumstances'}
-                    value={'This is a test of a multiline piece of text that is very long and will go on to more lines than just one.'}
-                />
+                {callout.description &&
+                    <TextAreaField
+                        title={'Circumstances'}
+                        value={callout.description}
+                    />
+                }
                 <View style={{ height: 10 }} />
             </InformationTray>
-            <InformationTray
-                title={'Location'}
-                titleBarColor={colors.blue}
-                editButton={true}
-                onEditPress={editDetailsPressed}>
-                <LocationField location={summary.location} />
-            </InformationTray>
+            {callout.location &&
+                <InformationTray
+                    title={'Location'}
+                    titleBarColor={colors.blue}
+                    editButton={true}
+                    onEditPress={editDetailsPressed}>
+                    <LocationField location={callout.location} />
+                </InformationTray>
+            }
             <InformationTray
                 title={'Additional Information'}
                 titleBarColor={colors.secondaryYellow}
@@ -85,11 +115,16 @@ const CalloutInformationTab = ({ summary }: CalloutInformationTabProps) => {
                     title={'Status'}
                     value={'Active'} />
                 <View style={elements.informationDiv} />
-                <InformationField
-                    title={'My Response'}
-                    value={textForResponseType(summary.my_response)}
-                    valueColor={colorForResponseType(summary.my_response)} />
-                <View style={elements.informationDiv} />
+                {callout.my_response &&
+                    <>
+                        <InformationField
+                            title={'My Response'}
+                            value={textForResponseType(callout.my_response)}
+                            valueColor={colorForResponseType(callout.my_response)} />
+
+                        <View style={elements.informationDiv} />
+                    </>
+                }
                 <InformationField
                     title={'Callout Created by'}
                     value={'Michael Johnson'} />

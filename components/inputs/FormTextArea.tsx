@@ -6,13 +6,14 @@ import colors from '../../styles/colors'
 type FormTextAreaProps = {
     title?: string,
     placeholder: string,
+    value?: string,
     height: number,
     onChange: (text: string) => void
 }
 
-const FormTextArea = ({title, placeholder, height, onChange}: FormTextAreaProps) => {
+const FormTextArea = ({title, placeholder, value, height, onChange}: FormTextAreaProps) => {
 
-    const [text, setText] = useState('');
+    const [text, setText] = useState(value);
 
     const textChanged = (text: string) => {
         setText(text);

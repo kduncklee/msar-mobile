@@ -93,8 +93,8 @@ const convertGeocodeToLocation = (result: any): location => {
 
     if (latitude != null && longitude != null) {
         location.coordinates = {
-            latitude: latitude.toString(),
-            longitude: longitude.toString()
+            lat: latitude.toString(),
+            long: longitude.toString()
         }
     }
 

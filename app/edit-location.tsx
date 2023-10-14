@@ -47,7 +47,7 @@ const Page = () => {
     useEffect(() => {
 
         if (currentLocation?.coordinates != null) {
-            const coordinate = coordinateFromString(`${currentLocation.coordinates.latitude}, ${currentLocation.coordinates.longitude}`)
+            const coordinate = coordinateFromString(`${currentLocation.coordinates.lat}, ${currentLocation.coordinates.long}`)
             setDefaultRegion({
                 latitude: coordinate.latitude,
                 longitude: coordinate.longitude,
@@ -60,8 +60,8 @@ const Page = () => {
     const backPressed = () => {
 
         if (initialLocation?.coordinates != null && currentLocation.coordinates != null) {
-            if (initialLocation.coordinates.latitude != currentLocation.coordinates.latitude ||
-                initialLocation.coordinates.longitude != currentLocation.coordinates.longitude) {
+            if (initialLocation.coordinates.lat != currentLocation.coordinates.lat ||
+                initialLocation.coordinates.long != currentLocation.coordinates.long) {
                 showChangeAlert();
                 return;
             }
@@ -98,8 +98,8 @@ const Page = () => {
 
         setLocation({
             coordinates: {
-                latitude: event.nativeEvent.coordinate.latitude.toString(),
-                longitude: event.nativeEvent.coordinate.longitude.toString()
+                lat: event.nativeEvent.coordinate.latitude.toString(),
+                long: event.nativeEvent.coordinate.longitude.toString()
             }
         })
     }
@@ -141,6 +141,7 @@ const Page = () => {
 
         if (response.status === 'OK') {
             if (response.results.length == 1) {
+                console.log(response.results[0]);
                 setLocation(response.results[0]);
             } else {
                 var tmpResults: location[] = []
@@ -184,7 +185,7 @@ const Page = () => {
 
     var currentCoordinate: LatLng = null;
     if (currentLocation?.coordinates != null) {
-        currentCoordinate = coordinateFromString(`${currentLocation.coordinates.latitude}, ${currentLocation.coordinates.longitude}`)
+        currentCoordinate = coordinateFromString(`${currentLocation.coordinates.lat}, ${currentLocation.coordinates.long}`)
     }
 
     return (

@@ -3,7 +3,7 @@ import { calloutSummary, colorForResponseType, colorForType, imageForType, textF
 import { elements } from '../../styles/elements';
 import colors from '../../styles/colors';
 import { getLongTimeString } from '../../utility/dateHelper';
-import { locationToString } from '../../types/location';
+import { locationToShortString } from '../../types/location';
 import { respondedItem } from '../../types/respondedItem';
 
 type CalloutCellProps = {
@@ -34,8 +34,8 @@ const CalloutCell = ({summary, onPress}: CalloutCellProps) => {
     return (
         <TouchableOpacity activeOpacity={0.5} onPress={cellPressed}>
             <View style={[elements.tray,styles.container]}>
-                <View style={[styles.sideBar, {backgroundColor: colorForType(summary.type)}]}>
-                    <Image source={imageForType(summary.type)} style={styles.sideBarImage} />
+                <View style={[styles.sideBar, {backgroundColor: colorForType(summary.operation_type)}]}>
+                    <Image source={imageForType(summary.operation_type)} style={styles.sideBarImage} />
                     <View style={styles.sideBarDiv} />
                     <Text style={styles.sideBarNumber}>{calculateResponseCount()}</Text>
                 </View>
@@ -45,12 +45,12 @@ const CalloutCell = ({summary, onPress}: CalloutCellProps) => {
                         <Text style={[styles.responseText, {color: colorForResponseType(summary.my_response)}]}>{textForResponseType(summary.my_response)}</Text>
                     </View>
                     <View style={styles.contentMiddle}>
-                        <Text style={styles.locationText} numberOfLines={1} ellipsizeMode='tail'>{locationToString(summary.location)}</Text>
+                        <Text style={styles.locationText} numberOfLines={1} ellipsizeMode='tail'>{locationToShortString(summary.location)}</Text>
                         <Image source={require('assets/icons/forward_narrow.png')} style={styles.arrowImage} />
                     </View>
                     <View style={styles.contentBottom}>
                         <View style={[elements.capsule]}>
-                            <Text style={elements.smallYellowText}>{getLongTimeString(summary.timestamp)}</Text>
+                            <Text style={elements.smallYellowText}>{getLongTimeString(summary.created_at)}</Text>
                         </View>
                         <View style={[elements.capsule, { marginLeft: 10}]}>
                             <Image source={require('assets/icons/log_yellow.png')} style={styles.logImage} />

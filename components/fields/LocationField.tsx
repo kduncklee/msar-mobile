@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
 import { elements } from '../../styles/elements';
 import colors from '../../styles/colors'
-import { location, locationToString } from '../../types/location';
+import { location, locationToShortString, locationToString } from '../../types/location';
 import { locationType } from '../../types/enums';
 import MapView, { LatLng, Region, Marker } from 'react-native-maps';
 import { coordinateFromString } from '../../utility/locationHeler';
@@ -15,7 +15,7 @@ type LocationFieldProps = {
 const LocationField = ({ location }: LocationFieldProps) => {
 
     var locType: locationType = null;
-    var coordinates: LatLng = null;
+    var coordinates: LatLng = { latitude: 0, longitude: 0 };
 
     var defaultRegion: Region = {
         latitude: 34.050783236893395,
@@ -24,19 +24,47 @@ const LocationField = ({ location }: LocationFieldProps) => {
         longitudeDelta: 0.1355799588636216
     }
 
-    if (location.description) {
+
+
+    if (location.text) {
         locType = locationType.DESCRIPTION;
+    } else if (location.address) {
+        locType = locationType.ADDRESS;
+        if (location.coordinates) {
+            if (location.coordinates.lat != null && location.coordinates.long != null) {
+                coordinates = coordinateFromString(`${location.coordinates.lat}, ${location.coordinates.long}`);
+            }
+            defaultRegion.latitude = coordinates.latitude;
+            defaultRegion.longitude = coordinates.longitude;
+        }
     } else if (location.coordinates) {
         locType = locationType.COORDINATES;
-        coordinates = coordinateFromString(`${location.coordinates.latitude}, ${location.coordinates.longitude}`);
+        if (location.coordinates.lat != null && location.coordinates.long != null) {
+            coordinates = coordinateFromString(`${location.coordinates.lat}, ${location.coordinates.long}`);
+        }
         defaultRegion.latitude = coordinates.latitude;
         defaultRegion.longitude = coordinates.longitude;
     }
 
+
+
+
+
     return (
         <View style={styles.container}>
             {locType === locationType.DESCRIPTION &&
-                <Text style={elements.mediumText}>{location.description}</Text>
+                <Text style={elements.mediumText}>{location.text}</Text>
+            }
+            {locType === locationType.ADDRESS &&
+                <>
+                    <MapView style={styles.mapContainer} region={defaultRegion}>
+                        {coordinates &&
+                            <Marker
+                                coordinate={coordinates}
+                                title={locationToShortString(location)} />
+                        }
+                    </MapView>
+                </>
             }
             {locType === locationType.COORDINATES &&
                 <MapView style={styles.mapContainer} region={defaultRegion}>
@@ -59,7 +87,7 @@ const LocationField = ({ location }: LocationFieldProps) => {
                             backgroundColor={colors.blue}
                             textColor={colors.primaryText}
                             onPress={() => console.log('pressed nav')} />
-                        <View style={{width: 12}} />
+                        <View style={{ width: 12 }} />
                         <SmallButton
                             title={'Copy'}
                             icon={require('../../assets/icons/copy.png')}

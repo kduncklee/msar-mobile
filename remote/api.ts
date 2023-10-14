@@ -1,4 +1,5 @@
 import { getCredentials } from "../storage/storage";
+import { callout, calloutFromResponse } from "../types/callout";
 import { loginResponse } from "./responses";
 
 let prod_server: string = "https://malibusarhours.org/calloutapi";
@@ -53,7 +54,7 @@ export const apiGetCallouts = async (status?: string): Promise<any> => {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data);
+        //console.log(data);
         return data;
     })
     .catch(error => {
@@ -64,6 +65,57 @@ export const apiGetCallouts = async (status?: string): Promise<any> => {
             ]
         };
     })
-
-
 }
+
+export const apiCreateCallout = async (callout: callout): Promise<any> => {
+    const credentials = await getCredentials();
+    if (!credentials.token) {
+        return { error: "no token"}
+    }
+
+    return fetch(calloutsEndpoint, {
+        method: "POST",
+        headers: {
+            'Authorization': 'Token ' + credentials.token,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(callout)
+    })
+    .then(response => response.json())
+    .then(data => {
+        return calloutFromResponse(data);
+    })
+    .catch(error => {
+        console.log(error);
+        return {
+            error: "Server Error"
+        };
+    })
+}
+
+export const apiGetCallout = async (id: number): Promise<any> => {
+    const credentials = await getCredentials();
+    if (!credentials.token) {
+        return { error: "no token"}
+    }
+
+    return fetch(calloutsEndpoint + id + '/', {
+        method: "GET",
+        headers: {
+            'Authorization': 'Token ' + credentials.token,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        return calloutFromResponse(data);
+    })
+    .catch(error => {
+        console.log(error);
+        return {
+            error: "Server Error"
+        };
+    })
+}
+

@@ -17,12 +17,13 @@ import { personnel } from '../../types/personnel';
 import LogSelfMessageField from '../fields/log/LogSelfMessageField';
 import { message } from '../../types/message';
 import LogMessageField from '../fields/log/LogMessageField';
+import { callout } from '../../types/callout';
 
 type CalloutLogTabProps = {
-    summary: calloutSummary
+    callout: callout
 }
 
-const CalloutLogTab = ({ summary }: CalloutLogTabProps) => {
+const CalloutLogTab = ({ callout }: CalloutLogTabProps) => {
 
     const logList: logEntry[] = [
         {

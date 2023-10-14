@@ -19,10 +19,13 @@ import CalloutLogTab from '../components/callouts/CalloutLogTab';
 import CalloutPersonnelTab from '../components/callouts/CalloutPersonnelTab';
 import { tabItem } from '../types/tabItem';
 import LogInput from '../components/callouts/LogInput';
+import { callout } from '../types/callout';
+import { apiGetCallout } from '../remote/api';
+import ActivityModal from '../components/modals/ActivityModal';
 
 const Page = () => {
 
-    const params = useLocalSearchParams();
+    const { id, title } = useLocalSearchParams<{ id: string, title: string}>();
     const safeAreaInsets = useSafeAreaInsets();
     var calloutId: number = null;
 
@@ -30,7 +33,9 @@ const Page = () => {
     const opacity = useSharedValue(0);
 
     const [modalVisible, setModalVisible] = useState(false);
+    const [showSpinner, setShowSpinner] = useState(false);
     const [currentTab, setCurrentTab] = useState(0);
+    const [callout, setCallout] = useState<callout>(null);
 
     const [logMessageText, setLogMessageText] = useState('');
 
@@ -56,22 +61,23 @@ const Page = () => {
         } else if (Platform.OS === 'android') {
             StatusBar.setBackgroundColor(colors.primaryBg);
         }
+
+        getCallout();
+
     }, []);
 
-    let summary: calloutSummary = {
-        id: 1,
-        subject: "Missing Hiker",
-        type: calloutType.SEARCH,
-        responder_count: 3,
-        timestamp: new Date(),
-        location: {
-            coordinates: {
-                latitude: "34.09454155005811",
-                longitude: "-118.94362251701045"
-            }
-        },
-        log_count: 12,
-        my_response: responseType.TEN8
+    const getCallout = async () => {
+
+        const idInt: number = parseInt(id);
+        console.log(idInt);
+        setShowSpinner(true);
+        const response = await apiGetCallout(idInt);
+        console.log(response);
+        setShowSpinner(false);
+        //if it's a callout
+        setCallout(response);
+        //else
+        //show error
     }
 
     const tabChanged = (index: number) => {
@@ -118,51 +124,59 @@ const Page = () => {
         };
     });
 
+    
     return (
         <>
             <SafeAreaView style={styles.container}>
-                <Header title={summary.subject} backButton={true} timestamp={new Date()} />
-                <TabSelector tabs={tabs} onTabChange={tabChanged} />
-                <View style={styles.contentContainer}>
-                    <ScrollView style={styles.scrollView}>
-                        {currentTab === 0 &&
-                            <CalloutInformationTab
-                                summary={summary} />
-                        }
-                        {currentTab === 1 &&
-                            <CalloutLogTab
-                                summary={summary} />
-                        }
-                        {currentTab === 2 &&
-                            <CalloutPersonnelTab
-                                summary={summary} />
-                        }
-                    </ScrollView>
-                    {currentTab === 0 &&
-                        <TouchableOpacity
-                            activeOpacity={0.8}
-                            style={[elements.capsuleButton, styles.respondCalloutButton]}
-                            onPress={() => respondToCallout()}>
-                            <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>Respond</Text>
-                        </TouchableOpacity>
-                    }
-                    {currentTab === 1 &&
-                        <LogInput
-                            onTextChange={onLogMessageTextChanged}
-                            text={logMessageText}
-                            onSendPress={ () => console.log('send')}
-                            onPhotoPress={ () => console.log('photo')} />
-                    }
-                </View>
+                <Header title={title} backButton={true} timestamp={new Date()} />
+                {callout &&
+                    <>
+                        <TabSelector tabs={tabs} onTabChange={tabChanged} />
+                        <View style={styles.contentContainer}>
+                            <ScrollView style={styles.scrollView}>
+                                {currentTab === 0 &&
+                                    <CalloutInformationTab
+                                        callout={callout} />
+                                }
+                                {currentTab === 1 &&
+                                    <CalloutLogTab
+                                        callout={callout} />
+                                }
+                                {currentTab === 2 &&
+                                    <CalloutPersonnelTab
+                                        callout={callout} />
+                                }
+                            </ScrollView>
+                            {currentTab === 0 &&
+                                <TouchableOpacity
+                                    activeOpacity={0.8}
+                                    style={[elements.capsuleButton, styles.respondCalloutButton]}
+                                    onPress={() => respondToCallout()}>
+                                    <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>Respond</Text>
+                                </TouchableOpacity>
+                            }
+                            {currentTab === 1 &&
+                                <LogInput
+                                    onTextChange={onLogMessageTextChanged}
+                                    text={logMessageText}
+                                    onSendPress={() => console.log('send')}
+                                    onPhotoPress={() => console.log('photo')} />
+                            }
+                        </View>
+                    </>
+                }
             </SafeAreaView>
             <Animated.View style={[styles.respondTray, trayAnimatedStyle]}>
-                <View style={{ flex: 1}} />
+                <View style={{ flex: 1 }} />
                 <CalloutRespond onCancel={cancelRespondModal} onSelect={responseSelected} />
             </Animated.View>
             {modalVisible &&
                 <Animated.View style={[styles.modalBackground, modalAnimatedStyle]}>
                     <TouchableOpacity onPress={cancelRespondModal} style={{ flex: 1 }} />
                 </Animated.View>
+            }
+            {showSpinner &&
+                <ActivityModal message={"Loading Callout..."} />
             }
 
         </>

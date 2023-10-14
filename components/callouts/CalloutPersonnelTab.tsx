@@ -8,9 +8,10 @@ import colors from '../../styles/colors';
 import { elements } from '../../styles/elements';
 import { textForResponseType, colorForResponseType, textForType } from '../../types/calloutSummary';
 import { personnel } from '../../types/personnel';
+import { callout } from '../../types/callout';
 
 type CalloutPersonnelTabProps = {
-    summary: calloutSummary
+    callout: callout
 }
 
 const personnelList: personnel[] = [
@@ -53,7 +54,7 @@ const personnelList: personnel[] = [
 
 ]
 
-const CalloutPersonnelTab = ({ summary }: CalloutPersonnelTabProps) => {
+const CalloutPersonnelTab = ({ callout }: CalloutPersonnelTabProps) => {
 
     const filterByTen19: personnel[] = personnelList.filter((person) => {
         return person.response === responseType.TEN19;

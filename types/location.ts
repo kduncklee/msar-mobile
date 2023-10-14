@@ -1,6 +1,5 @@
 export type location = {
     text?: string,
-    description?: string,
     address?: {
         street: string,
         city: string,
@@ -8,30 +7,41 @@ export type location = {
         zip: string
     }
     coordinates?: {
-        latitude: string,
-        longitude: string
+        lat: string,
+        long: string
     }
 }
 
 export const locationToString = (location: location): string => {
-    
+
     if (location.text != null) {
-        return location.text
-    } else if (location.description != null) {
-        return location.description
-    } else if (location.address != null) {
-        return `${location.address.street}, ${location.address.city}, ${location.address.state} ${location.address.zip}`;
-    } else if (location.coordinates != null) {
-        return `${location.coordinates.latitude}, ${location.coordinates.longitude}`
+        if (location.text.length > 0) {
+            return location.text
+        }
     }
     
-    return "";
+    if (location.address != null) {
+        return `${location.address.street}, ${location.address.city}, ${location.address.state} ${location.address.zip}`;
+    }
+    
+    if (location.coordinates != null) {
+        return `${location.coordinates.lat}, ${location.coordinates.long}`
+    }
+
+    return "UNKNOWN";
 }
 
 export const locationToShortString = (location: location): string => {
 
-    if (location.address != null) {
+    if (location.text != null) {
+        if (location.text.length > 0) {
+            return location.text
+        }
+    } else if (location.address != null) {
         return `${location.address.street}`;
+    } else if (location.coordinates != null) {
+        return `${location.coordinates.lat}, ${location.coordinates.long}`
     }
+
     return "Location";
 }
