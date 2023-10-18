@@ -75,7 +75,7 @@ const Page = () => {
         if (callout) {
             setHeaderTitle(callout.title);
             setPersonnelBadge(calloutResponseBadge(callout));
-            //setLogBadge(callout.log_count)
+            setLogBadge(callout.log_count)
         }
     },[callout]);
 

@@ -54,7 +54,7 @@ const CalloutPersonnelTab = ({ callout }: CalloutPersonnelTabProps) => {
 
                             return (
                                 <>
-                                    <PersonnelField key={index} opResponse={opResponse} />
+                                    <PersonnelField key={opResponse.member.id} opResponse={opResponse} />
                                     {addDiv &&
                                         <View style={elements.informationDiv} />
                                     }
@@ -79,7 +79,7 @@ const CalloutPersonnelTab = ({ callout }: CalloutPersonnelTabProps) => {
 
                             return (
                                 <>
-                                    <PersonnelField key={index} opResponse={opResponse} />
+                                    <PersonnelField key={opResponse.member.id} opResponse={opResponse} />
                                     {addDiv &&
                                         <View style={elements.informationDiv} />
                                     }
@@ -104,7 +104,7 @@ const CalloutPersonnelTab = ({ callout }: CalloutPersonnelTabProps) => {
 
                             return (
                                 <>
-                                    <PersonnelField key={index} opResponse={opResponse} />
+                                    <PersonnelField key={opResponse.member.id} opResponse={opResponse} />
                                     {addDiv &&
                                         <View style={elements.informationDiv} />
                                     }
