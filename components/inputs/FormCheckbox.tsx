@@ -11,8 +11,6 @@ type FormCheckboxProps = {
 
 const FormCheckbox = ({ title, checked, onToggle }: FormCheckboxProps) => {
 
-    //const [checkStatus, setChecked] = useState(false);
-
     const onCheckToggle = () => {
         
         onToggle(!checked);

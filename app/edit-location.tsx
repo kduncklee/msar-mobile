@@ -3,7 +3,7 @@ import { SafeAreaView, StyleSheet, StatusBar, Platform, TouchableOpacity, Text, 
 import Header from '../components/Header';
 import colors from '../styles/colors';
 import { elements } from '../styles/elements';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router } from 'expo-router';
 import MapView, { LatLng, LongPressEvent, Region, Marker, MapMarker } from 'react-native-maps';
 import { coordinateFromString } from '../utility/locationHeler';
 import FormTextInput from '../components/inputs/FormTextInput';

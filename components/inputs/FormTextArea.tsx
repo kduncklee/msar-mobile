@@ -13,10 +13,7 @@ type FormTextAreaProps = {
 
 const FormTextArea = ({title, placeholder, value, height, onChange}: FormTextAreaProps) => {
 
-    const [text, setText] = useState(value);
-
     const textChanged = (text: string) => {
-        setText(text);
         onChange(text);
     }
 
@@ -30,7 +27,7 @@ const FormTextArea = ({title, placeholder, value, height, onChange}: FormTextAre
                     style={[elements.fieldText, {flex: 1, padding: 8, backgroundColor: "#ff000000"}]}
                     multiline={true}
                     onChangeText={textChanged}
-                    value={text}
+                    value={value}
                     placeholder={placeholder}
                     placeholderTextColor={colors.grayText} />
             </View>

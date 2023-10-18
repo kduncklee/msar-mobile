@@ -1,5 +1,8 @@
+import { NullLiteral } from "typescript"
 import { calloutStatus, calloutType, responseType, stringToCalloutType, stringToCalloutStatus, stringToResponseType } from "./enums"
 import { location } from "./location"
+import { operationalPeriod, opResponse } from "./operationalPeriod"
+import { user } from "./user"
 
 export type callout = {
     id?: number,
@@ -15,9 +18,11 @@ export type callout = {
     status: calloutStatus,
     resolution?: string,
     location?: location,
+    operational_periods?: operationalPeriod[],
     handling_unit?: string,
     created_at?: Date,
-    my_response?: responseType
+    my_response?: responseType,
+    created_by?: user
 }
 
 export const calloutFromResponse = (data: any): callout => {
@@ -36,18 +41,32 @@ export const calloutFromResponse = (data: any): callout => {
         status: stringToCalloutStatus(data.status),
         resolution: data.resolution,
         location: data.location,
+        operational_periods: data.operational_periods,
         handling_unit: data.handling_unit,
         created_at: new Date(data.created_at),
-        my_response: stringToResponseType(data.my_response)
+        my_response: stringToResponseType(data.my_response),
+        created_by: data.created_by
     }
 }
 
-export const blankCallout = (): callout => {
-    return {
-        id: 1,
-        title: "Loading...",
-        operation_type: calloutType.INFORMATION,
-        status: calloutStatus.ACTIVE,
-        created_at: new Date()
+export const calloutResponseBadge = (callout: callout): string | null => {
+
+    if (callout.operational_periods[0]) {
+        const responses = callout.operational_periods[0].responses;
+        const filterByTen19: opResponse[] = responses.filter((opResponse) => {
+            return opResponse.response === responseType.TEN19;
+        });
+    
+        const filterByTen8: opResponse[] = responses.filter((opResponse) => {
+            return opResponse.response === responseType.TEN8;
+        });
+
+        const badgeCount = filterByTen19.length + filterByTen8.length;
+        if (badgeCount > 0) {
+            return `${badgeCount}`;
+        }
     }
+
+
+    return null;
 }

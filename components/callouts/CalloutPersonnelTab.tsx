@@ -7,135 +7,114 @@ import PersonnelField from '../fields/PersonnelField';
 import colors from '../../styles/colors';
 import { elements } from '../../styles/elements';
 import { textForResponseType, colorForResponseType, textForType } from '../../types/calloutSummary';
-import { personnel } from '../../types/personnel';
+import { opResponse } from '../../types/operationalPeriod';
 import { callout } from '../../types/callout';
 
 type CalloutPersonnelTabProps = {
     callout: callout
 }
 
-const personnelList: personnel[] = [
-    {
-        first_name: "Bob",
-        last_name: "Jones",
-        phone: "310-555-1212",
-        response: responseType.TEN19
-    },
-    {
-        first_name: "Fred",
-        last_name: "Smith",
-        phone: "310-555-1212",
-        response: responseType.TEN19
-    },
-    {
-        first_name: "James",
-        last_name: "Turner",
-        phone: "310-555-1212",
-        response: responseType.TEN8,
-    },
-    {
-        first_name: "George",
-        last_name: "Hunt",
-        phone: "310-555-1212",
-        response: responseType.TEN8,
-    },
-    {
-        first_name: "Michael",
-        last_name: "Knight",
-        phone: "310-555-1212",
-        response: responseType.TEN7,
-    },
-    {
-        first_name: "Pete",
-        last_name: "Wilson",
-        phone: "310-555-1212",
-        response: responseType.TEN7,
-    },
 
-]
 
 const CalloutPersonnelTab = ({ callout }: CalloutPersonnelTabProps) => {
 
-    const filterByTen19: personnel[] = personnelList.filter((person) => {
-        return person.response === responseType.TEN19;
+    var responses: opResponse[] = [];
+    if (callout.operational_periods[0]) {
+        responses = callout.operational_periods[0].responses;
+    }
+
+    const filterByTen19: opResponse[] = responses.filter((opResponse) => {
+        return opResponse.response === responseType.TEN19;
     });
 
-    const filterByTen8: personnel[] = personnelList.filter((person) => {
-        return person.response === responseType.TEN8;
+    const filterByTen8: opResponse[] = responses.filter((opResponse) => {
+        return opResponse.response === responseType.TEN8;
     });
 
-    const filterByTen7: personnel[] = personnelList.filter((person) => {
-        return person.response === responseType.TEN7;
+    const filterByTen7: opResponse[] = responses.filter((opResponse) => {
+        return opResponse.response === responseType.TEN7;
     });
 
     return (
         <>
-            <InformationTray
-                title={'10-19'}
-                titleBarColor={colors.secondaryYellow}
-                titleTextColor={colors.black}
-                count={filterByTen19.length}>
-                <View style={{ marginTop: 8 }} />
-                {
-                    filterByTen19.map((person: personnel, index: number) => {
+            {filterByTen19.length == 0 && filterByTen8.length == 0 && filterByTen7.length == 0 &&
+                <Text style={[elements.mediumText, { margin: 20, textAlign: "center", color: colors.grayText }]}>No Responses</Text>
+            }
+            {filterByTen19.length > 0 &&
+                <InformationTray
+                    title={'10-19'}
+                    titleBarColor={colors.secondaryYellow}
+                    titleTextColor={colors.black}
+                    count={filterByTen19.length}>
+                    <View style={{ marginTop: 8 }} />
+                    {
+                        filterByTen19.map((opResponse: opResponse, index: number) => {
 
-                        const addDiv: boolean = (index < filterByTen19.length - 1);
+                            const addDiv: boolean = (index < filterByTen19.length - 1);
 
-                        return (
-                            <>
-                                <PersonnelField key={index} personnel={person} />
-                                {addDiv &&
-                                    <View style={elements.informationDiv} />
-                                }
-                            </>
-                        )
-                    })
-                }
-            </InformationTray>
-            <InformationTray
-                title={'10-8'}
-                titleBarColor={colors.green}
-                titleTextColor={colors.primaryText}
-                count={filterByTen8.length}>
-                <View style={{ marginTop: 8 }} />
-                {
-                    filterByTen8.map((person: personnel, index: number) => {
+                            return (
+                                <>
+                                    <PersonnelField key={index} opResponse={opResponse} />
+                                    {addDiv &&
+                                        <View style={elements.informationDiv} />
+                                    }
+                                </>
+                            )
+                        })
+                    }
+                    <View style={{ marginBottom: 8 }} />
+                </InformationTray>
+            }
+            {filterByTen8.length > 0 &&
+                <InformationTray
+                    title={'10-8'}
+                    titleBarColor={colors.green}
+                    titleTextColor={colors.primaryText}
+                    count={filterByTen8.length}>
+                    <View style={{ marginTop: 8 }} />
+                    {
+                        filterByTen8.map((opResponse: opResponse, index: number) => {
 
-                        const addDiv: boolean = (index < filterByTen8.length - 1);
+                            const addDiv: boolean = (index < filterByTen8.length - 1);
 
-                        return (
-                            <>
-                                <PersonnelField key={index} personnel={person} />
-                                {addDiv &&
-                                    <View style={elements.informationDiv} />
-                                }
-                            </>
-                        )
-                    })
-                }
-            </InformationTray>
-            <InformationTray
-                title={'10-7'}
-                titleBarColor={colors.red}
-                titleTextColor={colors.primaryText}
-                count={filterByTen7.length}>
-                <View style={{ marginTop: 8 }} />
-                {
-                    filterByTen7.map((person: personnel, index: number) => {
+                            return (
+                                <>
+                                    <PersonnelField key={index} opResponse={opResponse} />
+                                    {addDiv &&
+                                        <View style={elements.informationDiv} />
+                                    }
+                                </>
+                            )
+                        })
+                    }
+                    <View style={{ marginBottom: 8 }} />
+                </InformationTray>
+            }
+            {filterByTen7.length > 0 &&
+                <InformationTray
+                    title={'10-7'}
+                    titleBarColor={colors.red}
+                    titleTextColor={colors.primaryText}
+                    count={filterByTen7.length}>
+                    <View style={{ marginTop: 8 }} />
+                    {
+                        filterByTen7.map((opResponse: opResponse, index: number) => {
 
-                        const addDiv: boolean = (index < filterByTen7.length - 1);
+                            const addDiv: boolean = (index < filterByTen7.length - 1);
 
-                        return (
-                            <>
-                                <PersonnelField key={index} personnel={person} />
-                                {addDiv &&
-                                    <View style={elements.informationDiv} />
-                                }
-                            </>
-                        )
-                    })
-                }
-            </InformationTray>
+                            return (
+                                <>
+                                    <PersonnelField key={index} opResponse={opResponse} />
+                                    {addDiv &&
+                                        <View style={elements.informationDiv} />
+                                    }
+                                </>
+                            )
+                        })
+                    }
+                    <View style={{ marginBottom: 8 }} />
+                </InformationTray>
+            }
         </>
     );
 }

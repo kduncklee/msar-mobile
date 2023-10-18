@@ -7,11 +7,11 @@ import colors from '../styles/colors';
 import TabSelector from '../components/TabSelector/TabSelector';
 import { elements } from '../styles/elements';
 import { router } from 'expo-router';
-import { apiGetCallout, apiGetCallouts } from '../remote/api';
+import { apiGetCallouts } from '../remote/api';
 import ActivityModal from '../components/modals/ActivityModal';
 import { tabItem } from '../types/tabItem';
 import '../storage/global';
-import { callout, calloutFromResponse } from '../types/callout';
+import msarEventEmitter from '../utility/msarEventEmitter';
 
 const Page = () => {
 
@@ -29,6 +29,7 @@ const Page = () => {
             badgeColor: colors.red
         }
     ]
+
     var status: string = "active";
 
 
@@ -39,7 +40,17 @@ const Page = () => {
             StatusBar.setBackgroundColor(colors.primaryBg);
         }
         
+        msarEventEmitter.on('refreshCallout',refreshReceived);
+        loadCallouts();
+        
+        return () => {
+            msarEventEmitter.off('refreshData',refreshReceived);
+        }
     }, []);
+
+    const refreshReceived = data => {
+        loadCallouts();
+    }
 
     const loadCallouts = async () => {
         setShowSpinner(true);
@@ -51,13 +62,13 @@ const Page = () => {
                 callouts.push(calloutSummaryFromResponse(result));
             });
             setActiveCalloutList(callouts);
+            setShowSpinner(false);
         }
-        setShowSpinner(false);
-        console.log(response);
+        //console.log(response);
     }
 
     const tabChanged = (index: number) => {
-        
+
         status = "active&status=resolved";
         if (index === 1) {
             status = "archived";

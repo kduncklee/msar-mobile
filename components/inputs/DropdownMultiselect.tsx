@@ -8,12 +8,13 @@ type DropdownMultiselectProps = {
     title?: string,
     options: any[],
     placeholder: string,
+    selectedValues?: string[],
     onSelect: (values: any) => void
 }
 
-const DropdownMultiselect = ({ title, options, placeholder, onSelect }: DropdownMultiselectProps) => {
+const DropdownMultiselect = ({ title, options, placeholder, selectedValues, onSelect }: DropdownMultiselectProps) => {
 
-    const [selected, setSelected] = useState([]);
+    //const [selected, setSelected] = useState(selectedValues);
 
     return (
         <View style={styles.container}>
@@ -31,14 +32,14 @@ const DropdownMultiselect = ({ title, options, placeholder, onSelect }: Dropdown
                     labelField="label"
                     valueField="value"
                     placeholder={placeholder}
-                    value={selected}
+                    value={selectedValues}
                     containerStyle={{ overflow: "hidden", borderRadius: 8, borderColor: colors.grayText, borderWidth: 1, backgroundColor: colors.secondaryBg }}
                     itemContainerStyle={{ backgroundColor: colors.primaryBg }}
                     activeColor={colors.secondaryBg}
                     itemTextStyle={{ color: colors.primaryText }}
                     selectedStyle={styles.selectedStyle}
                     onChange={item => {
-                        setSelected(item);
+                        //setSelected(item);
                         onSelect(item);
                     }} />
             </View>

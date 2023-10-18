@@ -8,12 +8,11 @@ type DropdownSelectorProps = {
     title?: string,
     options: any[],
     placeholder: string,
+    selectedValue?: any,
     onSelect: (values: any) => void
 }
 
-const DropdownSelector = ({ title, options, placeholder, onSelect }: DropdownSelectorProps) => {
-
-    const [value, setValue] = useState(null);
+const DropdownSelector = ({ title, options, placeholder,selectedValue, onSelect }: DropdownSelectorProps) => {
 
     return (
         <View style={styles.container}>
@@ -31,13 +30,13 @@ const DropdownSelector = ({ title, options, placeholder, onSelect }: DropdownSel
                     labelField="label"
                     valueField="value"
                     placeholder={placeholder}
-                    value={value}
+                    value={selectedValue}
                     containerStyle={{ overflow: "hidden", borderRadius: 8, borderColor: colors.grayText, borderWidth: 1, backgroundColor: colors.secondaryBg }}
                     itemContainerStyle={{ backgroundColor: colors.primaryBg }}
                     activeColor={colors.secondaryBg}
                     itemTextStyle={{ color: colors.primaryText }}
                     onChange={item => {
-                        setValue(item.value);
+                        //setValue(item.value);
                         onSelect(item);
                     }} />
             </View>

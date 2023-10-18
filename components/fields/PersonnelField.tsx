@@ -1,15 +1,14 @@
-import React, { useState, } from 'react';
-import { StyleSheet, View, Text, Image, ImageRequireSource } from 'react-native';
-import { elements } from '../../styles/elements';
+import { StyleSheet, View, Text, Image } from 'react-native';
 import colors from '../../styles/colors'
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { personnel, personnelToString } from '../../types/personnel';
+import { opResponse } from '../../types/operationalPeriod';
+import { userToString } from '../../types/user';
 
 type PersonnelFieldProps = {
-    personnel: personnel
+    opResponse: opResponse
 }
 
-const PersonnelField = ({ personnel }: PersonnelFieldProps) => {
+const PersonnelField = ({ opResponse }: PersonnelFieldProps) => {
 
     const onPhonePress = () => {
         console.log("phone pressed");
@@ -17,14 +16,14 @@ const PersonnelField = ({ personnel }: PersonnelFieldProps) => {
 
     return (
         <View style={styles.container}>
-            {personnel.phone &&
+            {opResponse.member.mobile_phone &&
                 <TouchableOpacity style={styles.button} activeOpacity={0.5} onPress={() => onPhonePress}>
-                    <Text style={styles.valueText}>{personnelToString(personnel)}</Text>
+                    <Text style={styles.valueText}>{userToString(opResponse.member)}</Text>
                     <Image source={require('../../assets/icons/phone.png')} style={styles.iconImage} />
                 </TouchableOpacity>
             }
-            {!personnel.phone &&
-                <Text style={[styles.valueText, { color: colors.primaryText }]}>{personnelToString(personnel)}</Text>
+            {!opResponse.member.mobile_phone &&
+                <Text style={[styles.valueText, { color: colors.primaryText }]}>{userToString(opResponse.member)}</Text>
             }
         </View>
     );

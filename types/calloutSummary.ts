@@ -46,6 +46,17 @@ export const calloutSummaryFromResponse = (data: any): calloutSummary => {
     }
 }
 
+export const textForCalloutStatus = (type: calloutStatus): string => {
+    switch (type) {
+        case calloutStatus.ACTIVE:
+            return "Active";
+        case calloutStatus.RESOLVED:
+            return "Resolved";
+        case calloutStatus.ARCHIVED:
+            return "Archived";
+    }
+}
+
 export const colorForType = (type: calloutType): string => {
 
     switch (type) {

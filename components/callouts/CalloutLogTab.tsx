@@ -1,15 +1,7 @@
-import React, { StyleSheet } from 'react-native';
-import { View, Text } from 'react-native';
-import { calloutSummary } from '../../types/calloutSummary';
-import { calloutType, isLogType, responseType } from '../../types/enums';
-import InformationTray from '../fields/InformationTray';
-import InformationField from '../fields/InformationField';
-import TextAreaField from '../fields/TextAreaField';
-import LocationField from '../fields/LocationField';
-import CalloutRespond from '../callouts/CalloutRespond';
+import { useEffect } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { responseType } from '../../types/enums';
 import colors from '../../styles/colors';
-import { elements } from '../../styles/elements';
-import { textForResponseType, colorForResponseType, textForType } from '../../types/calloutSummary';
 import { logType } from '../../types/enums';
 import { logEntry } from '../../types/logEntry';
 import LogResponseField from '../fields/log/LogResponseField';
@@ -18,12 +10,18 @@ import LogSelfMessageField from '../fields/log/LogSelfMessageField';
 import { message } from '../../types/message';
 import LogMessageField from '../fields/log/LogMessageField';
 import { callout } from '../../types/callout';
+import { apiGetCalloutLog } from '../../remote/api';
 
 type CalloutLogTabProps = {
     callout: callout
 }
 
 const CalloutLogTab = ({ callout }: CalloutLogTabProps) => {
+
+    useEffect(() => {
+        getCalloutLog();
+    },[]);
+
 
     const logList: logEntry[] = [
         {
@@ -63,6 +61,11 @@ const CalloutLogTab = ({ callout }: CalloutLogTabProps) => {
             timestamp: new Date()
         }
     ];
+
+    const getCalloutLog = async () => {
+        const response = await apiGetCalloutLog(callout.id);
+
+    }
 
 
     return (

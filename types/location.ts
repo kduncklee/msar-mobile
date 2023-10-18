@@ -21,7 +21,9 @@ export const locationToString = (location: location): string => {
     }
     
     if (location.address != null) {
-        return `${location.address.street}, ${location.address.city}, ${location.address.state} ${location.address.zip}`;
+        if (location.address.street != null) {
+            return `${location.address.street}, ${location.address.city}, ${location.address.state} ${location.address.zip}`;
+        }
     }
     
     if (location.coordinates != null) {
@@ -37,11 +39,17 @@ export const locationToShortString = (location: location): string => {
         if (location.text.length > 0) {
             return location.text
         }
-    } else if (location.address != null) {
-        return `${location.address.street}`;
-    } else if (location.coordinates != null) {
+    }
+    
+    if (location.address != null) {
+        if (location.address.street != null) {
+            return `${location.address.street}`;
+        }
+    }
+    
+    if (location.coordinates != null) {
         return `${location.coordinates.lat}, ${location.coordinates.long}`
     }
 
-    return "Location";
+    return "UNKNOWN";
 }

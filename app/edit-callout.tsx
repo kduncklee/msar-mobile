@@ -4,7 +4,7 @@ import Header from '../components/Header';
 import colors from '../styles/colors';
 import { elements } from '../styles/elements';
 import { router, useLocalSearchParams, useGlobalSearchParams } from 'expo-router';
-import { calloutStatus, calloutType } from '../types/enums';
+import { calloutStatus, calloutType, stringToCalloutType } from '../types/enums';
 import DropdownSelector from '../components/inputs/DropdownSelector';
 import FormTextInput from '../components/inputs/FormTextInput';
 import FormTextArea from '../components/inputs/FormTextArea';
@@ -13,13 +13,18 @@ import DropdownMultiselect from '../components/inputs/DropdownMultiselect';
 import ActivityModal from '../components/modals/ActivityModal';
 import "../storage/global"
 import { callout } from '../types/callout';
-import { apiCreateCallout } from '../remote/api';
+import { apiCreateCallout, apiUpdateCallout, apiGetCallout } from '../remote/api';
+import * as notificationListHelper from "../utility/notificationListHelper"
+import { location, locationToString } from '../types/location';
+import msarEventEmitter from '../utility/msarEventEmitter';
 
 const Page = () => {
 
+    const { id } = useLocalSearchParams<{ id: string }>();
     const [showSpinner, setShowSpinner] = useState(false);
+    const [spinnerMessage, setSpinnerMessage] = useState('');
     const [title, setTitle] = useState<string>(null);
-    const [operationType,setOperationType] = useState<calloutType>(null);
+    const [operationType, setOperationType] = useState<calloutType>(null);
     const [subject, setSubject] = useState<string>(null);
     const [subjectContact, setSubjectContact] = useState<string>(null);
     const [informant, setInformant] = useState<string>(null);
@@ -31,10 +36,8 @@ const Page = () => {
     const [resolutionNotes, setResolutionNotes] = useState<string>(null);
     const [locationText, setLocationText] = useState('');
     const [handlingUnit, setHandlingUnit] = useState<string>(null);
-
-    const { callout } = useLocalSearchParams();
+    const [existingData, setExistingData] = useState<callout>(null);
     const { location } = useGlobalSearchParams();
-    var calloutId: number = null;
     var headerTitle: string = "Create Callout";
 
     let callOutTypeSelect = [
@@ -50,19 +53,7 @@ const Page = () => {
         { label: "MRA MAL", value: '3' }
     ]
 
-    let notificationSelect = [
-        { label: "LAHS Desk", value: '0'},
-        { label: "Fire", value: '1'},
-        { label: "State Parks", value: '2'},
-        { label: "NPS", value: '3'},
-        { label: "MRCA", value: '4'},
-        { label: "CHP", value: '5'},
-        { label: "Drone Requested", value: '6'}
-    ]
-
-    if (callout && typeof callout === 'string') {
-        //console.log(callout);
-        calloutId = parseInt(callout, 10);
+    if (id && typeof id === 'string') {
         headerTitle = "Update Callout";
     }
 
@@ -72,8 +63,12 @@ const Page = () => {
         } else if (Platform.OS === 'android') {
             StatusBar.setBackgroundColor(colors.primaryBg);
         }
-        global.currentRoute = "edit-callout";
+
         global.selectedLocation = null;
+
+        if (id) {
+            getCallout();
+        }
 
     }, []);
 
@@ -84,13 +79,73 @@ const Page = () => {
         }
     }, [location]);
 
+    useEffect(() => {
+        if (existingData) {
+            populateFields();
+        }
+    }, [existingData]);
+
+    const getCallout = async () => {
+
+        const idInt: number = parseInt(id);
+        setSpinnerMessage('Loading Callout...');
+        setShowSpinner(true);
+        const response = await apiGetCallout(idInt);
+        console.log(response);
+        setShowSpinner(false);
+        //if it's a callout
+        setExistingData(response);
+        //else
+        //show error
+    }
+
+    const populateFields = () => {
+
+        setTitle(existingData.title);
+        setOperationType(stringToCalloutType(existingData.operation_type));
+        setLocationText(locationToString(existingData.location));
+        global.selectedLocation = existingData.location;
+        setSubject(existingData.subject);
+        setSubjectContact(existingData.subject_contact);
+        setInformant(existingData.informant);
+        setInformantContact(existingData.informant_contact);
+        setCircumstances(existingData.description);
+        setRadioFrequency(existingData.radio_channel);
+        setNotificationsMade(existingData.notifications_made);
+        setHandlingUnit(existingData.handling_unit);
+        if (existingData.status === calloutStatus.RESOLVED) {
+            setTen22(true);
+        }
+        setResolutionNotes(existingData.resolution);
+
+    }
+
     const createCalloutPressed = () => {
 
-        if (ten22) {
-            Alert.alert('Confirm 10-22', "Are you sure you want to mark this callout 10-22?", [
+        var shouldShowConfirmation: boolean = false;
+        var confirmationMessage = "Are you sure you want to mark this callout 10-22?"
+        if (!existingData) {
+            shouldShowConfirmation = ten22;
+        } else {
+            if (existingData.status === calloutStatus.RESOLVED && ten22 === false) {
+                shouldShowConfirmation = true;
+                confirmationMessage = "Are you sure you want to mark this callout Active?"
+            } else if (existingData.status === calloutStatus.ACTIVE && ten22) {
+                shouldShowConfirmation = true;
+            }
+        }
+
+        if (shouldShowConfirmation) {
+            Alert.alert('Confirm Status', confirmationMessage, [
                 {
                     text: 'Yes',
-                    onPress: () => createCallout(),
+                    onPress: () => {
+                        if (!existingData) {
+                            createCallout();
+                        } else {
+                            updateCallout();
+                        }
+                    },
                     style: "destructive"
                 },
                 {
@@ -99,15 +154,24 @@ const Page = () => {
                 }
             ]);
         } else {
-            createCallout();
+            if (!existingData) {
+                createCallout();
+            } else {
+                updateCallout();
+            }
         }
     }
 
-    const createCallout = async () => {
-        console.log('create call out');
-        if (!validateFields()) {
-            return;
+    const generateCallout = (): callout => {
+
+        var locationObject: location = {
+            text: locationText
         }
+        if (global.selectedLocation) {
+            locationObject = global.selectedLocation;
+        }
+
+        //console.log("Location: " + JSON.stringify(locationObject));
 
         const callout: callout = {
             title: title,
@@ -121,16 +185,50 @@ const Page = () => {
             status: ten22 ? calloutStatus.RESOLVED : calloutStatus.ACTIVE,
             notifications_made: notificationsMade,
             resolution: resolutionNotes,
-            location: global.selectedLocation,
+            location: locationObject,
             handling_unit: handlingUnit
         }
 
-        console.log(callout);
+        //console.log("generated Callout: " + JSON.stringify(callout));
+
+        return callout;
+    }
+
+    const createCallout = async () => {
+        if (!validateFields()) {
+            return;
+        }
+
+        setSpinnerMessage("Creating Callout...");
         setShowSpinner(true);
-        const response: any = await apiCreateCallout(callout);
+        const response: any = await apiCreateCallout(generateCallout());
         setShowSpinner(false);
+        if (typeof response.id === 'number' && typeof response.title === 'string') {
+            msarEventEmitter.emit('refreshCallout',{});
+            router.replace({ pathname: 'view-callout', params: { id: response.id.toString(), title: response.title } })
+        }
+
         console.log(response);
 
+    }
+
+    const updateCallout = async () => {
+        if (!validateFields()) {
+            return;
+        }
+
+        const idInt: number = parseInt(id);
+
+        setSpinnerMessage("Updating Callout...");
+        setShowSpinner(true);
+        const response: any = await apiUpdateCallout(idInt, generateCallout());
+        setShowSpinner(false);
+        if (typeof response.id === 'number' && typeof response.title === 'string') {
+            msarEventEmitter.emit('refreshCallout',{id: idInt});
+            router.back();
+        }
+
+        console.log(response);
     }
 
     const validateFields = (): boolean => {
@@ -180,23 +278,13 @@ const Page = () => {
 
     const notificationsSelected = (items: string[]) => {
 
-        const selectedLabels: string[] = [];
-
-        items.forEach((value: string) => {
-            const foundItem = notificationSelect.find(item => item.value === value);
-            if (foundItem) {
-                selectedLabels.push(foundItem.label);
-            }
-        });
-
-
-        setNotificationsMade(selectedLabels);
+        setNotificationsMade(notificationListHelper.indicesToLabels(items));
     }
 
     const on1022Toggle = (checked: boolean) => {
         setTen22(checked);
         if (!checked) {
-            //clear 10-22 reason
+            setResolutionNotes('');
         }
     }
 
@@ -210,96 +298,99 @@ const Page = () => {
 
     return (
         <>
-        <SafeAreaView style={styles.container}>
-            <Header title={headerTitle} backButton={true} timestamp={new Date()} />
-            <KeyboardAvoidingView
-                style={styles.contentContainer}
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -500} // Adjust the offset as needed
-            >
-                <ScrollView style={styles.scrollView}>
-                <FormTextInput
-                        title={'Title'}
-                        onChange={titleChanged}
-                        placeholder='Title'
-                        value={title} />
-                    <DropdownSelector
-                        title={'Callout Type'}
-                        options={callOutTypeSelect}
-                        placeholder={'Select type'}
-                        onSelect={calloutTypeSelected} />
-                    <FormTextInput
-                        title={'Location'}
-                        rightButton={require('../assets/icons/map.png')}
-                        onRightPress={locationButtonPressed}
-                        onChange={locationChanged}
-                        placeholder='Location'
-                        value={locationText} />
-                    <FormTextInput
-                        title={'Subject'}
-                        onChange={subjectChanged}
-                        placeholder='Subject'
-                        value={subject} />
-                    <FormTextInput
-                        icon={require('../assets/icons/phone.png')}
-                        onChange={subjectContactChanged}
-                        placeholder='Subject Contact'
-                        value={subjectContact} />
-                    <FormTextInput
-                        title={'Informant'}
-                        onChange={informantChanged}
-                        placeholder='Informant'
-                        value={informant} />
-                    <FormTextInput
-                        icon={require('../assets/icons/phone.png')}
-                        onChange={informantContactChanged}
-                        placeholder='Informant Contact'
-                        value={informantContact} />
-                    <FormTextArea
-                        title={'Circumstances'}
-                        height={100}
-                        onChange={circumstancesChanged}
-                        placeholder='Circumstances'
-                        value={circumstances} />
-                    <DropdownSelector
-                        title={'Tactical Talkgroup'}
-                        options={radioFrequencySelect}
-                        placeholder={'Select Frequency'}
-                        onSelect={radioFreqSelected} />
-                    <DropdownMultiselect
-                        title={'Notifications Made'}
-                        options={notificationSelect}
-                        placeholder={'Select Notifications'}
-                        onSelect={notificationsSelected} />
-                    <FormTextInput
-                        title={'Handling Unit / Tag #'}
-                        onChange={handlingUnitChanged}
-                        placeholder='Handling Unit / Tag #'
-                        value={handlingUnit} />
-                    <FormCheckbox
-                        title={'10-22'}
-                        checked={ten22}
-                        onToggle={on1022Toggle} />
-                    {ten22 &&
+            <SafeAreaView style={styles.container}>
+                <Header title={headerTitle} backButton={true} timestamp={new Date()} />
+                <KeyboardAvoidingView
+                    style={styles.contentContainer}
+                    behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                    keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -500} // Adjust the offset as needed
+                >
+                    <ScrollView style={styles.scrollView}>
+                        <FormTextInput
+                            title={'Title'}
+                            onChange={titleChanged}
+                            placeholder='Title'
+                            value={title} />
+                        <DropdownSelector
+                            title={'Callout Type'}
+                            options={callOutTypeSelect}
+                            placeholder={'Select type'}
+                            selectedValue={`${callOutTypeSelect.findIndex(item => item.enum === operationType)}`}
+                            onSelect={calloutTypeSelected} />
+                        <FormTextInput
+                            title={'Location'}
+                            rightButton={require('../assets/icons/map.png')}
+                            onRightPress={locationButtonPressed}
+                            onChange={locationChanged}
+                            placeholder='Location'
+                            value={locationText} />
+                        <FormTextInput
+                            title={'Subject'}
+                            onChange={subjectChanged}
+                            placeholder='Subject'
+                            value={subject} />
+                        <FormTextInput
+                            icon={require('../assets/icons/phone.png')}
+                            onChange={subjectContactChanged}
+                            placeholder='Subject Contact'
+                            value={subjectContact} />
+                        <FormTextInput
+                            title={'Informant'}
+                            onChange={informantChanged}
+                            placeholder='Informant'
+                            value={informant} />
+                        <FormTextInput
+                            icon={require('../assets/icons/phone.png')}
+                            onChange={informantContactChanged}
+                            placeholder='Informant Contact'
+                            value={informantContact} />
                         <FormTextArea
+                            title={'Circumstances'}
                             height={100}
-                            onChange={resolutionChanged}
-                            placeholder='Resolution Notes'
-                            value={resolutionNotes} />
-                    }
-                    <TouchableOpacity
-                        activeOpacity={0.8}
-                        style={[elements.capsuleButton, styles.submitCalloutButton]}
-                        onPress={() => createCalloutPressed()}>
-                        <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>{headerTitle}</Text>
-                    </TouchableOpacity>
-                    <View style={{ height: 40 }} />
-                </ScrollView>
-            </KeyboardAvoidingView>
-        </SafeAreaView>
-        {showSpinner &&
-            <ActivityModal message={"Creating Callout..."} />
-        }
+                            onChange={circumstancesChanged}
+                            placeholder='Circumstances'
+                            value={circumstances} />
+                        <DropdownSelector
+                            title={'Tactical Talkgroup'}
+                            options={radioFrequencySelect}
+                            placeholder={'Select Frequency'}
+                            selectedValue={`${radioFrequencySelect.findIndex(item => item.label === radioFrequency)}`}
+                            onSelect={radioFreqSelected} />
+                        <DropdownMultiselect
+                            title={'Notifications Made'}
+                            options={notificationListHelper.list}
+                            placeholder={'Select Notifications'}
+                            selectedValues={notificationListHelper.labelsToIndices(notificationsMade)}
+                            onSelect={notificationsSelected} />
+                        <FormTextInput
+                            title={'Handling Unit / Tag #'}
+                            onChange={handlingUnitChanged}
+                            placeholder='Handling Unit / Tag #'
+                            value={handlingUnit} />
+                        <FormCheckbox
+                            title={'10-22'}
+                            checked={ten22}
+                            onToggle={on1022Toggle} />
+                        {ten22 &&
+                            <FormTextArea
+                                height={100}
+                                onChange={resolutionChanged}
+                                placeholder='Resolution Notes'
+                                value={resolutionNotes} />
+                        }
+                        <TouchableOpacity
+                            activeOpacity={0.8}
+                            style={[elements.capsuleButton, styles.submitCalloutButton]}
+                            onPress={() => createCalloutPressed()}>
+                            <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>{headerTitle}</Text>
+                        </TouchableOpacity>
+                        <View style={{ height: 40 }} />
+                    </ScrollView>
+                </KeyboardAvoidingView>
+            </SafeAreaView>
+            {showSpinner &&
+                <ActivityModal message={spinnerMessage} />
+            }
         </>
     )
 }

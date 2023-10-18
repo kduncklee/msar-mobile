@@ -46,14 +46,10 @@ const LocationField = ({ location }: LocationFieldProps) => {
         defaultRegion.longitude = coordinates.longitude;
     }
 
-
-
-
-
     return (
         <View style={styles.container}>
             {locType === locationType.DESCRIPTION &&
-                <Text style={elements.mediumText}>{location.text}</Text>
+                <Text style={[elements.mediumText, {padding: 8}]}>{location.text}</Text>
             }
             {locType === locationType.ADDRESS &&
                 <>

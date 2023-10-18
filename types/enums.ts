@@ -5,14 +5,18 @@ export enum calloutType {
 }
 
 export const stringToCalloutType = (value: string): calloutType | undefined => {
-    const enumValue = value as calloutType;
-    if (Object.values(calloutType).includes(enumValue)) {
-        return enumValue;
+    
+    switch (value) {
+        case 'search':
+            return calloutType.SEARCH;
+        case 'rescue':
+            return calloutType.RESCUE;
+        case 'information':
+            return calloutType.INFORMATION;
     }
 
     return undefined;
 }
-
 
 export enum responseType {
     TEN7 = "10-7",
@@ -51,9 +55,13 @@ export enum calloutStatus {
 }
 
 export const stringToCalloutStatus = (value: string): calloutStatus | undefined => {
-    const enumValue = value as calloutStatus;
-    if (Object.values(calloutStatus).includes(enumValue)) {
-        return enumValue;
+    switch (value) {
+        case 'active':
+            return calloutStatus.ACTIVE;
+        case 'resolved':
+            return calloutStatus.RESOLVED;
+        case 'archived':
+            return calloutStatus.ARCHIVED;
     }
 
     return undefined;

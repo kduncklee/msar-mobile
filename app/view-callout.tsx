@@ -1,16 +1,12 @@
 import { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpacity, Text, View, Touchable } from 'react-native';
+import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpacity, Text, View } from 'react-native';
 import Header from '../components/Header';
 import colors from '../styles/colors';
 import { elements } from '../styles/elements';
-import { router, useLocalSearchParams } from 'expo-router';
-import { calloutType, responseType } from '../types/enums';
-import { calloutSummary, colorForResponseType, textForResponseType, textForType } from '../types/calloutSummary';
+import { useLocalSearchParams } from 'expo-router';
+import { responseType } from '../types/enums';
+import { textForResponseType } from '../types/calloutSummary';
 import TabSelector from '../components/TabSelector/TabSelector';
-import InformationTray from '../components/fields/InformationTray';
-import InformationField from '../components/fields/InformationField';
-import TextAreaField from '../components/fields/TextAreaField';
-import LocationField from '../components/fields/LocationField';
 import CalloutRespond from '../components/callouts/CalloutRespond';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, Easing } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -19,15 +15,16 @@ import CalloutLogTab from '../components/callouts/CalloutLogTab';
 import CalloutPersonnelTab from '../components/callouts/CalloutPersonnelTab';
 import { tabItem } from '../types/tabItem';
 import LogInput from '../components/callouts/LogInput';
-import { callout } from '../types/callout';
-import { apiGetCallout } from '../remote/api';
+import { callout, calloutResponseBadge } from '../types/callout';
+import { apiGetCallout, apiRespondToCallout } from '../remote/api';
 import ActivityModal from '../components/modals/ActivityModal';
+import msarEventEmitter from '../utility/msarEventEmitter';
 
 const Page = () => {
 
     const { id, title } = useLocalSearchParams<{ id: string, title: string}>();
+    const [headerTitle, setHeaderTitle] = useState(title);
     const safeAreaInsets = useSafeAreaInsets();
-    var calloutId: number = null;
 
     const translateY = useSharedValue(600);
     const opacity = useSharedValue(0);
@@ -36,6 +33,8 @@ const Page = () => {
     const [showSpinner, setShowSpinner] = useState(false);
     const [currentTab, setCurrentTab] = useState(0);
     const [callout, setCallout] = useState<callout>(null);
+    const [logBadge, setLogBadge] = useState(null);
+    const [personnelBadge, setPersonnelBadge] = useState(null);
 
     const [logMessageText, setLogMessageText] = useState('');
 
@@ -45,12 +44,12 @@ const Page = () => {
         },
         {
             title: "Log",
-            badge: 64,
+            badge: logBadge,
             badgeColor: colors.red
         },
         {
             title: "Personnel",
-            badge: 4,
+            badge: personnelBadge,
             badgeColor: colors.green
         }
     ]
@@ -62,17 +61,34 @@ const Page = () => {
             StatusBar.setBackgroundColor(colors.primaryBg);
         }
 
+        msarEventEmitter.on('refreshCallout',refreshReceived);
+
         getCallout();
 
+        return () => {
+            msarEventEmitter.off('refreshCallout',refreshReceived);
+        }
+
     }, []);
+
+    useEffect(() => {
+        if (callout) {
+            setHeaderTitle(callout.title);
+            setPersonnelBadge(calloutResponseBadge(callout));
+            //setLogBadge(callout.log_count)
+        }
+    },[callout]);
+
+    const refreshReceived = data => {
+        getCallout();
+    }
 
     const getCallout = async () => {
 
         const idInt: number = parseInt(id);
-        console.log(idInt);
         setShowSpinner(true);
         const response = await apiGetCallout(idInt);
-        console.log(response);
+        console.log(JSON.stringify(response));
         setShowSpinner(false);
         //if it's a callout
         setCallout(response);
@@ -88,7 +104,6 @@ const Page = () => {
         translateY.value = withSpring(0 - safeAreaInsets.bottom, { damping: 20, stiffness: 100 });
         opacity.value = withTiming(0.8, { duration: 500 });
         setModalVisible(true);
-
     }
 
     const cancelRespondModal = () => {
@@ -97,13 +112,20 @@ const Page = () => {
             duration: 500, // Adjust the duration as needed
         });
         opacity.value = withTiming(0, { duration: 500 });
-
     }
 
     const responseSelected = (response: responseType) => {
         console.log(textForResponseType(response));
-
+        submitCalloutResponse(textForResponseType(response));
         cancelRespondModal();
+    }
+
+    const submitCalloutResponse = async (responseString: string) => {
+
+        const idInt: number = parseInt(id);
+        const response = await apiRespondToCallout(idInt, responseString);
+
+        msarEventEmitter.emit('refreshCallout',{id: idInt});
     }
 
     const onLogMessageTextChanged = (text: string) => {
@@ -128,7 +150,7 @@ const Page = () => {
     return (
         <>
             <SafeAreaView style={styles.container}>
-                <Header title={title} backButton={true} timestamp={new Date()} />
+                <Header title={headerTitle} backButton={true} timestamp={new Date()} />
                 {callout &&
                     <>
                         <TabSelector tabs={tabs} onTabChange={tabChanged} />

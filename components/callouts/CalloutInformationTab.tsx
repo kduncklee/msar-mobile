@@ -1,7 +1,7 @@
 import React, { StyleSheet } from 'react-native';
 import { View } from 'react-native';
-import { calloutSummary } from '../../types/calloutSummary';
-import { calloutType, responseType } from '../../types/enums';
+import { calloutSummary, textForCalloutStatus } from '../../types/calloutSummary';
+import { calloutType, responseType, stringToCalloutStatus } from '../../types/enums';
 import InformationTray from '../fields/InformationTray';
 import InformationField from '../fields/InformationField';
 import TextAreaField from '../fields/TextAreaField';
@@ -12,7 +12,7 @@ import { elements } from '../../styles/elements';
 import { textForResponseType, colorForResponseType, textForType } from '../../types/calloutSummary';
 import { getFullTimeString } from '../../utility/dateHelper';
 import { callout } from '../../types/callout';
-import { stringToCalloutType, stringToResponseType } from '../../types/enums';
+import { router } from 'expo-router';
 
 type CalloutInformationTabProps = {
     callout: callout
@@ -22,6 +22,7 @@ const CalloutInformationTab = ({ callout }: CalloutInformationTabProps) => {
 
     const editDetailsPressed = () => {
         console.log('edit details');
+        router.push({ pathname: 'edit-callout', params: { id: callout.id.toString() } })
     }
 
     return (
@@ -78,7 +79,7 @@ const CalloutInformationTab = ({ callout }: CalloutInformationTabProps) => {
                 {callout.notifications_made &&
                     <InformationField
                         title={'Notifications Made'}
-                        value={'LAHS Desk, Fire'} />
+                        value={callout.notifications_made.join(', ')} />
                 }
                 <View style={elements.informationDiv} />
                 {callout.handling_unit &&
@@ -113,7 +114,7 @@ const CalloutInformationTab = ({ callout }: CalloutInformationTabProps) => {
                 <View style={{ marginTop: 8 }} />
                 <InformationField
                     title={'Status'}
-                    value={'Active'} />
+                    value={textForCalloutStatus(callout.status)} />
                 <View style={elements.informationDiv} />
                 {callout.my_response &&
                     <>
@@ -125,9 +126,11 @@ const CalloutInformationTab = ({ callout }: CalloutInformationTabProps) => {
                         <View style={elements.informationDiv} />
                     </>
                 }
-                <InformationField
-                    title={'Callout Created by'}
-                    value={'Michael Johnson'} />
+                {callout.created_by &&
+                    <InformationField
+                        title={'Callout Created by'}
+                        value={callout.created_by.full_name} />
+                }
                 <View style={{ height: 10 }} />
             </InformationTray>
 

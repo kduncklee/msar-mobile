@@ -1,6 +1,6 @@
 export type tabItem = {
     title: string,
-    badge?: number,
+    badge?: string,
     badgeColor?: string,
     badgeTextColor?: string
 }
