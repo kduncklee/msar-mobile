@@ -24,10 +24,9 @@ const InformationTray = ({ title, titleBarColor, titleTextColor, editButton, onE
                 <Text style={[styles.titleText, {color: titleColor}]}>
                     {title}
                 </Text>
-                {onEditPress &&
+                {(onEditPress && editButton) &&
                     <TouchableOpacity activeOpacity={0.5} style={styles.editButton} onPress={onEditPress}>
-                        {editButton == true &&
-                            <Image source={require('../../assets/icons/pencil.png')} style={styles.editImage} />}
+                        <Image source={require('../../assets/icons/pencil.png')} style={styles.editImage} />
                     </TouchableOpacity>
                 }
                 {count &&
