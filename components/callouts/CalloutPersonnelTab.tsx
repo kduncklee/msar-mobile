@@ -1,5 +1,5 @@
-import React, { StyleSheet } from 'react-native';
-import { View, Text } from 'react-native';
+import React, { Fragment } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { calloutSummary } from '../../types/calloutSummary';
 import { calloutType, responseType } from '../../types/enums';
 import InformationTray from '../fields/InformationTray';
@@ -53,12 +53,12 @@ const CalloutPersonnelTab = ({ callout }: CalloutPersonnelTabProps) => {
                             const addDiv: boolean = (index < filterByTen19.length - 1);
 
                             return (
-                                <>
+                                <React.Fragment key={opResponse.member.id}>
                                     <PersonnelField key={opResponse.member.id} opResponse={opResponse} />
                                     {addDiv &&
                                         <View style={elements.informationDiv} />
                                     }
-                                </>
+                                </React.Fragment>
                             )
                         })
                     }

@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpacity, Text, View } from 'react-native';
 import Header from '../components/Header';
 import colors from '../styles/colors';
 import { elements } from '../styles/elements';
 import { useLocalSearchParams } from 'expo-router';
-import { responseType } from '../types/enums';
+import { calloutStatus, responseType } from '../types/enums';
 import { textForResponseType } from '../types/calloutSummary';
 import TabSelector from '../components/TabSelector/TabSelector';
 import CalloutRespond from '../components/callouts/CalloutRespond';
@@ -16,7 +16,7 @@ import CalloutPersonnelTab from '../components/callouts/CalloutPersonnelTab';
 import { tabItem } from '../types/tabItem';
 import LogInput from '../components/callouts/LogInput';
 import { callout, calloutResponseBadge } from '../types/callout';
-import { apiGetCallout, apiRespondToCallout } from '../remote/api';
+import { apiGetCallout, apiPostCalloutLog, apiRespondToCallout } from '../remote/api';
 import ActivityModal from '../components/modals/ActivityModal';
 import msarEventEmitter from '../utility/msarEventEmitter';
 
@@ -25,18 +25,22 @@ const Page = () => {
     const { id, title } = useLocalSearchParams<{ id: string, title: string}>();
     const [headerTitle, setHeaderTitle] = useState(title);
     const safeAreaInsets = useSafeAreaInsets();
+    const scrollViewRef = useRef(null);
 
     const translateY = useSharedValue(600);
     const opacity = useSharedValue(0);
 
     const [modalVisible, setModalVisible] = useState(false);
     const [showSpinner, setShowSpinner] = useState(false);
+    const [spinnerMessage, setSpinnerMessage] = useState('');
     const [currentTab, setCurrentTab] = useState(0);
     const [callout, setCallout] = useState<callout>(null);
     const [logBadge, setLogBadge] = useState(null);
     const [personnelBadge, setPersonnelBadge] = useState(null);
+    const [calloutTimestamp, setCalloutTimestamp] = useState<Date>(null);
 
     const [logMessageText, setLogMessageText] = useState('');
+    const [isActive, setIsActive] = useState(false);
 
     const tabs: tabItem[] = [
         {
@@ -62,11 +66,13 @@ const Page = () => {
         }
 
         msarEventEmitter.on('refreshCallout',refreshReceived);
+        msarEventEmitter.on('logLoaded',logLoaded);
 
         getCallout();
 
         return () => {
             msarEventEmitter.off('refreshCallout',refreshReceived);
+            msarEventEmitter.off('logLoaded',logLoaded);
         }
 
     }, []);
@@ -75,7 +81,13 @@ const Page = () => {
         if (callout) {
             setHeaderTitle(callout.title);
             setPersonnelBadge(calloutResponseBadge(callout));
-            setLogBadge(callout.log_count)
+            setLogBadge(callout.log_count);
+            setCalloutTimestamp(callout.created_at);
+            if (callout.status === calloutStatus.ACTIVE) {
+                setIsActive(true);
+            } else {
+                setIsActive(false);
+            }
         }
     },[callout]);
 
@@ -83,12 +95,23 @@ const Page = () => {
         getCallout();
     }
 
+    const logLoaded = data => {
+        if (currentTab === 1) {
+            setTimeout(scrollToBottom, 500);
+        }
+    }
+
+    const scrollToBottom = () => {
+        scrollViewRef.current.scrollToEnd({ animated: true });
+    }
+
     const getCallout = async () => {
 
         const idInt: number = parseInt(id);
+        setSpinnerMessage("Loading Callout...");
         setShowSpinner(true);
         const response = await apiGetCallout(idInt);
-        console.log(JSON.stringify(response));
+        //console.log(JSON.stringify(response));
         setShowSpinner(false);
         //if it's a callout
         setCallout(response);
@@ -123,13 +146,28 @@ const Page = () => {
     const submitCalloutResponse = async (responseString: string) => {
 
         const idInt: number = parseInt(id);
+        setSpinnerMessage("Submitting Response...");
+        setShowSpinner(true);
         const response = await apiRespondToCallout(idInt, responseString);
-
+        setShowSpinner(false);
         msarEventEmitter.emit('refreshCallout',{id: idInt});
     }
 
     const onLogMessageTextChanged = (text: string) => {
         setLogMessageText(text);
+    }
+
+    const submitLogMessage = async () => {
+        const idInt: number = parseInt(id);
+        const logMessage: string = logMessageText;
+        setLogMessageText('');
+        setShowSpinner(true);
+        //set message for spinner
+        const response = await apiPostCalloutLog(idInt, logMessage);
+        setShowSpinner(false);
+
+        msarEventEmitter.emit('refreshCallout',{id: idInt});
+        msarEventEmitter.emit('refreshLog',{id: idInt});
     }
 
     const trayAnimatedStyle = useAnimatedStyle(() => {
@@ -150,12 +188,12 @@ const Page = () => {
     return (
         <>
             <SafeAreaView style={styles.container}>
-                <Header title={headerTitle} backButton={true} timestamp={new Date()} />
+                <Header title={headerTitle} backButton={true} timestamp={calloutTimestamp} />
                 {callout &&
                     <>
                         <TabSelector tabs={tabs} onTabChange={tabChanged} />
                         <View style={styles.contentContainer}>
-                            <ScrollView style={styles.scrollView}>
+                            <ScrollView ref={scrollViewRef} style={styles.scrollView}>
                                 {currentTab === 0 &&
                                     <CalloutInformationTab
                                         callout={callout} />
@@ -169,7 +207,7 @@ const Page = () => {
                                         callout={callout} />
                                 }
                             </ScrollView>
-                            {currentTab === 0 &&
+                            {currentTab === 0 && isActive &&
                                 <TouchableOpacity
                                     activeOpacity={0.8}
                                     style={[elements.capsuleButton, styles.respondCalloutButton]}
@@ -177,11 +215,11 @@ const Page = () => {
                                     <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>Respond</Text>
                                 </TouchableOpacity>
                             }
-                            {currentTab === 1 &&
+                            {currentTab === 1 && isActive &&
                                 <LogInput
                                     onTextChange={onLogMessageTextChanged}
                                     text={logMessageText}
-                                    onSendPress={() => console.log('send')}
+                                    onSendPress={submitLogMessage}
                                     onPhotoPress={() => console.log('photo')} />
                             }
                         </View>
@@ -198,9 +236,8 @@ const Page = () => {
                 </Animated.View>
             }
             {showSpinner &&
-                <ActivityModal message={"Loading Callout..."} />
+                <ActivityModal message={spinnerMessage} />
             }
-
         </>
     )
 }

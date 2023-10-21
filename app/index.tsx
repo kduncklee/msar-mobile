@@ -7,8 +7,9 @@ import FormTextInput from '../components/inputs/FormTextInput';
 import SmallButton from '../components/inputs/SmallButton';
 import { apiGetToken } from '../remote/api';
 import { loginResponse } from '../remote/responses';
-import { storeCredentials } from '../storage/storage';
+import { getCredentials, storeCredentials } from '../storage/storage';
 import ActivityModal from '../components/modals/ActivityModal';
+import "../storage/global";
 
 const Page = () => {
 
@@ -65,6 +66,7 @@ const Page = () => {
 
         if (response.token) {
             await storeCredentials(username, response.token);
+            global.currentCredentials = await getCredentials();
             router.push('callout-list');
         }
 

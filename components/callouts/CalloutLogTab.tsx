@@ -1,89 +1,69 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { responseType } from '../../types/enums';
+import { stringToResponseType } from '../../types/enums';
 import colors from '../../styles/colors';
 import { logType } from '../../types/enums';
 import { logEntry } from '../../types/logEntry';
 import LogResponseField from '../fields/log/LogResponseField';
-import { personnel } from '../../types/personnel';
 import LogSelfMessageField from '../fields/log/LogSelfMessageField';
-import { message } from '../../types/message';
 import LogMessageField from '../fields/log/LogMessageField';
 import { callout } from '../../types/callout';
 import { apiGetCalloutLog } from '../../remote/api';
-
+import LogSystemField from '../fields/log/LogUpdateField';
+import msarEventEmitter from '../../utility/msarEventEmitter';
 type CalloutLogTabProps = {
     callout: callout
 }
 
 const CalloutLogTab = ({ callout }: CalloutLogTabProps) => {
 
+    const [logList, setLogList] = useState<logEntry[]>([]);
+
     useEffect(() => {
+
+        msarEventEmitter.on('refreshLog',refreshReceived);
+
         getCalloutLog();
+
+        return () => {
+            msarEventEmitter.off('refreshLog',refreshReceived);
+        }
+        
     },[]);
 
-
-    const logList: logEntry[] = [
-        {
-            type: logType.RESPONSE,
-            data: {
-                first_name: "Bob",
-                last_name: "Jones",
-                phone: "310-555-1212",
-                response: responseType.TEN19
-            },
-            timestamp: new Date()
-        },
-        {
-            type: logType.MESSAGE_SELF,
-            data: {
-                author: {
-                    first_name: "Bob",
-                    last_name: "Jones",
-                    phone: "310-555-1212",
-                    response: responseType.TEN19
-                },
-                message: "I found him. assessing the situation. Will report back. also other stuff and things and even morex"
-            },
-            timestamp: new Date()
-        },
-        {
-            type: logType.MESSAGE,
-            data: {
-                author: {
-                    first_name: "Bob",
-                    last_name: "Jones",
-                    phone: "310-555-1212",
-                    response: responseType.TEN8
-                },
-                message: "Ok. Standing by."
-            },
-            timestamp: new Date()
+    useEffect(() => {
+        if (logList.length > 0) {
+            msarEventEmitter.emit('logLoaded',{});
         }
-    ];
+    },[logList]);
+
+
+    const refreshReceived = data => {
+        getCalloutLog();
+    }
 
     const getCalloutLog = async () => {
         const response = await apiGetCalloutLog(callout.id);
-
+        setLogList(response.results);
     }
+
 
 
     return (
         <>
             {
-                logList.map((object: any, index: number) => {
-                    switch (object.type) {
+                logList.map((entry: logEntry, index: number) => {
+                    switch (entry.type) {
                         case logType.RESPONSE:
-                            return (<LogResponseField key={index} personnel={object.data as personnel} timestamp={object.timestamp} />);
-                        case logType.MESSAGE_SELF:
-                            return (<LogSelfMessageField key={index} message={object.data as message} timestamp={object.timestamp} />);
+                            return (<LogResponseField key={entry.id} member={entry.member} response={stringToResponseType(entry.update)} timestamp={entry.created_at} />);
+                        case logType.SYSTEM:
+                            return (<LogSystemField key={entry.id} member={entry.member} update={entry.update} timestamp={entry.created_at} />);
                         case logType.MESSAGE:
-                            return (<LogMessageField key={index} message={object.data} timestamp={object.timestamp} />);
-                        default:
-                            return (<Text key={index}>no</Text>);
+                            return (<LogMessageField key={entry.id} member={entry.member} message={entry.message} timestamp={entry.created_at} />);
                     }
                 })
             }
+            <View style={{marginTop: 60}} />
         </>
     );
 }

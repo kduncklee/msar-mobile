@@ -2,23 +2,23 @@ import React, { useState, } from 'react';
 import { StyleSheet, View, Text, Image, ImageRequireSource } from 'react-native';
 import { elements } from '../../../styles/elements';
 import colors from '../../../styles/colors'
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { personnel, personnelToString } from '../../../types/personnel';
 import { responseType } from '../../../types/enums';
 import { colorForResponseType, textForResponseType } from '../../../types/calloutSummary';
 import { getTimeString } from '../../../utility/dateHelper';
+import { user, userToString } from '../../../types/user';
 
 type LogResponseFieldProps = {
-    personnel: personnel,
+    member: user,
+    response: responseType,
     timestamp: Date
 }
 
-const LogResponseField = ({ personnel, timestamp }: LogResponseFieldProps) => {
+const LogResponseField = ({ member, response, timestamp }: LogResponseFieldProps) => {
 
     return (
         <View style={styles.container}>
-            <Text style={[styles.valueText,{color: colorForResponseType(personnel.response)}]}>
-                {personnelToString(personnel)}{' responded '}{textForResponseType(personnel.response)}
+            <Text style={[styles.valueText,{color: colorForResponseType(response)}]}>
+                {userToString(member)}{' responded '}{textForResponseType(response)}
             </Text>
             <Text style={styles.logTimestamp}>
                 {getTimeString(timestamp)}

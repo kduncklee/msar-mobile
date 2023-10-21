@@ -1,6 +1,7 @@
 import { getCredentials } from "../storage/storage";
 import { callout, calloutFromResponse } from "../types/callout";
-import { loginResponse } from "./responses";
+import { logEntry, logEntryFromRespsonse } from "../types/logEntry";
+import { calloutGetLogResponse, loginResponse } from "./responses";
 
 let prod_server: string = "https://malibusarhours.org/calloutapi";
 let server: string = prod_server;
@@ -176,7 +177,7 @@ export const apiRespondToCallout = async (id: number, response: string): Promise
     })
 }
 
-export const apiGetCalloutLog = async (id: number): Promise<any> => {
+export const apiGetCalloutLog = async (id: number): Promise<calloutGetLogResponse> => {
 
     const credentials = await getCredentials();
     if (!credentials.token) {
@@ -192,8 +193,16 @@ export const apiGetCalloutLog = async (id: number): Promise<any> => {
     })
     .then(response => response.json())
     .then(data => {
-        console.log("get callout log response: " + JSON.stringify(data));
-        return data;
+        //console.log("get callout log response: " + JSON.stringify(data));
+        var results: logEntry[] = [];
+        data.results.forEach(result => {
+            results.push(logEntryFromRespsonse(result));
+        });
+
+        return {
+            count: data.count,
+            results: results
+        };
     })
     .catch(error => {
         console.log(error);
@@ -203,3 +212,33 @@ export const apiGetCalloutLog = async (id: number): Promise<any> => {
     })
 }
 
+
+export const apiPostCalloutLog = async (id: number, message: string): Promise<any> => {
+    const credentials = await getCredentials();
+    if (!credentials.token) {
+        return { error: "no token"}
+    }
+
+    return fetch(calloutsEndpoint + id + '/log/', {
+        method: "POST",
+        headers: {
+            'Authorization': 'Token ' + credentials.token,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            type: "message",
+            message: message
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        //console.log("created log entry: " + JSON.stringify(data));
+        return data
+    })
+    .catch(error => {
+        console.log(error);
+        return {
+            error: "Server Error"
+        };
+    })
+}

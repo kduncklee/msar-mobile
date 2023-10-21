@@ -1,30 +1,41 @@
-import React, { useState, } from 'react';
-import { StyleSheet, View, Text, Image, ImageRequireSource } from 'react-native';
+import React from 'react';
+import { StyleSheet, View, Text } from 'react-native';
 import { elements } from '../../../styles/elements';
 import colors from '../../../styles/colors'
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { personnel, personnelToString } from '../../../types/personnel';
-import { responseType } from '../../../types/enums';
-import { colorForResponseType, textForResponseType } from '../../../types/calloutSummary';
-import { message } from '../../../types/message';
 import { getTimeString } from '../../../utility/dateHelper';
+import { isUserSelf, user, userToString } from '../../../types/user';
 
 type LogMessageFieldProps = {
-    message: message,
+    member: user,
+    message: string,
     timestamp: Date
 }
 
-const LogMessageField = ({ message, timestamp }: LogMessageFieldProps) => {
+const LogMessageField = ({ member, message, timestamp }: LogMessageFieldProps) => {
+
+    const isSelf: boolean = isUserSelf(member);
 
     return (
-        <View style={[elements.tray,styles.container]}>
-            <Text style={[styles.messageAuthor]}>
-                {personnelToString(message.author)}
+        <View style={[elements.tray,
+        isSelf ? styles.selfContainer : styles.container,
+        {
+            "backgroundColor": isSelf ? colors.darkBlue : colors.secondaryBg
+        }
+        ]}>
+            {!isSelf &&
+                <Text style={[styles.messageAuthor]}>
+                    {userToString(member)}
+                </Text>
+            }
+            <Text style={[styles.messageText,{
+                "textAlign": isSelf ? "right" : "left"
+            }]}>
+                {message}
             </Text>
-            <Text style={[styles.messageText]}>
-                {message.message}
-            </Text>
-            <Text style={[styles.messageTimestamp]}>
+            <Text style={[styles.messageTimestamp,{
+                "textAlign": isSelf ? "right" : "left",
+                "color": isSelf ? colors.lightText : colors.grayText
+            }]}>
                 {getTimeString(timestamp)}
             </Text>
         </View>
@@ -41,10 +52,17 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         maxWidth: "80%"
     },
+    selfContainer: {
+        marginVertical: 16,
+        paddingHorizontal: 20,
+        paddingVertical: 8,
+        marginRight: 20,
+        marginLeft: "auto",
+        maxWidth: "80%"
+    },
     messageText: {
         fontSize: 16,
         fontWeight: "400",
-        textAlign: "left",
         color: colors.primaryText
     },
 
@@ -59,7 +77,6 @@ const styles = StyleSheet.create({
         marginTop: 8,
         fontSize: 12,
         fontWeight: "400",
-        textAlign: "right",
         color: colors.grayText
     }
 });

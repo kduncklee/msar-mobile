@@ -28,7 +28,7 @@ const LogInput = ({text, onSendPress, onPhotoPress, onTextChange}: LogInputProps
                 style={styles.messageText}
                 placeholder={'Message...'}
                 placeholderTextColor={colors.grayText}/>
-            <TouchableOpacity activeOpacity={0.5} style={[styles.button,{backgroundColor: colors.blue}]}>
+            <TouchableOpacity activeOpacity={0.5} style={[styles.button,{backgroundColor: colors.blue}]} onPress={onSendPress}>
                 <Image source={require('../../assets/icons/send_white.png')} style={styles.buttonImage} />
             </TouchableOpacity>
         </View>

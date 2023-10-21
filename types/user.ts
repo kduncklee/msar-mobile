@@ -1,3 +1,5 @@
+import "../storage/global";
+
 export type user = {
     id: number,
     first_name: string,
@@ -10,4 +12,18 @@ export type user = {
 export const userToString = (user: user): string => {
 
     return user.full_name;
+}
+
+export const isUserSelf = (user: user): boolean => {
+
+    if (global.currentCredentials) {
+        //console.log(global.currentCredentials);
+        if (global.currentCredentials.username) {
+            if (global.currentCredentials.username === user.username) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }

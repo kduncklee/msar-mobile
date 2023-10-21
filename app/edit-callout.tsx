@@ -33,6 +33,7 @@ const Page = () => {
     const [circumstances, setCircumstances] = useState<string>(null);
     const [notificationsMade, setNotificationsMade] = useState<string[]>([]);
     const [ten22, setTen22] = useState(false);
+    const [archived, setArchived] = useState(false);
     const [resolutionNotes, setResolutionNotes] = useState<string>(null);
     const [locationText, setLocationText] = useState('');
     const [handlingUnit, setHandlingUnit] = useState<string>(null);
@@ -187,6 +188,10 @@ const Page = () => {
             resolution: resolutionNotes,
             location: locationObject,
             handling_unit: handlingUnit
+        }
+
+        if (archived) {
+            callout.status = calloutStatus.ARCHIVED;
         }
 
         //console.log("generated Callout: " + JSON.stringify(callout));
@@ -377,6 +382,12 @@ const Page = () => {
                                 onChange={resolutionChanged}
                                 placeholder='Resolution Notes'
                                 value={resolutionNotes} />
+                        }
+                        {ten22 &&
+                            <FormCheckbox
+                            title={'Archive'}
+                            checked={archived}
+                            onToggle={() => setArchived(true)} />
                         }
                         <TouchableOpacity
                             activeOpacity={0.8}

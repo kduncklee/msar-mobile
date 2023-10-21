@@ -17,15 +17,15 @@ const Page = () => {
 
     const [showSpinner, setShowSpinner] = useState(false);
     const [activeCalloutList, setActiveCalloutList] = useState<calloutSummary[]>([]);
-    const [archivedCalloutList, setArchivedCalloutList] = useState<calloutSummary[]>([]);
+    const [archiveCount, setArchiveCount] = useState(null);
 
     const tabs: tabItem[] = [
         {
             title: "Active"
         },
         {
-            title: "Archive",
-            badge: 64,
+            title: "Archived",
+            badge: archiveCount,
             badgeColor: colors.red
         }
     ]

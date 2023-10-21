@@ -1,24 +1,24 @@
-import React, { StyleSheet } from 'react-native';
-import { View } from 'react-native';
-import { calloutSummary, textForCalloutStatus } from '../../types/calloutSummary';
-import { calloutType, responseType, stringToCalloutStatus } from '../../types/enums';
+import { View, StyleSheet } from 'react-native';
+import { textForCalloutStatus } from '../../types/calloutSummary';
 import InformationTray from '../fields/InformationTray';
 import InformationField from '../fields/InformationField';
 import TextAreaField from '../fields/TextAreaField';
 import LocationField from '../fields/LocationField';
-import CalloutRespond from '../callouts/CalloutRespond';
 import colors from '../../styles/colors';
 import { elements } from '../../styles/elements';
 import { textForResponseType, colorForResponseType, textForType } from '../../types/calloutSummary';
 import { getFullTimeString } from '../../utility/dateHelper';
 import { callout } from '../../types/callout';
 import { router } from 'expo-router';
+import { calloutStatus } from '../../types/enums';
 
 type CalloutInformationTabProps = {
     callout: callout
 }
 
 const CalloutInformationTab = ({ callout }: CalloutInformationTabProps) => {
+
+    const showEdit: boolean = (callout.status === calloutStatus.ARCHIVED) ? false : true;
 
     const editDetailsPressed = () => {
         console.log('edit details');
@@ -30,7 +30,7 @@ const CalloutInformationTab = ({ callout }: CalloutInformationTabProps) => {
             <InformationTray
                 title={'Details'}
                 titleBarColor={colors.red}
-                editButton={true}
+                editButton={showEdit}
                 onEditPress={editDetailsPressed}>
                 <View style={{ marginTop: 8 }} />
                 {callout.created_at &&
@@ -100,7 +100,7 @@ const CalloutInformationTab = ({ callout }: CalloutInformationTabProps) => {
                 <InformationTray
                     title={'Location'}
                     titleBarColor={colors.blue}
-                    editButton={true}
+                    editButton={showEdit}
                     onEditPress={editDetailsPressed}>
                     <LocationField location={callout.location} />
                 </InformationTray>
@@ -109,7 +109,7 @@ const CalloutInformationTab = ({ callout }: CalloutInformationTabProps) => {
                 title={'Additional Information'}
                 titleBarColor={colors.secondaryYellow}
                 titleTextColor={colors.black}
-                editButton={true}
+                editButton={showEdit}
                 onEditPress={editDetailsPressed}>
                 <View style={{ marginTop: 8 }} />
                 <InformationField

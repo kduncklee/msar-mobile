@@ -41,11 +41,22 @@ export enum locationType {
 }
 
 export enum logType {
-    RESPONSE,
-    CALLOUT_UPDATE,
-    MESSAGE_SELF,
-    MESSAGE,
-    MESSAGE_SYSTEM
+    RESPONSE = "response",
+    SYSTEM = "system",
+    MESSAGE = "message"
+}
+
+export const stringToLogType = (value: string): logType | undefined => {
+    switch (value) {
+        case 'response':
+            return logType.RESPONSE;
+        case 'system':
+            return logType.SYSTEM;
+        case 'message':
+            return logType.MESSAGE;
+    }
+
+    return undefined;
 }
 
 export enum calloutStatus {
