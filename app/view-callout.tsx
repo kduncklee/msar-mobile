@@ -162,7 +162,6 @@ const Page = () => {
         const logMessage: string = logMessageText;
         setLogMessageText('');
         setShowSpinner(true);
-        //set message for spinner
         const response = await apiPostCalloutLog(idInt, logMessage);
         setShowSpinner(false);
 

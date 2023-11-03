@@ -9,10 +9,12 @@ type HeaderProps = {
     title: string,
     backButton?: boolean,
     onBackPressed?: () => void,
+    rightButton?: boolean,
+    onRightPressed?: () => void,
     timestamp?: Date
 }
 
-const Header = ({ title, backButton = false, onBackPressed, timestamp = null }: HeaderProps) => {
+const Header = ({ title, backButton = false, onBackPressed, rightButton = false, onRightPressed, timestamp = null }: HeaderProps) => {
 
     const [headerMargin, setHeaderMargin] = useState(0);
 
@@ -52,7 +54,7 @@ const Header = ({ title, backButton = false, onBackPressed, timestamp = null }: 
         <View style={[styles.container, { marginTop: headerMargin }]}>
             {backButton &&
                 <TouchableOpacity activeOpacity={0.2} style={styles.backContainer} onPress={() => backPressed()}>
-                    <Image source={require('assets/icons/back.png')} style={styles.backImage}></Image>
+                    <Image source={require('assets/icons/back.png')} style={styles.backImage} />
                 </TouchableOpacity>
             }
             <Text style={[styles.title, { paddingHorizontal: backButton ? 10 : 20 }]}>
@@ -61,6 +63,11 @@ const Header = ({ title, backButton = false, onBackPressed, timestamp = null }: 
             {timestamp != null && <View style={[elements.capsule, { marginRight: 20 }]}>
                 <Text style={elements.smallYellowText}>{getTimeString(timestamp)}</Text>
             </View>
+            }
+            {rightButton &&
+                <TouchableOpacity activeOpacity={0.2} style={styles.rightContainer} onPress={onRightPressed}>
+                    <Image source={require('assets/icons/settings.png')} style={styles.rightImage} />
+                </TouchableOpacity>
             }
         </View>
     );
@@ -84,9 +91,21 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center"
     },
+    rightContainer: {
+        width: 30,
+        height: 30,
+        marginRight: 10,
+        alignItems: "center",
+        justifyContent: "center"
+    },
     backImage: {
         width: 20,
         height: 20,
+        resizeMode: 'contain',
+    },
+    rightImage: {
+        width: 40,
+        height: 40,
         resizeMode: 'contain',
     }
 });

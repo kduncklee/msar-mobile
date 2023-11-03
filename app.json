@@ -15,13 +15,16 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "org.malibusarhours.msar",
+      "icon": "./assets/icon.png"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "foregroundImage": "./assets/icon-foreground.png",
+        "backgroundColor": "#2B3038"
+      },
+      "package": "org.malibusarhours.msar"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -32,6 +35,14 @@
     "experiments": {
       "tsconfigPaths": true
     },
-    "scheme": "com.reduxsoft.msar"
+    "scheme": "com.reduxsoft.msar",
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "f39a7bb9-2132-4fbb-abc6-c08a0daef74b"
+      }
+    }
   }
 }

@@ -85,10 +85,15 @@ const Page = () => {
         router.push({ pathname: 'view-callout', params: { id: calloutSummary.id, title: calloutSummary.title } })
     }
 
+    const settingsPressed = () => {
+        router.push('/settings');
+        console.log("settings");
+    }
+
     return (
         <>
             <SafeAreaView style={styles.container}>
-                <Header title="Callouts" />
+                <Header title="Callouts" rightButton={true} onRightPressed={() => settingsPressed()}/>
                 <TabSelector tabs={tabs} onTabChange={tabChanged} />
                 <View style={styles.contentContainer}>
                     <ScrollView style={styles.scrollView}>
