@@ -24,7 +24,8 @@
         "foregroundImage": "./assets/icon-foreground.png",
         "backgroundColor": "#2B3038"
       },
-      "package": "org.malibusarhours.msar"
+      "package": "org.malibusarhours.msar",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"

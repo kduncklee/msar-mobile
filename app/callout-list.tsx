@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpacity, Text, View } from 'react-native';
 import Header from '../components/Header';
 import CalloutCell from '../components/callouts/CalloutCell';
@@ -12,12 +12,17 @@ import ActivityModal from '../components/modals/ActivityModal';
 import { tabItem } from '../types/tabItem';
 import '../storage/global';
 import msarEventEmitter from '../utility/msarEventEmitter';
+import pushNotifications from '../utility/pushNotifications';
+import * as Notifications from 'expo-notifications';
 
 const Page = () => {
 
     const [showSpinner, setShowSpinner] = useState(false);
     const [activeCalloutList, setActiveCalloutList] = useState<calloutSummary[]>([]);
     const [archiveCount, setArchiveCount] = useState(null);
+    const notificationListener = useRef<Notifications.Subscription>();
+    const responseListener = useRef<Notifications.Subscription>();
+    const [notification, setNotification] = useState(false);
 
     const tabs: tabItem[] = [
         {
@@ -34,6 +39,19 @@ const Page = () => {
 
 
     useEffect(() => {
+
+        pushNotifications.registerForPushNotificationsAsync();
+
+        notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+            console.log('notification received');
+            console.log(notification.request.content.title);
+            //setNotification(notification);
+          });
+      
+          responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+            console.log(response);
+          });
+
         if (Platform.OS === 'ios') {
             StatusBar.setBarStyle('light-content');
         } else if (Platform.OS === 'android') {

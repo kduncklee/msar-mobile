@@ -2,11 +2,13 @@ import { getCredentials } from "../storage/storage";
 import { callout, calloutFromResponse } from "../types/callout";
 import { logEntry, logEntryFromRespsonse } from "../types/logEntry";
 import { calloutGetLogResponse, loginResponse } from "./responses";
+import { Platform } from "react-native";
 
 let prod_server: string = "https://malibusarhours.org/calloutapi";
 let server: string = prod_server;
 let tokenEndpoint: string = server + "/api-token-auth/";
 let calloutsEndpoint: string = server + "/api/callouts/";
+let devicesEndpoint: string = server + "/api/devices/";
 
 export const apiGetToken = async (username: string, password: string): Promise<loginResponse> => {
 
@@ -234,6 +236,41 @@ export const apiPostCalloutLog = async (id: number, message: string): Promise<an
     .then(data => {
         //console.log("created log entry: " + JSON.stringify(data));
         return data
+    })
+    .catch(error => {
+        console.log(error);
+        return {
+            error: "Server Error"
+        };
+    })
+}
+
+export const apiSetDeviceId = async (token: string): Promise<any> => {
+    const credentials = await getCredentials();
+    if (!credentials.token) {
+        return { error: "no token"}
+    }
+
+    const tokenInfo = {
+        name: "expo",
+        registration_id: token,
+        device_id: "msar",
+        active: true,
+        type: Platform.OS === 'ios' ? 'ios' : 'android'
+    }
+
+    return fetch(devicesEndpoint, {
+        method: "POST",
+        headers: {
+            'Authorization': 'Token ' + credentials.token,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(tokenInfo)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("assigned push token: " + JSON.stringify(data));
+        //return calloutFromResponse(data);
     })
     .catch(error => {
         console.log(error);
