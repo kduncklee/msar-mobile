@@ -1,32 +1,32 @@
 import { useEffect, useRef, useState } from 'react';
-import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, Image, View, KeyboardAvoidingView, Keyboard, Alert  } from 'react-native';
+import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, Image, View, KeyboardAvoidingView, Keyboard, Alert } from 'react-native';
 import colors from '../styles/colors';
 import { elements } from '../styles/elements';
 import { router } from 'expo-router';
 import FormTextInput from '../components/inputs/FormTextInput';
 import SmallButton from '../components/inputs/SmallButton';
-import { apiGetToken } from '../remote/api';
+import { apiGetToken, apiValidateToken } from '../remote/api';
 import { loginResponse } from '../remote/responses';
-import { getCredentials, storeCredentials } from '../storage/storage';
+import { getCredentials, storeCredentials, clearCredentials } from '../storage/storage';
 import ActivityModal from '../components/modals/ActivityModal';
 import "../storage/global";
 import * as Notifications from 'expo-notifications';
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
-      shouldShowAlert: true,
-      shouldPlaySound: false,
-      shouldSetBadge: false,
+        shouldShowAlert: true,
+        shouldPlaySound: false,
+        shouldSetBadge: false,
     }),
-  });
+});
 
 const Page = () => {
+    //R07 / L!u0fN*V^rcPe1hX
 
-    
-    const [topMargin,setTopMargin] = useState(0);
+    const [topMargin, setTopMargin] = useState(0);
     const scrollViewRef = useRef(null);
-    const [username, setUsername] = useState('R07');
-    const [password, setPassword] = useState('L!u0fN*V^rcPe1hX')
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
     const [showSpinner, setShowSpinner] = useState(false);
 
     useEffect(() => {
@@ -39,6 +39,7 @@ const Page = () => {
             setTopMargin(StatusBar.currentHeight + 20);
         }
 
+
         const keyboardDidShowListener = Keyboard.addListener(
             'keyboardDidShow',
             () => {
@@ -48,8 +49,33 @@ const Page = () => {
             }
         );
 
-        
+        tokenCheck();
+        //validateToken();
+
     }, []);
+
+    const tokenCheck = async () => {
+        const creds = await getCredentials();
+        if (!creds.token || !creds.username) {
+            return;
+        }
+
+        setUsername(creds.username);
+        setPassword("PASSWORD");
+        setShowSpinner(true);
+
+        const response = await apiValidateToken();
+        if (response.valid_token == true) {
+            router.push('callout-list');
+        } else {
+            await clearCredentials();
+            setUsername('');
+            setPassword('');
+        }
+
+        setShowSpinner(false);
+
+    }
 
 
     const usernameChanged = (text: string) => {
@@ -63,13 +89,13 @@ const Page = () => {
     const login = async () => {
         setShowSpinner(true);
 
-        const response: loginResponse = await apiGetToken(username,password);
+        const response: loginResponse = await apiGetToken(username, password);
         setShowSpinner(false);
         if (response.non_field_errors) {
             let errorString: string = response.non_field_errors.join('\n');
             Alert.alert('Problem logging in', errorString, [
-                {text: 'OK'},
-              ]);
+                { text: 'OK' },
+            ]);
             return
         }
 
@@ -91,10 +117,10 @@ const Page = () => {
                     behavior={Platform.OS === 'ios' ? 'padding' : undefined}
                     keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -500} // Adjust the offset as needed
                 >
-                    <ScrollView 
+                    <ScrollView
                         style={styles.scrollView}
                         ref={scrollViewRef}>
-                        <Image source={require('../assets/msar_logo.png')} style={[styles.logoImage,{marginTop: topMargin}]} />
+                        <Image source={require('../assets/msar_logo.png')} style={[styles.logoImage, { marginTop: topMargin }]} />
                         <View style={[elements.tray, { padding: 20, margin: 20 }]}>
                             <FormTextInput
                                 title={'Username'}

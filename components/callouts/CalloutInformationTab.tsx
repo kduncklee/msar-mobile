@@ -1,4 +1,4 @@
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Linking } from 'react-native';
 import { textForCalloutStatus } from '../../types/calloutSummary';
 import InformationTray from '../fields/InformationTray';
 import InformationField from '../fields/InformationField';
@@ -24,6 +24,11 @@ const CalloutInformationTab = ({ callout }: CalloutInformationTabProps) => {
         console.log('edit details');
         router.push({ pathname: 'edit-callout', params: { id: callout.id.toString() } })
     }
+
+    const makePhoneCall = (phoneNumber: string) => {
+        const phoneNumberWithPrefix = `tel:${phoneNumber}`;
+        Linking.openURL(phoneNumberWithPrefix).catch((err) => console.error('An error occurred', err));
+      };
 
     return (
         <>
@@ -52,7 +57,7 @@ const CalloutInformationTab = ({ callout }: CalloutInformationTabProps) => {
                     <InformationField
                         value={callout.subject_contact}
                         icon={require('../../assets/icons/phone_yellow.png')}
-                        onIconPress={() => console.log('pressed icon')} />
+                        onIconPress={() => makePhoneCall(callout.informant_contact)} />
                 }
                 {(callout.subject || callout.subject_contact) &&
                     <View style={elements.informationDiv} />
@@ -66,7 +71,7 @@ const CalloutInformationTab = ({ callout }: CalloutInformationTabProps) => {
                     <InformationField
                         value={callout.informant_contact}
                         icon={require('../../assets/icons/phone_yellow.png')}
-                        onIconPress={() => console.log('pressed icon')} />
+                        onIconPress={() => makePhoneCall(callout.informant_contact)} />
                 }
                 {(callout.informant || callout.informant_contact) &&
                     <View style={elements.informationDiv} />

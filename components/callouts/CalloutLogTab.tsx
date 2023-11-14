@@ -1,16 +1,17 @@
-import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { useEffect, useState, useRef } from 'react';
+import { View, StyleSheet } from 'react-native';
 import { stringToResponseType } from '../../types/enums';
 import colors from '../../styles/colors';
 import { logType } from '../../types/enums';
 import { logEntry } from '../../types/logEntry';
 import LogResponseField from '../fields/log/LogResponseField';
-import LogSelfMessageField from '../fields/log/LogSelfMessageField';
 import LogMessageField from '../fields/log/LogMessageField';
 import { callout } from '../../types/callout';
 import { apiGetCalloutLog } from '../../remote/api';
 import LogSystemField from '../fields/log/LogUpdateField';
 import msarEventEmitter from '../../utility/msarEventEmitter';
+import * as Notifications from 'expo-notifications';
+
 type CalloutLogTabProps = {
     callout: callout
 }
@@ -18,24 +19,35 @@ type CalloutLogTabProps = {
 const CalloutLogTab = ({ callout }: CalloutLogTabProps) => {
 
     const [logList, setLogList] = useState<logEntry[]>([]);
+    const notificationListener = useRef<Notifications.Subscription>();
 
     useEffect(() => {
 
-        msarEventEmitter.on('refreshLog',refreshReceived);
+        msarEventEmitter.on('refreshLog', refreshReceived);
+
+        notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+            //setNotification(notification);
+            if (notification?.request?.content?.data?.type === 'log' &&
+                notification.request.content.data?.id === callout?.id) {
+                console.log('update log!!!')
+                getCalloutLog();
+            }
+
+        });
 
         getCalloutLog();
 
         return () => {
-            msarEventEmitter.off('refreshLog',refreshReceived);
+            msarEventEmitter.off('refreshLog', refreshReceived);
         }
-        
-    },[]);
+
+    }, []);
 
     useEffect(() => {
         if (logList.length > 0) {
-            msarEventEmitter.emit('logLoaded',{});
+            msarEventEmitter.emit('logLoaded', {});
         }
-    },[logList]);
+    }, [logList]);
 
 
     const refreshReceived = data => {
@@ -63,7 +75,7 @@ const CalloutLogTab = ({ callout }: CalloutLogTabProps) => {
                     }
                 })
             }
-            <View style={{marginTop: 60}} />
+            <View style={{ marginTop: 60 }} />
         </>
     );
 }

@@ -22,7 +22,7 @@ import msarEventEmitter from '../utility/msarEventEmitter';
 
 const Page = () => {
 
-    const { id, title } = useLocalSearchParams<{ id: string, title: string}>();
+    const { id, title, type } = useLocalSearchParams<{ id: string, title: string, type?: string }>();
     const [headerTitle, setHeaderTitle] = useState(title);
     const safeAreaInsets = useSafeAreaInsets();
     const scrollViewRef = useRef(null);
@@ -33,7 +33,13 @@ const Page = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [showSpinner, setShowSpinner] = useState(false);
     const [spinnerMessage, setSpinnerMessage] = useState('');
-    const [currentTab, setCurrentTab] = useState(0);
+    let defaultTab: number = 0;
+    if (type != null) {
+        if ( type === 'log') {
+            defaultTab = 1;
+        }
+    }
+    const [currentTab, setCurrentTab] = useState(defaultTab);
     const [callout, setCallout] = useState<callout>(null);
     const [logBadge, setLogBadge] = useState(null);
     const [personnelBadge, setPersonnelBadge] = useState(null);
@@ -65,14 +71,14 @@ const Page = () => {
             StatusBar.setBackgroundColor(colors.primaryBg);
         }
 
-        msarEventEmitter.on('refreshCallout',refreshReceived);
-        msarEventEmitter.on('logLoaded',logLoaded);
+        msarEventEmitter.on('refreshCallout', refreshReceived);
+        msarEventEmitter.on('logLoaded', logLoaded);
 
         getCallout();
 
         return () => {
-            msarEventEmitter.off('refreshCallout',refreshReceived);
-            msarEventEmitter.off('logLoaded',logLoaded);
+            msarEventEmitter.off('refreshCallout', refreshReceived);
+            msarEventEmitter.off('logLoaded', logLoaded);
         }
 
     }, []);
@@ -83,13 +89,14 @@ const Page = () => {
             setPersonnelBadge(calloutResponseBadge(callout));
             setLogBadge(callout.log_count);
             setCalloutTimestamp(callout.created_at);
+
             if (callout.status === calloutStatus.ACTIVE) {
                 setIsActive(true);
             } else {
                 setIsActive(false);
             }
         }
-    },[callout]);
+    }, [callout]);
 
     const refreshReceived = data => {
         getCallout();
@@ -106,7 +113,7 @@ const Page = () => {
     }
 
     const getCallout = async () => {
-
+        console.log(id);
         const idInt: number = parseInt(id);
         setSpinnerMessage("Loading Callout...");
         setShowSpinner(true);
@@ -150,7 +157,7 @@ const Page = () => {
         setShowSpinner(true);
         const response = await apiRespondToCallout(idInt, responseString);
         setShowSpinner(false);
-        msarEventEmitter.emit('refreshCallout',{id: idInt});
+        msarEventEmitter.emit('refreshCallout', { id: idInt });
     }
 
     const onLogMessageTextChanged = (text: string) => {
@@ -165,8 +172,8 @@ const Page = () => {
         const response = await apiPostCalloutLog(idInt, logMessage);
         setShowSpinner(false);
 
-        msarEventEmitter.emit('refreshCallout',{id: idInt});
-        msarEventEmitter.emit('refreshLog',{id: idInt});
+        msarEventEmitter.emit('refreshCallout', { id: idInt });
+        msarEventEmitter.emit('refreshLog', { id: idInt });
     }
 
     const trayAnimatedStyle = useAnimatedStyle(() => {
@@ -183,14 +190,14 @@ const Page = () => {
         };
     });
 
-    
+
     return (
         <>
             <SafeAreaView style={styles.container}>
                 <Header title={headerTitle} backButton={true} timestamp={calloutTimestamp} />
                 {callout &&
                     <>
-                        <TabSelector tabs={tabs} onTabChange={tabChanged} />
+                        <TabSelector tabs={tabs} selected={currentTab} onTabChange={tabChanged} />
                         <View style={styles.contentContainer}>
                             <ScrollView ref={scrollViewRef} style={styles.scrollView}>
                                 {currentTab === 0 &&

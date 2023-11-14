@@ -45,3 +45,8 @@ export const getCredentials = async () => {
     }
 }
 
+export const clearCredentials = async () => {
+    await removeData("username");
+    await removeData("token");
+}
+

@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { Platform } from 'react-native';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
@@ -6,8 +7,14 @@ import { apiSetDeviceId } from '../remote/api';
 
 class PushNotifications {
     private pushToken: string = null;
+    
 
     async registerForPushNotificationsAsync() {
+
+      if (!Device.isDevice) {
+        return;
+      }
+
         let token;
       
         if (Platform.OS === 'android') {

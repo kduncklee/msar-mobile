@@ -6,12 +6,13 @@ import { elements } from '../../styles/elements';
 
 type TabSelectorProps = {
     tabs: tabItem[],
+    selected?: number,
     onTabChange: (values: any) => void
 }
 
-const TabSelector = ({ tabs, onTabChange }: TabSelectorProps) => {
+const TabSelector = ({ tabs, selected, onTabChange }: TabSelectorProps) => {
 
-    const [selectedIndex, setSelectedIndex] = useState(0);
+    const [selectedIndex, setSelectedIndex] = useState(selected ? selected : 0);
 
     const tabSelected = (index: number) => {
         setSelectedIndex(index);

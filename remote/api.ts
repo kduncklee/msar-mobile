@@ -1,7 +1,7 @@
 import { getCredentials } from "../storage/storage";
 import { callout, calloutFromResponse } from "../types/callout";
 import { logEntry, logEntryFromRespsonse } from "../types/logEntry";
-import { calloutGetLogResponse, loginResponse } from "./responses";
+import { calloutGetLogResponse, loginResponse, tokenValidationResponse } from "./responses";
 import { Platform } from "react-native";
 
 let prod_server: string = "https://malibusarhours.org/calloutapi";
@@ -9,6 +9,7 @@ let server: string = prod_server;
 let tokenEndpoint: string = server + "/api-token-auth/";
 let calloutsEndpoint: string = server + "/api/callouts/";
 let devicesEndpoint: string = server + "/api/devices/";
+let tokenValidationEndpoint: string = server + "/api/?format=json";
 
 export const apiGetToken = async (username: string, password: string): Promise<loginResponse> => {
 
@@ -33,6 +34,33 @@ export const apiGetToken = async (username: string, password: string): Promise<l
                 "Server Error"
             ]
         };
+    })
+}
+
+export const apiValidateToken = async (): Promise<tokenValidationResponse> => {
+
+    const credentials = await getCredentials();
+    if (!credentials.token) {
+        return { valid_token: false }
+    }
+
+    return fetch(tokenValidationEndpoint, {
+        method: "GET",
+        headers: {
+            'Authorization': 'Token ' + credentials.token
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            return { valid_token: true }
+        } else {
+            return { valid_token: false }
+        }
+        //console.log("response status " + response.status);
+    })
+    .catch(error => {
+        console.log(error);
+        return { valid_token: false }
     })
 }
 

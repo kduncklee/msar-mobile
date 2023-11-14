@@ -16,3 +16,7 @@ export type calloutGetLogResponse = {
     results?: logEntry[],
     error?: string
 }
+
+export type tokenValidationResponse = {
+    valid_token: boolean
+}

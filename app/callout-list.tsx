@@ -45,11 +45,13 @@ const Page = () => {
         notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
             console.log('notification received');
             console.log(notification.request.content.title);
+            console.log(notification.request.content.data);
             //setNotification(notification);
           });
       
           responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-            console.log(response);
+            console.log('notification from home screen');
+            console.log(response.notification.request.content.data);
           });
 
         if (Platform.OS === 'ios') {

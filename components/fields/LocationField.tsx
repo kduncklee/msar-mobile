@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, Image, TouchableOpacity, Linking, Platform } from 'react-native';
 import { elements } from '../../styles/elements';
 import colors from '../../styles/colors'
 import { location, locationToShortString, locationToString } from '../../types/location';
@@ -7,6 +7,7 @@ import { locationType } from '../../types/enums';
 import MapView, { LatLng, Region, Marker } from 'react-native-maps';
 import { coordinateFromString } from '../../utility/locationHeler';
 import SmallButton from '../inputs/SmallButton';
+import * as Clipboard from 'expo-clipboard';
 
 type LocationFieldProps = {
     location: location
@@ -24,6 +25,20 @@ const LocationField = ({ location }: LocationFieldProps) => {
         longitudeDelta: 0.1355799588636216
     }
 
+    const copyPressed = async () => {
+        await Clipboard.setStringAsync(locationToString(location));
+    }
+
+    const openMapPressed = () => {
+
+        const address = locationToString(location);
+        const mapUrl = Platform.select({
+            ios: `maps:0,0?q=${encodeURIComponent(address)}`,
+            android: `geo:0,0?q=${encodeURIComponent(address)}`,
+        });
+
+        Linking.openURL(mapUrl).catch((err) => console.error('An error occurred', err));
+    }
 
 
     if (location.text) {
@@ -49,7 +64,7 @@ const LocationField = ({ location }: LocationFieldProps) => {
     return (
         <View style={styles.container}>
             {locType === locationType.DESCRIPTION &&
-                <Text style={[elements.mediumText, {padding: 8}]}>{location.text}</Text>
+                <Text style={[elements.mediumText, { padding: 8 }]}>{location.text}</Text>
             }
             {locType === locationType.ADDRESS &&
                 <>
@@ -82,14 +97,14 @@ const LocationField = ({ location }: LocationFieldProps) => {
                             icon={require('../../assets/icons/navigation.png')}
                             backgroundColor={colors.blue}
                             textColor={colors.primaryText}
-                            onPress={() => console.log('pressed nav')} />
+                            onPress={() => openMapPressed()} />
                         <View style={{ width: 12 }} />
                         <SmallButton
                             title={'Copy'}
                             icon={require('../../assets/icons/copy.png')}
                             backgroundColor={colors.darkBlue}
                             textColor={colors.primaryText}
-                            onPress={() => console.log('pressed copy')} />
+                            onPress={() => copyPressed()} />
                     </View>
                 </>
             }
