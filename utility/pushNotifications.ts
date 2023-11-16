@@ -3,7 +3,7 @@ import { Platform } from 'react-native';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
-import { apiSetDeviceId } from '../remote/api';
+import { apiRemoveDeviceId, apiSetDeviceId } from '../remote/api';
 
 class PushNotifications {
     private pushToken: string = null;
@@ -53,6 +53,28 @@ class PushNotifications {
 
       async sendPushToken(token: string) {
         const response: any = await apiSetDeviceId(token);
+      }
+
+      async removePushToken() {
+        let token = await this.getToken();
+        if (token != null) {
+          const response: any = await apiRemoveDeviceId(token);
+        }
+      }
+
+      async getToken() {
+        let token: string = null;
+        if (Device.isDevice) {
+          let tokenObject = await Notifications.getExpoPushTokenAsync({
+            projectId: Constants.expoConfig.extra.eas.projectId,
+          });
+
+          if (tokenObject.data) {
+            token = tokenObject.data;
+          }
+        }
+
+        return token;
       }
 
 }

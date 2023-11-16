@@ -7,6 +7,7 @@ import { clearCredentials, getCredentials } from "../storage/storage";
 import InformationField from "../components/fields/InformationField";
 import FormCheckbox from "../components/inputs/FormCheckbox";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import pushNotifications from "../utility/pushNotifications";
 
 
 const Page = () => {
@@ -21,6 +22,7 @@ const Page = () => {
     useEffect(() => {
 
         loadCredentials();
+        checkPushNotifications();
     }, []);
 
     const loadCredentials = async () => {
@@ -31,13 +33,21 @@ const Page = () => {
         console.log(credentials);
     }
 
+    const checkPushNotifications = async () => {
+        let token = await pushNotifications.getToken();
+        if (token != null) {
+            setPushEnabled(true);
+        }
+    }
+
     const onPushToggle = () => {
         setPushEnabled(!pushEnabled);
     }
 
     const onSignOutPress = async () => {
+        
+        await pushNotifications.removePushToken();
         await clearCredentials();
-        //remove push token
         router.replace('/');
     }
 

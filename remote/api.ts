@@ -307,3 +307,29 @@ export const apiSetDeviceId = async (token: string): Promise<any> => {
         };
     })
 }
+
+export const apiRemoveDeviceId = async (token: string): Promise<any> => {
+    const credentials = await getCredentials();
+    if (!credentials.token) {
+        return { error: "no token"}
+    }
+
+    return fetch(devicesEndpoint + token + "/", {
+        method: "DELETE",
+        headers: {
+            'Authorization': 'Token ' + credentials.token,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("removed push token: " + JSON.stringify(data));
+        //return calloutFromResponse(data);
+    })
+    .catch(error => {
+        console.log(error);
+        return {
+            error: "Server Error"
+        };
+    })
+}
