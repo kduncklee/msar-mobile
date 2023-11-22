@@ -17,6 +17,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "org.malibusarhours.msar",
+      "buildNumber": "3",
       "icon": "./assets/icon.png"
     },
     "android": {

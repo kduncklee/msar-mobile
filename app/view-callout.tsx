@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpacity, Text, View } from 'react-native';
+import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpacity, Text, View, KeyboardAvoidingView } from 'react-native';
 import Header from '../components/Header';
 import colors from '../styles/colors';
 import { elements } from '../styles/elements';
@@ -35,7 +35,7 @@ const Page = () => {
     const [spinnerMessage, setSpinnerMessage] = useState('');
     let defaultTab: number = 0;
     if (type != null) {
-        if ( type === 'log') {
+        if (type === 'log') {
             defaultTab = 1;
         }
     }
@@ -198,21 +198,26 @@ const Page = () => {
                 {callout &&
                     <>
                         <TabSelector tabs={tabs} selected={currentTab} onTabChange={tabChanged} />
+                        <KeyboardAvoidingView
+                                style={styles.contentContainer}
+                                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                                keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -500} // Adjust the offset as needed
+                            >
                         <View style={styles.contentContainer}>
-                            <ScrollView ref={scrollViewRef} style={styles.scrollView}>
-                                {currentTab === 0 &&
-                                    <CalloutInformationTab
-                                        callout={callout} />
-                                }
-                                {currentTab === 1 &&
-                                    <CalloutLogTab
-                                        callout={callout} />
-                                }
-                                {currentTab === 2 &&
-                                    <CalloutPersonnelTab
-                                        callout={callout} />
-                                }
-                            </ScrollView>
+                                <ScrollView ref={scrollViewRef} style={styles.scrollView}>
+                                    {currentTab === 0 &&
+                                        <CalloutInformationTab
+                                            callout={callout} />
+                                    }
+                                    {currentTab === 1 &&
+                                        <CalloutLogTab
+                                            callout={callout} />
+                                    }
+                                    {currentTab === 2 &&
+                                        <CalloutPersonnelTab
+                                            callout={callout} />
+                                    }
+                                </ScrollView>
                             {currentTab === 0 && isActive &&
                                 <TouchableOpacity
                                     activeOpacity={0.8}
@@ -229,6 +234,7 @@ const Page = () => {
                                     onPhotoPress={() => console.log('photo')} />
                             }
                         </View>
+                        </KeyboardAvoidingView>
                     </>
                 }
             </SafeAreaView>

@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
         alignItems: "flex-end",
         justifyContent: "center",
         paddingHorizontal: 20,
+        marginBottom: 10
     },
     messageText: {
         paddingVertical: 8,

@@ -1,7 +1,7 @@
 export const list = [
-    { label: "LAHS Desk", value: '0'},
-    { label: "Fire", value: '1'},
-    { label: "State Parks", value: '2'},
+    { label: "LHS Desk", value: '0'},
+    { label: "LACoFD", value: '1'},
+    { label: "SP", value: '2'},
     { label: "NPS", value: '3'},
     { label: "MRCA", value: '4'},
     { label: "CHP", value: '5'},
