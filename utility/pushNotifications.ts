@@ -24,6 +24,33 @@ class PushNotifications {
             vibrationPattern: [0, 250, 250, 250],
             lightColor: '#FF231F7C',
           });
+          Notifications.setNotificationChannelAsync('callout', {
+            name: 'New Callout',
+            audioAttributes: {
+              usage: Notifications.AndroidAudioUsage.ALARM,
+            },
+            importance: Notifications.AndroidImportance.MAX,
+            vibrationPattern: [0, 200,200,600,600, 200,200,600,600, 200,200,600,600, 200,200,600,600],
+            lightColor: '#FF231F7C',
+          });
+          Notifications.setNotificationChannelAsync('callout-resolved', {
+            name: 'Callout Resolved',
+            importance: Notifications.AndroidImportance.MAX,
+            vibrationPattern: [0, 500, 500, 500],
+            lightColor: '#FF231F7C',
+          });
+          Notifications.setNotificationChannelAsync('log', {
+            name: 'Log Updates',
+            importance: Notifications.AndroidImportance.DEFAULT,
+            vibrationPattern: [0, 250, 250, 250],
+            lightColor: '#FF231F7C',
+          });
+          Notifications.setNotificationChannelAsync('announcement', {
+            name: 'Announcements',
+            importance: Notifications.AndroidImportance.MAX,
+            vibrationPattern: [0, 250, 250, 250],
+            lightColor: '#FF231F7C',
+          });
         }
       
         if (Device.isDevice) {
