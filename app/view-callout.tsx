@@ -19,6 +19,7 @@ import { callout, calloutResponseBadge } from '../types/callout';
 import { apiGetCallout, apiPostCalloutLog, apiRespondToCallout } from '../remote/api';
 import ActivityModal from '../components/modals/ActivityModal';
 import msarEventEmitter from '../utility/msarEventEmitter';
+import * as Notifications from 'expo-notifications';
 
 const Page = () => {
 
@@ -65,6 +66,7 @@ const Page = () => {
     ]
 
     useEffect(() => {
+
         if (Platform.OS === 'ios') {
             StatusBar.setBarStyle('light-content');
         } else if (Platform.OS === 'android') {
@@ -113,6 +115,9 @@ const Page = () => {
     }
 
     const getCallout = async () => {
+
+        const perms = await Notifications.getPermissionsAsync();
+        console.log(perms);
         console.log(id);
         const idInt: number = parseInt(id);
         setSpinnerMessage("Loading Callout...");

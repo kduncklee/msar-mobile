@@ -17,8 +17,14 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "org.malibusarhours.msar",
-      "buildNumber": "3",
-      "icon": "./assets/icon.png"
+      "buildNumber": "4",
+      "icon": "./assets/icon.png",
+      "infoPlist": {
+        "com.apple.developer.usernotifications.critical-alerts": 1
+      },
+      "entitlements": {
+        "com.apple.developer.usernotifications.critical-alerts": true
+      }
     },
     "android": {
       "adaptiveIcon": {
