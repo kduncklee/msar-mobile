@@ -16,7 +16,7 @@ const DropdownSelector = ({ title, options, placeholder,selectedValue, onSelect 
 
     return (
         <View style={styles.container}>
-            {title &&
+            {!!title &&
                 <Text style={elements.fieldTitle}>{title}</Text>
             }
             <View style={elements.inputContainer}>

@@ -47,7 +47,7 @@ const TabSelector = ({ tabs, selected, onTabChange }: TabSelectorProps) => {
                             style={[styles.button, { borderBottomColor: divColor, borderBottomWidth: 2 }]}
                             onPress={() => tabSelected(index)}>
                             <Text style={[styles.buttonLabel, { color: textColor }]}>{tab.title}</Text>
-                            {tab.badge &&
+                            {!!tab.badge &&
                                 <View style={[elements.tabBadge, {backgroundColor: badgeColor}]}>
                                     <Text style={[elements.tabBadgeText, {color: badgeTextColor}]}>{tab.badge}</Text>
                                 </View>

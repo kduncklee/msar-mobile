@@ -19,7 +19,7 @@ const FormTextArea = ({title, placeholder, value, height, onChange}: FormTextAre
 
     return (
         <View style={styles.container}>
-            {title &&
+            {!!title &&
                 <Text style={elements.fieldTitle}>{title}</Text>
             }
             <View style={[elements.inputContainer, {height: height}]}>

@@ -18,7 +18,7 @@ const InformationField = ({ title, value, valueColor, icon, onIconPress }: Infor
 
     return (
         <View style={styles.container}>
-            {title &&
+            {!!title &&
                 <Text style={styles.titleText}>{title}</Text>
             }
             <View style={styles.valueContainer}>
