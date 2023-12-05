@@ -200,7 +200,7 @@ const Page = () => {
         <>
             <SafeAreaView style={styles.container}>
                 <Header title={headerTitle} backButton={true} timestamp={calloutTimestamp} />
-                {callout &&
+                {!!callout &&
                     <>
                         <TabSelector tabs={tabs} selected={currentTab} onTabChange={tabChanged} />
                         <KeyboardAvoidingView
@@ -247,12 +247,12 @@ const Page = () => {
                 <View style={{ flex: 1 }} />
                 <CalloutRespond onCancel={cancelRespondModal} onSelect={responseSelected} />
             </Animated.View>
-            {modalVisible &&
+            {!!modalVisible &&
                 <Animated.View style={[styles.modalBackground, modalAnimatedStyle]}>
                     <TouchableOpacity onPress={cancelRespondModal} style={{ flex: 1 }} />
                 </Animated.View>
             }
-            {showSpinner &&
+            {!!showSpinner &&
                 <ActivityModal message={spinnerMessage} />
             }
         </>

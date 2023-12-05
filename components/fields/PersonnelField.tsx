@@ -16,7 +16,7 @@ const PersonnelField = ({ opResponse }: PersonnelFieldProps) => {
 
     return (
         <View style={styles.container}>
-            {opResponse.member.mobile_phone &&
+            {!!opResponse.member.mobile_phone &&
                 <TouchableOpacity style={styles.button} activeOpacity={0.5} onPress={() => onPhonePress}>
                     <Text style={styles.valueText}>{userToString(opResponse.member)}</Text>
                     <Image source={require('../../assets/icons/phone.png')} style={styles.iconImage} />

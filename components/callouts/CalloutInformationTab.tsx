@@ -38,7 +38,7 @@ const CalloutInformationTab = ({ callout }: CalloutInformationTabProps) => {
                 editButton={showEdit}
                 onEditPress={editDetailsPressed}>
                 <View style={{ marginTop: 8 }} />
-                {callout.created_at &&
+                {!!callout.created_at &&
                     <InformationField
                         title={'Time of Dispatch'}
                         value={getFullTimeString(callout.created_at)} />
@@ -48,52 +48,52 @@ const CalloutInformationTab = ({ callout }: CalloutInformationTabProps) => {
                     title={'Type'}
                     value={textForType(callout.operation_type)} />
                 <View style={elements.informationDiv} />
-                {callout.subject &&
+                {!!callout.subject &&
                     <InformationField
                         title={'Subject'}
                         value={callout.subject} />
                 }
-                {callout.subject_contact &&
+                {!!callout.subject_contact &&
                     <InformationField
                         value={callout.subject_contact}
                         icon={require('../../assets/icons/phone_yellow.png')}
                         onIconPress={() => makePhoneCall(callout.informant_contact)} />
                 }
-                {(callout.subject || callout.subject_contact) &&
+                {(!!callout.subject || !!callout.subject_contact) &&
                     <View style={elements.informationDiv} />
                 }
-                {callout.informant &&
+                {!!callout.informant &&
                     <InformationField
                         title={'Informant'}
                         value={callout.informant} />
                 }
-                {callout.informant_contact &&
+                {!!callout.informant_contact &&
                     <InformationField
                         value={callout.informant_contact}
                         icon={require('../../assets/icons/phone_yellow.png')}
                         onIconPress={() => makePhoneCall(callout.informant_contact)} />
                 }
-                {(callout.informant || callout.informant_contact) &&
+                {(!!callout.informant || !!callout.informant_contact) &&
                     <View style={elements.informationDiv} />
                 }
-                {callout.radio_channel &&
+                {!!callout.radio_channel &&
                     <InformationField
                         title={'Tactical Talkgroup'}
                         value={callout.radio_channel} />
                 }
-                {callout.notifications_made &&
+                {!!callout.notifications_made &&
                     <InformationField
                         title={'Notifications Made'}
                         value={callout.notifications_made.join(', ')} />
                 }
                 <View style={elements.informationDiv} />
-                {callout.handling_unit &&
+                {!!callout.handling_unit &&
                     <InformationField
                         title={'Handling Unit / Tag #'}
                         value={callout.handling_unit} />
                 }
                 <View style={elements.informationDiv} />
-                {callout.description &&
+                {!!callout.description &&
                     <TextAreaField
                         title={'Circumstances'}
                         value={callout.description}
@@ -101,7 +101,7 @@ const CalloutInformationTab = ({ callout }: CalloutInformationTabProps) => {
                 }
                 <View style={{ height: 10 }} />
             </InformationTray>
-            {callout.location &&
+            {!!callout.location &&
                 <InformationTray
                     title={'Location'}
                     titleBarColor={colors.blue}
@@ -121,7 +121,7 @@ const CalloutInformationTab = ({ callout }: CalloutInformationTabProps) => {
                     title={'Status'}
                     value={textForCalloutStatus(callout.status)} />
                 <View style={elements.informationDiv} />
-                {callout.my_response &&
+                {!!callout.my_response &&
                     <>
                         <InformationField
                             title={'My Response'}
@@ -131,7 +131,7 @@ const CalloutInformationTab = ({ callout }: CalloutInformationTabProps) => {
                         <View style={elements.informationDiv} />
                     </>
                 }
-                {callout.created_by &&
+                {!!callout.created_by &&
                     <InformationField
                         title={'Callout Created by'}
                         value={callout.created_by.full_name} />

@@ -15,7 +15,7 @@ const TextAreaField = ({ title, value, valueColor }: TextAreaFieldProps) => {
 
     return (
         <View style={styles.container}>
-            {title &&
+            {!!title &&
                 <Text style={styles.titleText}>{title}</Text>
             }
             <View style={styles.valueContainer}>

@@ -11,7 +11,7 @@ const ActivityModal = ({ message }: ActivityModalProps) => {
     return (
         <View style={styles.container}>
             <ActivityIndicator size={"large"} color={colors.primaryText} style={styles.spinner} />
-            {message &&
+            {!!message &&
                 <Text style={styles.messageText}>{message}</Text>
             }
         </View>

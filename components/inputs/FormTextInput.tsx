@@ -37,11 +37,11 @@ const FormTextInput = ({ title, placeholder, value, icon, rightButton, onRightPr
 
     return (
         <View style={styles.container}>
-            {title &&
+            {!!title &&
                 <Text style={elements.fieldTitle}>{title}</Text>
             }
             <View style={[elements.inputContainer, { height: 50 }]}>
-                {icon &&
+                {!!icon &&
                     <Image source={icon} style={elements.fieldImage} />
                 }
                 <TextInput

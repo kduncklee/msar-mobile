@@ -18,7 +18,7 @@ const DropdownMultiselect = ({ title, options, placeholder, selectedValues, onSe
 
     return (
         <View style={styles.container}>
-            {title &&
+            {!!title &&
                 <Text style={elements.fieldTitle}>{title}</Text>
             }
             <View style={[elements.inputContainer, {flexDirection: "column", paddingHorizontal: 8}]}>

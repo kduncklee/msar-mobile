@@ -21,10 +21,10 @@ const SmallButton = ({ title, icon, backgroundColor, textColor, onPress}: SmallB
         
             <TouchableOpacity activeOpacity={0.5} onPress={onPress}>
                 <View style={[styles.container, {backgroundColor: backgroundColor, justifyContent: "center"}]}>
-                {icon &&
+                {!!icon &&
                     <Image source={icon} style={[elements.buttonIcon]} />
                 }
-                {title &&
+                {!!title &&
                     <Text style={[elements.fieldText, {color: textColor, paddingVertical: 8, paddingLeft: titlePaddingLeft ,paddingRight: 12, fontWeight: "400"}]}>{title}</Text>
                 }
                 </View>
