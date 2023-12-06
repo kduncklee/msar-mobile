@@ -46,7 +46,9 @@ const Page = () => {
 
     useEffect(() => {
 
-        if (currentLocation?.coordinates != null) {
+        if (currentLocation?.coordinates != null &&
+            !!currentLocation.coordinates.lat &&
+            !!currentLocation.coordinates.long) {
             const coordinate = coordinateFromString(`${currentLocation.coordinates.lat}, ${currentLocation.coordinates.long}`)
             setDefaultRegion({
                 latitude: coordinate.latitude,

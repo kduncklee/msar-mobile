@@ -57,7 +57,7 @@ const CalloutInformationTab = ({ callout }: CalloutInformationTabProps) => {
                     <InformationField
                         value={callout.subject_contact}
                         icon={require('../../assets/icons/phone_yellow.png')}
-                        onIconPress={() => makePhoneCall(callout.informant_contact)} />
+                        onIconPress={() => makePhoneCall(callout.subject_contact)} />
                 }
                 {(!!callout.subject || !!callout.subject_contact) &&
                     <View style={elements.informationDiv} />

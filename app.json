@@ -2,7 +2,7 @@
   "expo": {
     "name": "msar",
     "slug": "msar",
-    "version": "1.0.1",
+    "version": "1.0.5",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -32,8 +32,8 @@
         "backgroundColor": "#2B3038"
       },
       "package": "org.malibusarhours.msar",
+      "versionCode": "6",
       "googleServicesFile": "./google-services.json"
-      "versionCode": "2",
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -1,8 +1,8 @@
 import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
-import { calloutSummary, colorForResponseType, colorForType, imageForType, textForResponseType } from '../../types/calloutSummary';
+import { calloutSummary, colorForResponseType, colorForTypeAndStatus, imageForType, textForResponseType } from '../../types/calloutSummary';
 import { elements } from '../../styles/elements';
 import colors from '../../styles/colors';
-import { getLongTimeString } from '../../utility/dateHelper';
+import { getConditionalTimeString } from '../../utility/dateHelper';
 import { locationToShortString } from '../../types/location';
 import { respondedItem } from '../../types/respondedItem';
 
@@ -34,7 +34,7 @@ const CalloutCell = ({summary, onPress}: CalloutCellProps) => {
     return (
         <TouchableOpacity activeOpacity={0.5} onPress={cellPressed}>
             <View style={[elements.tray,styles.container]}>
-                <View style={[styles.sideBar, {backgroundColor: colorForType(summary.operation_type)}]}>
+                <View style={[styles.sideBar, {backgroundColor: colorForTypeAndStatus(summary.operation_type, summary.status)}]}>
                     <Image source={imageForType(summary.operation_type)} style={styles.sideBarImage} />
                     <View style={styles.sideBarDiv} />
                     <Text style={styles.sideBarNumber}>{calculateResponseCount()}</Text>
@@ -50,7 +50,7 @@ const CalloutCell = ({summary, onPress}: CalloutCellProps) => {
                     </View>
                     <View style={styles.contentBottom}>
                         <View style={[elements.capsule]}>
-                            <Text style={elements.smallYellowText}>{getLongTimeString(summary.created_at)}</Text>
+                            <Text style={elements.smallYellowText}>{getConditionalTimeString(summary.created_at)}</Text>
                         </View>
                         <View style={[elements.capsule, { marginLeft: 10}]}>
                             <Image source={require('assets/icons/log_yellow.png')} style={styles.logImage} />
