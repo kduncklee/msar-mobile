@@ -69,6 +69,13 @@ export const colorForType = (type: calloutType): string => {
     }
 }
 
+export const colorForTypeAndStatus = (type: calloutType, status: calloutStatus): string => {
+    if (status == calloutStatus.RESOLVED) {
+        return colors.green;
+    }
+    return colorForType(type);
+}
+
 export const imageForType = (type: calloutType): ImageRequireSource => {
 
     switch (type) {

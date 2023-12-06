@@ -35,7 +35,7 @@ const Page = () => {
         }
     ]
 
-    var status: string = "active";
+    var status: string = "active&status=resolved";
 
 
     useEffect(() => {

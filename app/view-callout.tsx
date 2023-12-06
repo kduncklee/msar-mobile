@@ -209,20 +209,29 @@ const Page = () => {
                                 keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -500} // Adjust the offset as needed
                             >
                         <View style={styles.contentContainer}>
-                                <ScrollView ref={scrollViewRef} style={styles.scrollView}>
-                                    {currentTab === 0 &&
-                                        <CalloutInformationTab
-                                            callout={callout} />
-                                    }
-                                    {currentTab === 1 &&
-                                        <CalloutLogTab
-                                            callout={callout} />
-                                    }
-                                    {currentTab === 2 &&
-                                        <CalloutPersonnelTab
-                                            callout={callout} />
-                                    }
+                            {currentTab === 0 &&
+                                <ScrollView ref={scrollViewRef}
+                                        style={styles.scrollView}>
+                                    <CalloutInformationTab
+                                        callout={callout} />
                                 </ScrollView>
+                            }
+                            {currentTab === 1 &&
+                                <ScrollView ref={scrollViewRef}
+                                    style={styles.scrollView}
+                                    onContentSizeChange={() =>
+                                        {scrollViewRef.current?.scrollToEnd()}}>
+                                    <CalloutLogTab
+                                        callout={callout} />
+                                </ScrollView>
+                            }
+                            {currentTab === 2 &&
+                                <ScrollView ref={scrollViewRef}
+                                        style={styles.scrollView}>
+                                    <CalloutPersonnelTab
+                                        callout={callout} />
+                                </ScrollView>
+                            }
                             {currentTab === 0 && isActive &&
                                 <TouchableOpacity
                                     activeOpacity={0.8}

@@ -61,3 +61,12 @@ export const getFullTimeString = (date: Date): string => {
 
     return formattedDateTime;
 }
+
+export const getConditionalTimeString = (date: Date): string => {
+     const day = 24 * 60 * 60 * 1000;
+     if (Date.now() - date < day) {
+         return getTimeString(date);
+     } else {
+         return getLongTimeString(date);
+     }
+}

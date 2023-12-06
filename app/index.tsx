@@ -43,7 +43,7 @@ const Page = () => {
         const keyboardDidShowListener = Keyboard.addListener(
             'keyboardDidShow',
             () => {
-                if (scrollViewRef) {
+                if (scrollViewRef && scrollViewRef.current) {
                     scrollViewRef.current.scrollToEnd({ animated: true })
                 }
             }

@@ -21,12 +21,12 @@ export const locationToString = (location: location): string => {
     }
     
     if (location.address != null) {
-        if (location.address.street != null) {
+        if (location.address.street) {
             return `${location.address.street}, ${location.address.city}, ${location.address.state} ${location.address.zip}`;
         }
     }
     
-    if (location.coordinates != null) {
+    if (location.coordinates?.lat && location.coordinates?.long) {
         return `${location.coordinates.lat}, ${location.coordinates.long}`
     }
 

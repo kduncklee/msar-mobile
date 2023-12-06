@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, Image, TouchableOpacity, Platform, StatusBar, B
 import { router, useFocusEffect } from 'expo-router';
 import colors from '../styles/colors';
 import { elements } from '../styles/elements';
-import { getTimeString } from '../utility/dateHelper';
+import { getConditionalTimeString } from '../utility/dateHelper';
 
 type HeaderProps = {
     title: string,
@@ -61,7 +61,7 @@ const Header = ({ title, backButton = false, onBackPressed, rightButton = false,
                 {title}
             </Text>
             {timestamp != null && <View style={[elements.capsule, { marginRight: 20 }]}>
-                <Text style={elements.smallYellowText}>{getTimeString(timestamp)}</Text>
+                <Text style={elements.smallYellowText}>{getConditionalTimeString(timestamp)}</Text>
             </View>
             }
             {rightButton &&

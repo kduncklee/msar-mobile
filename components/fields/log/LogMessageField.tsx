@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { elements } from '../../../styles/elements';
 import colors from '../../../styles/colors'
-import { getTimeString } from '../../../utility/dateHelper';
+import { getConditionalTimeString } from '../../../utility/dateHelper';
 import { isUserSelf, user, userToString } from '../../../types/user';
 
 type LogMessageFieldProps = {
@@ -36,7 +36,7 @@ const LogMessageField = ({ member, message, timestamp }: LogMessageFieldProps) =
                 "textAlign": isSelf ? "right" : "left",
                 "color": isSelf ? colors.lightText : colors.grayText
             }]}>
-                {getTimeString(timestamp)}
+                {getConditionalTimeString(timestamp)}
             </Text>
         </View>
     );

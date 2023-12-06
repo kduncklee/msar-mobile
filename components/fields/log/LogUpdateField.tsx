@@ -2,7 +2,7 @@ import React, { useState, } from 'react';
 import { StyleSheet, View, Text, Image, ImageRequireSource } from 'react-native';
 import { elements } from '../../../styles/elements';
 import colors from '../../../styles/colors'
-import { getTimeString } from '../../../utility/dateHelper';
+import { getConditionalTimeString } from '../../../utility/dateHelper';
 import { user, userToString } from '../../../types/user';
 
 type LogSystemFieldProps = {
@@ -22,7 +22,7 @@ const LogSystemField = ({ member, update, timestamp }: LogSystemFieldProps) => {
                 {update}
             </Text>
             <Text style={styles.logTimestamp}>
-                {getTimeString(timestamp)}
+                {getConditionalTimeString(timestamp)}
             </Text>
         </View>
     );

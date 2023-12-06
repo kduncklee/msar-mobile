@@ -4,7 +4,7 @@ import { elements } from '../../../styles/elements';
 import colors from '../../../styles/colors'
 import { responseType } from '../../../types/enums';
 import { colorForResponseType, textForResponseType } from '../../../types/calloutSummary';
-import { getTimeString } from '../../../utility/dateHelper';
+import { getConditionalTimeString } from '../../../utility/dateHelper';
 import { user, userToString } from '../../../types/user';
 
 type LogResponseFieldProps = {
@@ -21,7 +21,7 @@ const LogResponseField = ({ member, response, timestamp }: LogResponseFieldProps
                 {userToString(member)}{' responded '}{textForResponseType(response)}
             </Text>
             <Text style={styles.logTimestamp}>
-                {getTimeString(timestamp)}
+                {getConditionalTimeString(timestamp)}
             </Text>
         </View>
     );
