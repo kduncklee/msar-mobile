@@ -66,6 +66,7 @@ const Page = () => {
 
         const response = await apiValidateToken();
         if (response.valid_token == true) {
+            global.currentCredentials = await getCredentials();
             router.push('callout-list');
         } else {
             await clearCredentials();
