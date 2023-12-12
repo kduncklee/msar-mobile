@@ -26,6 +26,12 @@ class PushNotifications {
       });
       Notifications.setNotificationChannelAsync('callout', {
         name: 'New Callout',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 200, 200, 600, 600, 200, 200, 600, 600, 200, 200, 600, 600, 200, 200, 600, 600],
+        lightColor: '#FF231F7C',
+      });
+      Notifications.setNotificationChannelAsync('callout-alarm', {
+        name: 'New Callout - Alarm channel',
         audioAttributes: {
           usage: Notifications.AndroidAudioUsage.ALARM,
         },
