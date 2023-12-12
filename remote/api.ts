@@ -273,16 +273,21 @@ export const apiPostCalloutLog = async (id: number, message: string): Promise<an
     })
 }
 
-export const apiSetDeviceId = async (token: string): Promise<any> => {
+export const apiSetDeviceId = async (token: string, critical?: boolean): Promise<any> => {
     const credentials = await getCredentials();
     if (!credentials.token) {
         return { error: "no token"}
     }
 
+    let deviceId: string = "msar";
+    if (critical !== undefined && critical === false) {
+        deviceId = null
+    }
+
     const tokenInfo = {
         name: "expo",
         registration_id: token,
-        device_id: "msar",
+        device_id: deviceId,
         active: true,
         type: Platform.OS === 'ios' ? 'ios' : 'android'
     }

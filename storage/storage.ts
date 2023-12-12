@@ -50,3 +50,21 @@ export const clearCredentials = async () => {
     await removeData("token");
 }
 
+export const setCriticalAlerts = async (enabled: boolean) => {
+    let criticalAlerts: string = "0";
+    if (enabled) {
+        criticalAlerts = "1";
+    }
+
+    await storeData("criticalAlerts", criticalAlerts);
+}
+
+export const getCriticalAlertsEnabled = async () => {
+    const criticalAlerts = await getData("criticalAlerts");
+    if (criticalAlerts !== undefined && criticalAlerts === "0") {
+        return false;
+    } else {
+        return true;
+    }
+}
+

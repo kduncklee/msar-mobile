@@ -3,7 +3,7 @@ import { Link, router } from "expo-router"
 import { StyleSheet, View, Text, Platform } from "react-native";
 import colors from "../styles/colors";
 import { elements } from "../styles/elements";
-import { clearCredentials, getCredentials } from "../storage/storage";
+import { clearCredentials, getCredentials, getCriticalAlertsEnabled, setCriticalAlerts } from "../storage/storage";
 import InformationField from "../components/fields/InformationField";
 import FormCheckbox from "../components/inputs/FormCheckbox";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -14,6 +14,7 @@ const Page = () => {
 
     const [username, setUsername] = useState('Loading...');
     const [pushEnabled, setPushEnabled] = useState(false);
+    const [criticalAlerts, setCriticalAlerts] = useState(true);
 
     const topMargin: number = Platform.OS === 'ios' ? 0 : 20;
 
@@ -38,10 +39,36 @@ const Page = () => {
         if (token != null) {
             setPushEnabled(true);
         }
+
+        let criticalAlertsEnabled = await getCriticalAlertsEnabled();
+        setCriticalAlerts(criticalAlertsEnabled);
     }
 
-    const onPushToggle = () => {
-        setPushEnabled(!pushEnabled);
+    const onPushToggle = async () => {
+        const pushStatus = !pushEnabled;
+
+        if (!pushStatus) {
+            await pushNotifications.removePushToken();
+        } else {
+            let token = await pushNotifications.getToken();
+            if (token != null) {
+                await pushNotifications.sendPushToken(token,criticalAlerts);
+            }
+        }
+
+        setPushEnabled(pushStatus);
+    }
+
+    const onCriticalAlertsToggle = async () => {
+        const criticalAlertsEnabled = !criticalAlerts;
+
+        await setCriticalAlerts(criticalAlertsEnabled);
+        let token = await pushNotifications.getToken();
+        if (token != null) {
+            await pushNotifications.sendPushToken(token,criticalAlertsEnabled);
+        }
+
+        setCriticalAlerts(criticalAlertsEnabled);
     }
 
     const onSignOutPress = async () => {
@@ -70,6 +97,11 @@ const Page = () => {
                 title={'Notifications'}
                 checked={pushEnabled}
                 onToggle={onPushToggle} />
+            <FormCheckbox
+                title={'Critical Alerts'}
+                checked={criticalAlerts}
+                disabled={!pushEnabled}
+                onToggle={onCriticalAlertsToggle} />
             <View style={styles.bottomContainer}>
             <TouchableOpacity style={styles.signOutButton} activeOpacity={0.5} onPress={onSignOutPress}>
                 <Text style={[elements.mediumText, styles.signOutText]}>Sign Out</Text>

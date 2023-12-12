@@ -94,8 +94,8 @@ class PushNotifications {
     return token.data;
   }
 
-  async sendPushToken(token: string) {
-    const response: any = await apiSetDeviceId(token);
+  async sendPushToken(token: string, critical?: boolean) {
+    const response: any = await apiSetDeviceId(token, critical);
   }
 
   async removePushToken() {
