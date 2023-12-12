@@ -14,12 +14,6 @@ export type location = {
 
 export const locationToString = (location: location): string => {
 
-    if (location.text != null) {
-        if (location.text.length > 0) {
-            return location.text
-        }
-    }
-    
     if (location.address != null) {
         if (location.address.street) {
             return `${location.address.street}, ${location.address.city}, ${location.address.state} ${location.address.zip}`;
@@ -34,12 +28,6 @@ export const locationToString = (location: location): string => {
 }
 
 export const locationToShortString = (location: location): string => {
-
-    if (location.text != null) {
-        if (location.text.length > 0) {
-            return location.text
-        }
-    }
     
     if (location.address != null) {
         if (location.address.street != null) {

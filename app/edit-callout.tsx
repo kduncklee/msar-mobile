@@ -36,6 +36,7 @@ const Page = () => {
     const [archived, setArchived] = useState(false);
     const [resolutionNotes, setResolutionNotes] = useState<string>(null);
     const [locationText, setLocationText] = useState('');
+    const [locationDescText, setLocationDescText] = useState('');
     const [handlingUnit, setHandlingUnit] = useState<string>(null);
     const [existingData, setExistingData] = useState<callout>(null);
     const { location } = useGlobalSearchParams();
@@ -105,6 +106,7 @@ const Page = () => {
         setTitle(existingData.title);
         setOperationType(stringToCalloutType(existingData.operation_type));
         setLocationText(locationToString(existingData.location));
+        setLocationDescText(existingData.location.text);
         global.selectedLocation = existingData.location;
         setSubject(existingData.subject);
         setSubjectContact(existingData.subject_contact);
@@ -170,6 +172,10 @@ const Page = () => {
         }
         if (global.selectedLocation) {
             locationObject = global.selectedLocation;
+        }
+
+        if (locationDescText.length > 0) {
+            locationObject.text = locationDescText;
         }
 
         //console.log("Location: " + JSON.stringify(locationObject));
@@ -253,6 +259,10 @@ const Page = () => {
         setLocationText(text);
     }
 
+    const locationDescChanged = (text: string) => {
+        setLocationDescText(text);
+    }
+
     const locationButtonPressed = () => {
         router.push({ pathname: 'edit-location', params: { locationDescription: locationText, location: '' } });
     }
@@ -329,6 +339,10 @@ const Page = () => {
                             onChange={locationChanged}
                             placeholder='Location'
                             value={locationText} />
+                        <FormTextInput
+                            onChange={locationDescChanged}
+                            placeholder='Location Description'
+                            value={locationDescText} />
                         <FormTextInput
                             title={'Subject'}
                             onChange={subjectChanged}

@@ -41,7 +41,7 @@ const LocationField = ({ location }: LocationFieldProps) => {
     }
 
 
-    if (location.text) {
+    if (location.text && (location.address == null || location.coordinates == null)) {
         locType = locationType.DESCRIPTION;
     } else if (location.address) {
         locType = locationType.ADDRESS;
@@ -91,6 +91,11 @@ const LocationField = ({ location }: LocationFieldProps) => {
                     <Text style={[elements.smallText, { margin: 16 }]}>
                         {locationToString(location)}
                     </Text>
+                    {location.text &&
+                        <Text style={[elements.smallText, { marginHorizontal: 16, marginBottom: 16 }]}>
+                            {location.text}
+                        </Text>
+                    }
                     <View style={styles.buttonTray}>
                         <SmallButton
                             title={'Open Map'}
