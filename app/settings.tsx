@@ -3,7 +3,7 @@ import { Link, router } from "expo-router"
 import { StyleSheet, View, Text, Platform } from "react-native";
 import colors from "../styles/colors";
 import { elements } from "../styles/elements";
-import { clearCredentials, getCredentials, getCriticalAlertsEnabled, setCriticalAlerts } from "../storage/storage";
+import { clearCredentials, getCredentials, getCriticalAlertsEnabled, setCriticalAlertsEnabled } from "../storage/storage";
 import InformationField from "../components/fields/InformationField";
 import FormCheckbox from "../components/inputs/FormCheckbox";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -42,6 +42,7 @@ const Page = () => {
 
         let criticalAlertsEnabled = await getCriticalAlertsEnabled();
         setCriticalAlerts(criticalAlertsEnabled);
+        setCriticalAlertsEnabled(criticalAlertsEnabled);
     }
 
     const onPushToggle = async () => {
@@ -62,7 +63,7 @@ const Page = () => {
     const onCriticalAlertsToggle = async () => {
         const criticalAlertsEnabled = !criticalAlerts;
 
-        await setCriticalAlerts(criticalAlertsEnabled);
+        await setCriticalAlertsEnabled(criticalAlertsEnabled);
         let token = await pushNotifications.getToken();
         if (token != null) {
             await pushNotifications.sendPushToken(token,criticalAlertsEnabled);
