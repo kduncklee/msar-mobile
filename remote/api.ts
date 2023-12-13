@@ -4,7 +4,7 @@ import { logEntry, logEntryFromRespsonse } from "../types/logEntry";
 import { calloutGetLogResponse, loginResponse, tokenValidationResponse } from "./responses";
 import { Platform } from "react-native";
 
-let prod_server: string = "https://malibusarhours.org/calloutapi";
+let prod_server: string = "https://app.malibusarhours.org";
 let server: string = prod_server;
 let tokenEndpoint: string = server + "/api-token-auth/";
 let calloutsEndpoint: string = server + "/api/callouts/";
