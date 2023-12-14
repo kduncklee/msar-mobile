@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import * as Notifications from 'expo-notifications';
 import { Stack, router } from 'expo-router';
+import msarEventEmitter from '../utility/msarEventEmitter';
 
 const useNotificationObserver = () => {
     useEffect(() => {
@@ -11,6 +12,7 @@ const useNotificationObserver = () => {
         if (url) {
           if (url === 'view-callout') {
             router.push({ pathname: 'view-callout', params: { id: notification.request.content.data?.id, type: notification.request.content.data?.type } })
+            msarEventEmitter.emit('refreshCallout',{});
           }
           
         }

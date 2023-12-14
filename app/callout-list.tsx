@@ -64,7 +64,7 @@ const Page = () => {
         loadCallouts();
         
         return () => {
-            msarEventEmitter.off('refreshData',refreshReceived);
+            msarEventEmitter.off('refreshCallout',refreshReceived);
         }
     }, []);
 
