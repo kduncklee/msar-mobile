@@ -21,7 +21,6 @@ Notifications.setNotificationHandler({
 });
 
 const Page = () => {
-    //R07 / L!u0fN*V^rcPe1hX
 
     const [topMargin, setTopMargin] = useState(0);
     const scrollViewRef = useRef(null);
@@ -61,7 +60,7 @@ const Page = () => {
         }
 
         setUsername(creds.username);
-        setPassword("PASSWORD");
+        setPassword("");
         setShowSpinner(true);
 
         const response = await apiValidateToken();
