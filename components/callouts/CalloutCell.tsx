@@ -1,5 +1,6 @@
 import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
 import { calloutSummary, colorForResponseType, colorForTypeAndStatus, imageForType, textForResponseType } from '../../types/calloutSummary';
+import { responseType } from "../../types/enums"
 import { elements } from '../../styles/elements';
 import colors from '../../styles/colors';
 import { getConditionalTimeString } from '../../utility/dateHelper';
@@ -25,7 +26,9 @@ const CalloutCell = ({summary, onPress}: CalloutCellProps) => {
         var total = 0;
         let responded = summary.responded as respondedItem[]
         responded.forEach((item: respondedItem) => {
-            total += item.total;
+            if (item.response != responseType.TEN7) {
+                total += item.total;
+            }
         })
 
         return total;
