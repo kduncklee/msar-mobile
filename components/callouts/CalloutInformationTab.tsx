@@ -1,4 +1,4 @@
-import { View, StyleSheet, Linking } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { textForCalloutStatus } from '../../types/calloutSummary';
 import InformationTray from '../fields/InformationTray';
 import InformationField from '../fields/InformationField';
@@ -8,6 +8,7 @@ import colors from '../../styles/colors';
 import { elements } from '../../styles/elements';
 import { textForResponseType, colorForResponseType, textForType } from '../../types/calloutSummary';
 import { getFullTimeString } from '../../utility/dateHelper';
+import { makePhoneCall } from '../../utility/phone';
 import { callout } from '../../types/callout';
 import { router } from 'expo-router';
 import { calloutStatus } from '../../types/enums';
@@ -25,10 +26,6 @@ const CalloutInformationTab = ({ callout }: CalloutInformationTabProps) => {
         router.push({ pathname: 'edit-callout', params: { id: callout.id.toString() } })
     }
 
-    const makePhoneCall = (phoneNumber: string) => {
-        const phoneNumberWithPrefix = `tel:${phoneNumber}`;
-        Linking.openURL(phoneNumberWithPrefix).catch((err) => console.error('An error occurred', err));
-      };
 
     return (
         <>

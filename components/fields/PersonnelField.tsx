@@ -3,6 +3,7 @@ import colors from '../../styles/colors'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { opResponse } from '../../types/operationalPeriod';
 import { userToString } from '../../types/user';
+import { makePhoneCall } from '../../utility/phone';
 
 type PersonnelFieldProps = {
     opResponse: opResponse
@@ -10,14 +11,10 @@ type PersonnelFieldProps = {
 
 const PersonnelField = ({ opResponse }: PersonnelFieldProps) => {
 
-    const onPhonePress = () => {
-        console.log("phone pressed");
-    }
-
     return (
         <View style={styles.container}>
             {!!opResponse.member.mobile_phone &&
-                <TouchableOpacity style={styles.button} activeOpacity={0.5} onPress={() => onPhonePress}>
+                <TouchableOpacity style={styles.button} activeOpacity={0.5} onPress={() => makePhoneCall(opResponse.member.mobile_phone)}>
                     <Text style={styles.valueText}>{userToString(opResponse.member)}</Text>
                     <Image source={require('../../assets/icons/phone.png')} style={styles.iconImage} />
                 </TouchableOpacity>
