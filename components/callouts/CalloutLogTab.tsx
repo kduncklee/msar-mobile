@@ -7,59 +7,16 @@ import { logEntry } from '../../types/logEntry';
 import LogResponseField from '../fields/log/LogResponseField';
 import LogMessageField from '../fields/log/LogMessageField';
 import { callout } from '../../types/callout';
-import { apiGetCalloutLog } from '../../remote/api';
 import LogSystemField from '../fields/log/LogUpdateField';
 import msarEventEmitter from '../../utility/msarEventEmitter';
 import * as Notifications from 'expo-notifications';
 
 type CalloutLogTabProps = {
-    callout: callout
+    callout: callout,
+    logList: logEntry[]
 }
 
-const CalloutLogTab = ({ callout }: CalloutLogTabProps) => {
-
-    const [logList, setLogList] = useState<logEntry[]>([]);
-    const notificationListener = useRef<Notifications.Subscription>();
-
-    useEffect(() => {
-
-        msarEventEmitter.on('refreshLog', refreshReceived);
-
-        notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-            //setNotification(notification);
-            if (notification?.request?.content?.data?.type === 'log' &&
-                notification.request.content.data?.id === callout?.id) {
-                console.log('update log!!!')
-                getCalloutLog();
-            }
-
-        });
-
-        getCalloutLog();
-
-        return () => {
-            msarEventEmitter.off('refreshLog', refreshReceived);
-        }
-
-    }, []);
-
-    useEffect(() => {
-        if (logList.length > 0) {
-            msarEventEmitter.emit('logLoaded', {});
-        }
-    }, [logList]);
-
-
-    const refreshReceived = data => {
-        getCalloutLog();
-    }
-
-    const getCalloutLog = async () => {
-        const response = await apiGetCalloutLog(callout.id);
-        setLogList(response.results);
-    }
-
-
+const CalloutLogTab = ({ callout, logList }: CalloutLogTabProps) => {
 
     return (
         <>

@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpacity, Text, View } from 'react-native';
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import Header from '../components/Header';
 import CalloutCell from '../components/callouts/CalloutCell';
 import { calloutSummary, calloutSummaryFromResponse } from '../types/calloutSummary';
@@ -13,16 +14,35 @@ import { tabItem } from '../types/tabItem';
 import '../storage/global';
 import msarEventEmitter from '../utility/msarEventEmitter';
 import pushNotifications from '../utility/pushNotifications';
-import * as Notifications from 'expo-notifications';
+
+const useCalloutsQuery = (status?: string) => {
+  return useQuery({
+    queryKey: ["callouts", status],
+    queryFn: async () => {
+        console.log(status);
+        const response = await apiGetCallouts(status);
+        const callouts: calloutSummary[] = [];
+        console.log(response);
+        response.results.forEach((result: any) => {
+            // Perform operations on each result item here
+            callouts.push(calloutSummaryFromResponse(result));
+        });
+        return callouts;
+    }
+  })
+}
+
+const defaultStatus = "active&status=resolved";
 
 const Page = () => {
 
     const [showSpinner, setShowSpinner] = useState(false);
-    const [activeCalloutList, setActiveCalloutList] = useState<calloutSummary[]>([]);
     const [archiveCount, setArchiveCount] = useState(null);
-    const notificationListener = useRef<Notifications.Subscription>();
-    const responseListener = useRef<Notifications.Subscription>();
-    const [notification, setNotification] = useState(false);
+    const [status, setStatus] = useState(defaultStatus);
+    const queryClient = useQueryClient()
+    const query = useCalloutsQuery(status);
+
+    console.log(query);
 
     const tabs: tabItem[] = [
         {
@@ -35,24 +55,11 @@ const Page = () => {
         }
     ]
 
-    var status: string = "active&status=resolved";
-
 
     useEffect(() => {
 
         pushNotifications.registerForPushNotificationsAsync();
 
-        notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-            console.log('notification received');
-            console.log(notification.request.content.title);
-            console.log(notification.request.content.data);
-            //setNotification(notification);
-          });
-      
-          responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-            console.log('notification from home screen');
-            console.log(response.notification.request.content.data);
-          });
 
         if (Platform.OS === 'ios') {
             StatusBar.setBarStyle('light-content');
@@ -73,28 +80,15 @@ const Page = () => {
     }
 
     const loadCallouts = async () => {
-        setShowSpinner(true);
-        const response: any = await apiGetCallouts(status);
-        if (response.results) {
-            const callouts: calloutSummary[] = [];
-            response.results.forEach((result: any) => {
-                // Perform operations on each result item here
-                callouts.push(calloutSummaryFromResponse(result));
-            });
-            setActiveCalloutList(callouts);
-            setShowSpinner(false);
-        }
-        //console.log(response);
+        queryClient.invalidateQueries("callouts");
     }
 
     const tabChanged = (index: number) => {
-
-        status = "active&status=resolved";
         if (index === 1) {
-            status = "archived";
+            setStatus("archived");
+        } else {
+            setStatus(defaultStatus);
         }
-
-        loadCallouts();
     }
 
     const createCallout = () => {
@@ -116,15 +110,16 @@ const Page = () => {
                 <Header title="Callouts" rightButton={true} onRightPressed={() => settingsPressed()}/>
                 <TabSelector tabs={tabs} onTabChange={tabChanged} />
                 <View style={styles.contentContainer}>
-                    <ScrollView style={styles.scrollView}>
+            {query.isLoading ? (<Text>Loading...</Text>) : (<></>)}
+                    {query.isSuccess ? (<ScrollView style={styles.scrollView}>
                         {
-                            activeCalloutList.map((summary: calloutSummary, index: number) => {
+                            query.data.map((summary: calloutSummary, index: number) => {
 
                                 return (<CalloutCell key={summary.id} summary={summary} onPress={viewCallout} />)
                             })
                         }
                         <View style={{ height: 100 }} />
-                    </ScrollView>
+                                        </ScrollView>) : (<></>)}
                     <TouchableOpacity
                         activeOpacity={0.8}
                         style={[elements.capsuleButton, styles.createCalloutButton]}

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Malibu SAR",
     "slug": "MSAR",
-    "version": "1.1.2",
+    "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -32,7 +32,7 @@
         "backgroundColor": "#2B3038"
       },
       "package": "org.malibusarhours.msar",
-      "versionCode": "9",
+      "versionCode": "10",
       "googleServicesFile": "./google-services.json"
     },
     "web": {

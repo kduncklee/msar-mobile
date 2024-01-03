@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpacity, Text, View, KeyboardAvoidingView } from 'react-native';
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import Header from '../components/Header';
 import colors from '../styles/colors';
 import { elements } from '../styles/elements';
@@ -16,10 +17,25 @@ import CalloutPersonnelTab from '../components/callouts/CalloutPersonnelTab';
 import { tabItem } from '../types/tabItem';
 import LogInput from '../components/callouts/LogInput';
 import { callout, calloutResponseBadge } from '../types/callout';
-import { apiGetCallout, apiPostCalloutLog, apiRespondToCallout } from '../remote/api';
+import { apiGetCallout, apiGetCalloutLog, apiPostCalloutLog, apiRespondToCallout } from '../remote/api';
 import ActivityModal from '../components/modals/ActivityModal';
 import msarEventEmitter from '../utility/msarEventEmitter';
 import * as Notifications from 'expo-notifications';
+
+const useCalloutQuery = (id: string) => {
+    const idInt: number = parseInt(id);
+    return useQuery({
+        queryKey: ['callout', idInt],
+        queryFn: () => apiGetCallout(idInt)
+    })
+}
+const useCalloutLogQuery = (id: string) => {
+    const idInt: number = parseInt(id);
+    return useQuery({
+        queryKey: ['calloutLog', idInt],
+        queryFn: () => apiGetCalloutLog(idInt)
+    })
+}
 
 const Page = () => {
 
@@ -27,6 +43,8 @@ const Page = () => {
     const [headerTitle, setHeaderTitle] = useState(title);
     const safeAreaInsets = useSafeAreaInsets();
     const scrollViewRef = useRef(null);
+
+    const notificationListener = useRef<Notifications.Subscription>();
 
     const translateY = useSharedValue(600);
     const opacity = useSharedValue(0);
@@ -41,13 +59,19 @@ const Page = () => {
         }
     }
     const [currentTab, setCurrentTab] = useState(defaultTab);
-    const [callout, setCallout] = useState<callout>(null);
     const [logBadge, setLogBadge] = useState(null);
     const [personnelBadge, setPersonnelBadge] = useState(null);
     const [calloutTimestamp, setCalloutTimestamp] = useState<Date>(null);
 
     const [logMessageText, setLogMessageText] = useState('');
     const [isActive, setIsActive] = useState(false);
+
+    const queryClient = useQueryClient()
+    const calloutQuery = useCalloutQuery(id);
+    const logQuery = useCalloutLogQuery(id);
+
+    const callout = calloutQuery.data;
+    const logList = logQuery.data?.results;
 
     const tabs: tabItem[] = [
         {
@@ -73,14 +97,14 @@ const Page = () => {
             StatusBar.setBackgroundColor(colors.primaryBg);
         }
 
-        msarEventEmitter.on('refreshCallout', refreshReceived);
-        msarEventEmitter.on('logLoaded', logLoaded);
+        notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+            refreshCallout();
+        });
 
-        getCallout();
+        msarEventEmitter.on('refreshCallout', refreshReceived);
 
         return () => {
             msarEventEmitter.off('refreshCallout', refreshReceived);
-            msarEventEmitter.off('logLoaded', logLoaded);
         }
 
     }, []);
@@ -100,39 +124,19 @@ const Page = () => {
         }
     }, [callout]);
 
+    const refreshCallout = () => {
+        queryClient.invalidateQueries("callout");
+        queryClient.invalidateQueries("calloutLog");
+    }
+
     const refreshReceived = data => {
-        getCallout();
+        refreshCallout();
     }
 
-    const logLoaded = data => {
-        if (currentTab === 1) {
-            setTimeout(scrollToBottom, 500);
-        }
-    }
-
-    const scrollToBottom = () => {
-        scrollViewRef.current.scrollToEnd({ animated: true });
-    }
-
-    const getCallout = async () => {
-
-        const perms = await Notifications.getPermissionsAsync();
-        console.log(perms);
-        console.log(id);
-        const idInt: number = parseInt(id);
-        setSpinnerMessage("Loading Callout...");
-        setShowSpinner(true);
-        const response = await apiGetCallout(idInt);
-        //console.log(JSON.stringify(response));
-        setShowSpinner(false);
-        //if it's a callout
-        setCallout(response);
-        //else
-        //show error
-    }
 
     const tabChanged = (index: number) => {
         setCurrentTab(index);
+        refreshCallout();
     }
 
     const respondToCallout = () => {
@@ -156,7 +160,6 @@ const Page = () => {
     }
 
     const submitCalloutResponse = async (responseString: string) => {
-
         const idInt: number = parseInt(id);
         setSpinnerMessage("Submitting Response...");
         setShowSpinner(true);
@@ -178,7 +181,6 @@ const Page = () => {
         setShowSpinner(false);
 
         msarEventEmitter.emit('refreshCallout', { id: idInt });
-        msarEventEmitter.emit('refreshLog', { id: idInt });
     }
 
     const trayAnimatedStyle = useAnimatedStyle(() => {
@@ -216,20 +218,20 @@ const Page = () => {
                                         callout={callout} />
                                 </ScrollView>
                             }
-                            {currentTab === 1 &&
+                            {currentTab === 1 && !!logList &&
                                 <ScrollView ref={scrollViewRef}
                                     style={styles.scrollView}
                                     onContentSizeChange={() =>
                                         {scrollViewRef.current?.scrollToEnd()}}>
                                     <CalloutLogTab
-                                        callout={callout} />
+                                        callout={callout} logList={logList} />
                                 </ScrollView>
                             }
                             {currentTab === 2 &&
                                 <ScrollView ref={scrollViewRef}
                                         style={styles.scrollView}>
                                     <CalloutPersonnelTab
-                                        callout={callout} />
+                             callout={callout} />
                                 </ScrollView>
                             }
                             {currentTab === 0 && isActive &&
