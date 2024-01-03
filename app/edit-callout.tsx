@@ -174,7 +174,7 @@ const Page = () => {
             locationObject = global.selectedLocation;
         }
 
-        if (locationDescText.length > 0) {
+        if (locationDescText) {
             locationObject.text = locationDescText;
         }
 
