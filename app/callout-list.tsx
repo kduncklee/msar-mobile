@@ -110,7 +110,7 @@ const Page = () => {
                 <Header title="Callouts" rightButton={true} onRightPressed={() => settingsPressed()}/>
                 <TabSelector tabs={tabs} onTabChange={tabChanged} />
                 <View style={styles.contentContainer}>
-            {query.isLoading ? (<Text>Loading...</Text>) : (<></>)}
+                    {query.isLoading ? (<Text>Loading...</Text>) : (<></>)}
                     {query.isSuccess ? (<ScrollView style={styles.scrollView}>
                         {
                             query.data.map((summary: calloutSummary, index: number) => {
@@ -119,7 +119,7 @@ const Page = () => {
                             })
                         }
                         <View style={{ height: 100 }} />
-                                        </ScrollView>) : (<></>)}
+                    </ScrollView>) : (<></>)}
                     <TouchableOpacity
                         activeOpacity={0.8}
                         style={[elements.capsuleButton, styles.createCalloutButton]}
