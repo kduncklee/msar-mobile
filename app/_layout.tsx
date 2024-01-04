@@ -3,7 +3,7 @@ import { AppState, AppStateStatus } from 'react-native';
 import NetInfo from '@react-native-community/netinfo'
 import { QueryClient, QueryClientProvider, focusManager, onlineManager } from "@tanstack/react-query";
 import * as Notifications from 'expo-notifications';
-import { Stack, router } from 'expo-router';
+import { Slot, router } from 'expo-router';
 import msarEventEmitter from '../utility/msarEventEmitter';
 
 const queryClient = new QueryClient({
@@ -46,8 +46,9 @@ const useNotificationObserver = () => {
           if (url === 'view-callout') {
             router.push({ pathname: 'view-callout', params: { id: notification.request.content.data?.id, type: notification.request.content.data?.type } })
             msarEventEmitter.emit('refreshCallout',{});
+          } else {
+            router.push({ pathname: url })
           }
-          
         }
       }
   
@@ -77,11 +78,7 @@ const Layout = () => {
 
     return (
       <QueryClientProvider client={queryClient}>
-        <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen
-                name="settings"
-                options={{ presentation: 'modal'}} />
-        </Stack>
+        <Slot />
       </QueryClientProvider>
     );
 }

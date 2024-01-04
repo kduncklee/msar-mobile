@@ -49,7 +49,6 @@ const Page = () => {
         );
 
         tokenCheck();
-        //validateToken();
 
     }, []);
 
@@ -63,15 +62,21 @@ const Page = () => {
         setPassword("");
         setShowSpinner(true);
 
+        // Skipping api call to enable offline mode
+        /*
+        console.log("apiValidateToken");
         const response = await apiValidateToken();
         if (response.valid_token == true) {
             global.currentCredentials = await getCredentials();
-            router.push('callout-list');
+            router.push('/');
         } else {
             await clearCredentials();
             setUsername('');
             setPassword('');
         }
+        */
+        global.currentCredentials = await getCredentials();
+        router.push('/');
 
         setShowSpinner(false);
 
@@ -89,6 +94,7 @@ const Page = () => {
     const login = async () => {
         setShowSpinner(true);
 
+        console.log("apiGetToken");
         const response: loginResponse = await apiGetToken(username, password);
         setShowSpinner(false);
         if (response.non_field_errors) {
@@ -102,7 +108,7 @@ const Page = () => {
         if (response.token) {
             await storeCredentials(username, response.token);
             global.currentCredentials = await getCredentials();
-            router.push('callout-list');
+            router.push('/');
         }
 
 

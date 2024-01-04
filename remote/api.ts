@@ -8,6 +8,7 @@ let prod_server: string = "https://app.malibusarhours.org";
 let server: string = prod_server;
 let tokenEndpoint: string = server + "/api-token-auth/";
 let calloutsEndpoint: string = server + "/api/callouts/";
+let chatEndpoint: string = server + "/api/announcement/log/";
 let devicesEndpoint: string = server + "/api/devices/";
 let tokenValidationEndpoint: string = server + "/api/?format=json";
 
@@ -207,14 +208,14 @@ export const apiRespondToCallout = async (id: number, response: string): Promise
     })
 }
 
-export const apiGetCalloutLog = async (id: number): Promise<calloutGetLogResponse> => {
+const apiGetLogResponseFromUrl = async (url: string): Promise<calloutGetLogResponse> => {
 
     const credentials = await getCredentials();
     if (!credentials.token) {
         return { error: "no token"}
     }
 
-    return fetch(calloutsEndpoint + id + '/log/', {
+    return fetch(url, {
         method: "GET",
         headers: {
             'Authorization': 'Token ' + credentials.token,
@@ -242,14 +243,22 @@ export const apiGetCalloutLog = async (id: number): Promise<calloutGetLogRespons
     })
 }
 
+export const apiGetCalloutLog = async (id: number): Promise<calloutGetLogResponse> => {
+    return apiGetLogResponseFromUrl(calloutsEndpoint + id + '/log/');
+}
 
-export const apiPostCalloutLog = async (id: number, message: string): Promise<any> => {
+export const apiGetChatLog = async (): Promise<calloutGetLogResponse> => {
+    return apiGetLogResponseFromUrl(chatEndpoint);
+}
+
+
+const apiPostLogFromUrl = async (url: string, message: string): Promise<any> => {
     const credentials = await getCredentials();
     if (!credentials.token) {
         return { error: "no token"}
     }
 
-    return fetch(calloutsEndpoint + id + '/log/', {
+    return fetch(url, {
         method: "POST",
         headers: {
             'Authorization': 'Token ' + credentials.token,
@@ -271,6 +280,14 @@ export const apiPostCalloutLog = async (id: number, message: string): Promise<an
             error: "Server Error"
         };
     })
+}
+
+export const apiPostCalloutLog = async (id: number, message: string): Promise<any> => {
+    return apiPostLogFromUrl(calloutsEndpoint + id + '/log/', message);
+}
+
+export const apiPostChatLog = async (message: string): Promise<any> => {
+    return apiPostLogFromUrl(chatEndpoint, message);
 }
 
 export const apiSetDeviceId = async (token: string, critical?: boolean): Promise<any> => {

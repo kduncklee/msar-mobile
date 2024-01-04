@@ -14,6 +14,7 @@ utility/constants.ts
 ios/
 android/
 build-*.aab
+build*.apks
 
 # Native
 *.orig.*
@@ -34,7 +35,11 @@ yarn-error.*
 # macOS
 .DS_Store
 *.pem
-.~/
+
+# Emacs
+*~
+\#*\#
+.\#*
 
 # local env files
 .env*.local

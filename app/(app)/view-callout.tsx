@@ -1,25 +1,25 @@
 import { useState, useEffect, useRef } from 'react';
 import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpacity, Text, View, KeyboardAvoidingView } from 'react-native';
 import { useQueryClient, useQuery } from "@tanstack/react-query";
-import Header from '../components/Header';
-import colors from '../styles/colors';
-import { elements } from '../styles/elements';
+import Header from '../../components/Header';
+import colors from '../../styles/colors';
+import { elements } from '../../styles/elements';
 import { useLocalSearchParams } from 'expo-router';
-import { calloutStatus, responseType } from '../types/enums';
-import { textForResponseType } from '../types/calloutSummary';
-import TabSelector from '../components/TabSelector/TabSelector';
-import CalloutRespond from '../components/callouts/CalloutRespond';
+import { calloutStatus, responseType } from '../../types/enums';
+import { textForResponseType } from '../../types/calloutSummary';
+import TabSelector from '../../components/TabSelector/TabSelector';
+import CalloutRespond from '../../components/callouts/CalloutRespond';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, Easing } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import CalloutInformationTab from '../components/callouts/CalloutInformationTab';
-import CalloutLogTab from '../components/callouts/CalloutLogTab';
-import CalloutPersonnelTab from '../components/callouts/CalloutPersonnelTab';
-import { tabItem } from '../types/tabItem';
-import LogInput from '../components/callouts/LogInput';
-import { callout, calloutResponseBadge } from '../types/callout';
-import { apiGetCallout, apiGetCalloutLog, apiPostCalloutLog, apiRespondToCallout } from '../remote/api';
-import ActivityModal from '../components/modals/ActivityModal';
-import msarEventEmitter from '../utility/msarEventEmitter';
+import CalloutInformationTab from '../../components/callouts/CalloutInformationTab';
+import CalloutLogTab from '../../components/callouts/CalloutLogTab';
+import CalloutPersonnelTab from '../../components/callouts/CalloutPersonnelTab';
+import { tabItem } from '../../types/tabItem';
+import LogInput from '../../components/callouts/LogInput';
+import { callout, calloutResponseBadge } from '../../types/callout';
+import { apiGetCallout, apiGetCalloutLog, apiPostCalloutLog, apiRespondToCallout } from '../../remote/api';
+import ActivityModal from '../../components/modals/ActivityModal';
+import msarEventEmitter from '../../utility/msarEventEmitter';
 import * as Notifications from 'expo-notifications';
 
 const useCalloutQuery = (id: string) => {
@@ -223,8 +223,7 @@ const Page = () => {
                                     style={styles.scrollView}
                                     onContentSizeChange={() =>
                                         {scrollViewRef.current?.scrollToEnd()}}>
-                                    <CalloutLogTab
-                                        callout={callout} logList={logList} />
+                                    <CalloutLogTab logList={logList} />
                                 </ScrollView>
                             }
                             {currentTab === 2 &&

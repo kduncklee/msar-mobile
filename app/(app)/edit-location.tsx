@@ -1,18 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { SafeAreaView, StyleSheet, StatusBar, Platform, TouchableOpacity, Text, View, Alert, Image, KeyboardAvoidingView, Keyboard } from 'react-native';
-import Header from '../components/Header';
-import colors from '../styles/colors';
-import { elements } from '../styles/elements';
+import Header from '../../components/Header';
+import colors from '../../styles/colors';
+import { elements } from '../../styles/elements';
 import { router } from 'expo-router';
 import MapView, { LatLng, LongPressEvent, Region, Marker, MapMarker } from 'react-native-maps';
-import { coordinateFromString } from '../utility/locationHeler';
-import FormTextInput from '../components/inputs/FormTextInput';
-import { geocodeAddress } from '../remote/google-maps';
-import ActivityModal from '../components/modals/ActivityModal';
-import { geocodeAddressResponse } from '../remote/responses';
-import { location, locationToShortString, locationToString } from '../types/location';
-import LocationSelectionModal from '../components/modals/LocationSelectModal';
-import '../storage/global';
+import { coordinateFromString } from '../../utility/locationHeler';
+import FormTextInput from '../../components/inputs/FormTextInput';
+import { geocodeAddress } from '../../remote/google-maps';
+import ActivityModal from '../../components/modals/ActivityModal';
+import { geocodeAddressResponse } from '../../remote/responses';
+import { location, locationToShortString, locationToString } from '../../types/location';
+import LocationSelectionModal from '../../components/modals/LocationSelectModal';
+import '../../storage/global';
 
 const Page = () => {
     const markerRef = useRef<MapMarker>();
@@ -220,7 +220,7 @@ const Page = () => {
                                     onSubmit={performAddressSearch}
                                     autoCorrect={false} />
                                 <TouchableOpacity activeOpacity={0.5} style={[styles.button, { backgroundColor: colors.blue }]} onPress={searchPressed}>
-                                    <Image source={require('../assets/icons/location_search.png')} style={styles.buttonImage} />
+                                    <Image source={require('../../assets/icons/location_search.png')} style={styles.buttonImage} />
                                 </TouchableOpacity>
                             </View>
                             {!currentCoordinate &&

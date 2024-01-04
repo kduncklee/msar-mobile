@@ -6,17 +6,15 @@ import { logType } from '../../types/enums';
 import { logEntry } from '../../types/logEntry';
 import LogResponseField from '../fields/log/LogResponseField';
 import LogMessageField from '../fields/log/LogMessageField';
-import { callout } from '../../types/callout';
 import LogSystemField from '../fields/log/LogUpdateField';
 import msarEventEmitter from '../../utility/msarEventEmitter';
 import * as Notifications from 'expo-notifications';
 
 type CalloutLogTabProps = {
-    callout: callout,
     logList: logEntry[]
 }
 
-const CalloutLogTab = ({ callout, logList }: CalloutLogTabProps) => {
+const CalloutLogTab = ({ logList }: CalloutLogTabProps) => {
 
     return (
         <>

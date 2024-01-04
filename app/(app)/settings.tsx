@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link, router } from "expo-router"
 import { StyleSheet, View, Text, Platform } from "react-native";
-import colors from "../styles/colors";
-import { elements } from "../styles/elements";
-import { clearCredentials, getCredentials, getCriticalAlertsEnabled, setCriticalAlertsEnabled } from "../storage/storage";
-import InformationField from "../components/fields/InformationField";
-import FormCheckbox from "../components/inputs/FormCheckbox";
+import { useQueryClient } from "@tanstack/react-query";
+import colors from "../../styles/colors";
+import { elements } from "../../styles/elements";
+import { clearCredentials, getCredentials, getCriticalAlertsEnabled, setCriticalAlertsEnabled } from "../../storage/storage";
+import "../../storage/global";
+import InformationField from "../../components/fields/InformationField";
+import FormCheckbox from "../../components/inputs/FormCheckbox";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import pushNotifications from "../utility/pushNotifications";
+import pushNotifications from "../../utility/pushNotifications";
 
 
 const Page = () => {
@@ -15,6 +17,7 @@ const Page = () => {
     const [username, setUsername] = useState('Loading...');
     const [pushEnabled, setPushEnabled] = useState(false);
     const [criticalAlerts, setCriticalAlerts] = useState(true);
+    const queryClient = useQueryClient()
 
     const topMargin: number = Platform.OS === 'ios' ? 0 : 20;
 
@@ -76,6 +79,8 @@ const Page = () => {
         
         await pushNotifications.removePushToken();
         await clearCredentials();
+        global.currentCredentials = null;
+        queryClient.invalidateQueries();
         router.replace('/');
     }
 
@@ -83,7 +88,7 @@ const Page = () => {
         <View style={styles.container}>
             <View style={[styles.header, { marginTop: topMargin }]}>
                 <Text style={[styles.title]}>Settings</Text>
-                <Link style={styles.closeContainer} href='../'>
+                <Link style={styles.closeContainer} href='/'>
                     <Text style={[elements.mediumText, { color: colors.yellow }]}>
                         Close
                     </Text>

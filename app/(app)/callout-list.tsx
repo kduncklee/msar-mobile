@@ -1,19 +1,19 @@
 import { useEffect, useState, useRef } from 'react';
 import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpacity, Text, View } from 'react-native';
 import { useQueryClient, useQuery } from "@tanstack/react-query";
-import Header from '../components/Header';
-import CalloutCell from '../components/callouts/CalloutCell';
-import { calloutSummary, calloutSummaryFromResponse } from '../types/calloutSummary';
-import colors from '../styles/colors';
-import TabSelector from '../components/TabSelector/TabSelector';
-import { elements } from '../styles/elements';
+import Header from '../../components/Header';
+import CalloutCell from '../../components/callouts/CalloutCell';
+import { calloutSummary, calloutSummaryFromResponse } from '../../types/calloutSummary';
+import colors from '../../styles/colors';
+import TabSelector from '../../components/TabSelector/TabSelector';
+import { elements } from '../../styles/elements';
 import { router } from 'expo-router';
-import { apiGetCallouts } from '../remote/api';
-import ActivityModal from '../components/modals/ActivityModal';
-import { tabItem } from '../types/tabItem';
-import '../storage/global';
-import msarEventEmitter from '../utility/msarEventEmitter';
-import pushNotifications from '../utility/pushNotifications';
+import { apiGetCallouts } from '../../remote/api';
+import ActivityModal from '../../components/modals/ActivityModal';
+import { tabItem } from '../../types/tabItem';
+import '../../storage/global';
+import msarEventEmitter from '../../utility/msarEventEmitter';
+import pushNotifications from '../../utility/pushNotifications';
 
 const useCalloutsQuery = (status?: string) => {
   return useQuery({
@@ -99,15 +99,10 @@ const Page = () => {
         router.push({ pathname: 'view-callout', params: { id: calloutSummary.id, title: calloutSummary.title } })
     }
 
-    const settingsPressed = () => {
-        router.push('/settings');
-        console.log("settings");
-    }
-
     return (
         <>
             <SafeAreaView style={styles.container}>
-                <Header title="Callouts" rightButton={true} onRightPressed={() => settingsPressed()}/>
+                <Header title="Callouts" backButton={true} rightButton={true} />
                 <TabSelector tabs={tabs} onTabChange={tabChanged} />
                 <View style={styles.contentContainer}>
                     {query.isLoading ? (<Text>Loading...</Text>) : (<></>)}
