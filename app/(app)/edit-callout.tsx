@@ -1,22 +1,22 @@
 import { useState, useEffect } from 'react';
 import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpacity, Text, View, KeyboardAvoidingView, Alert } from 'react-native';
-import Header from '../components/Header';
-import colors from '../styles/colors';
-import { elements } from '../styles/elements';
+import Header from '../../components/Header';
+import colors from '../../styles/colors';
+import { elements } from '../../styles/elements';
 import { router, useLocalSearchParams, useGlobalSearchParams } from 'expo-router';
-import { calloutStatus, calloutType, stringToCalloutType } from '../types/enums';
-import DropdownSelector from '../components/inputs/DropdownSelector';
-import FormTextInput from '../components/inputs/FormTextInput';
-import FormTextArea from '../components/inputs/FormTextArea';
-import FormCheckbox from '../components/inputs/FormCheckbox';
-import DropdownMultiselect from '../components/inputs/DropdownMultiselect';
-import ActivityModal from '../components/modals/ActivityModal';
-import "../storage/global"
-import { callout } from '../types/callout';
-import { apiCreateCallout, apiUpdateCallout, apiGetCallout } from '../remote/api';
-import * as notificationListHelper from "../utility/notificationListHelper"
-import { location, locationToString } from '../types/location';
-import msarEventEmitter from '../utility/msarEventEmitter';
+import { calloutStatus, calloutType, stringToCalloutType } from '../../types/enums';
+import DropdownSelector from '../../components/inputs/DropdownSelector';
+import FormTextInput from '../../components/inputs/FormTextInput';
+import FormTextArea from '../../components/inputs/FormTextArea';
+import FormCheckbox from '../../components/inputs/FormCheckbox';
+import DropdownMultiselect from '../../components/inputs/DropdownMultiselect';
+import ActivityModal from '../../components/modals/ActivityModal';
+import "../../storage/global"
+import { callout } from '../../types/callout';
+import { apiCreateCallout, apiUpdateCallout, apiGetCallout } from '../../remote/api';
+import * as notificationListHelper from "../../utility/notificationListHelper"
+import { location, locationToString } from '../../types/location';
+import msarEventEmitter from '../../utility/msarEventEmitter';
 
 const Page = () => {
 
@@ -174,7 +174,7 @@ const Page = () => {
             locationObject = global.selectedLocation;
         }
 
-        if (locationDescText.length > 0) {
+        if (locationDescText) {
             locationObject.text = locationDescText;
         }
 
@@ -334,7 +334,7 @@ const Page = () => {
                             onSelect={calloutTypeSelected} />
                         <FormTextInput
                             title={'Location'}
-                            rightButton={require('../assets/icons/map.png')}
+                            rightButton={require('../../assets/icons/map.png')}
                             onRightPress={locationButtonPressed}
                             onChange={locationChanged}
                             placeholder='Location'
@@ -349,7 +349,7 @@ const Page = () => {
                             placeholder='Subject'
                             value={subject} />
                         <FormTextInput
-                            icon={require('../assets/icons/phone.png')}
+                            icon={require('../../assets/icons/phone.png')}
                             onChange={subjectContactChanged}
                             placeholder='Subject Contact'
                             value={subjectContact} />
@@ -359,7 +359,7 @@ const Page = () => {
                             placeholder='Informant'
                             value={informant} />
                         <FormTextInput
-                            icon={require('../assets/icons/phone.png')}
+                            icon={require('../../assets/icons/phone.png')}
                             onChange={informantContactChanged}
                             placeholder='Informant Contact'
                             value={informantContact} />

@@ -78,12 +78,12 @@ const CalloutPersonnelTab = ({ callout }: CalloutPersonnelTabProps) => {
                             const addDiv: boolean = (index < filterByTen8.length - 1);
 
                             return (
-                                <>
+                                <React.Fragment key={opResponse.member.id}>
                                     <PersonnelField key={opResponse.member.id} opResponse={opResponse} />
                                     {addDiv &&
                                         <View style={elements.informationDiv} />
                                     }
-                                </>
+                                </React.Fragment>
                             )
                         })
                     }
@@ -103,12 +103,12 @@ const CalloutPersonnelTab = ({ callout }: CalloutPersonnelTabProps) => {
                             const addDiv: boolean = (index < filterByTen7.length - 1);
 
                             return (
-                                <>
+                                <React.Fragment key={opResponse.member.id}>
                                     <PersonnelField key={opResponse.member.id} opResponse={opResponse} />
                                     {addDiv &&
                                         <View style={elements.informationDiv} />
                                     }
-                                </>
+                                </React.Fragment>
                             )
                         })
                     }

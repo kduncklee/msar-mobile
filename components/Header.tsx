@@ -14,7 +14,7 @@ type HeaderProps = {
     timestamp?: Date
 }
 
-const Header = ({ title, backButton = false, onBackPressed, rightButton = false, onRightPressed, timestamp = null }: HeaderProps) => {
+const Header = ({ title, backButton = false, onBackPressed, rightButton = false, timestamp = null }: HeaderProps) => {
 
     const [headerMargin, setHeaderMargin] = useState(0);
 
@@ -50,6 +50,11 @@ const Header = ({ title, backButton = false, onBackPressed, rightButton = false,
         }
     }
 
+    const settingsPressed = () => {
+        router.push('/settings');
+        console.log("settings");
+    }
+
     return (
         <View style={[styles.container, { marginTop: headerMargin }]}>
             {backButton &&
@@ -65,7 +70,7 @@ const Header = ({ title, backButton = false, onBackPressed, rightButton = false,
             </View>
             }
             {rightButton &&
-                <TouchableOpacity activeOpacity={0.2} style={styles.rightContainer} onPress={onRightPressed}>
+                <TouchableOpacity activeOpacity={0.2} style={styles.rightContainer} onPress={() => settingsPressed()}>
                     <Image source={require('assets/icons/settings.png')} style={styles.rightImage} />
                 </TouchableOpacity>
             }
