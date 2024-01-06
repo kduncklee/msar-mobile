@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
+import { Autolink, LatLngMatcher } from 'react-native-autolink';
 import { elements } from '../../../styles/elements';
 import colors from '../../../styles/colors'
 import { getConditionalTimeString } from '../../../utility/dateHelper';
@@ -27,11 +28,13 @@ const LogMessageField = ({ member, message, timestamp }: LogMessageFieldProps) =
                     {userToString(member)}
                 </Text>
             }
-            <Text style={[styles.messageText,{
+            <Autolink style={[styles.messageText,{
                 "textAlign": isSelf ? "right" : "left"
-            }]}>
-                {message}
-            </Text>
+            }]}
+            selectable={true}
+            email phone matchers={[LatLngMatcher]}
+            text={message}
+            />
             <Text style={[styles.messageTimestamp,{
                 "textAlign": isSelf ? "right" : "left",
                 "color": isSelf ? colors.lightText : colors.grayText
