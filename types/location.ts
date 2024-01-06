@@ -14,10 +14,18 @@ export type location = {
 
 export const locationToString = (location: location): string => {
 
-    if (location.address != null) {
-        if (location.address.street) {
-            return `${location.address.street}, ${location.address.city}, ${location.address.state} ${location.address.zip}`;
+    if (location.address?.street) {
+        var address = `${location.address.street}`;
+        if (location.address?.city) {
+            address += `, ${location.address.city}`;
+            if (location.address?.state) {
+                address += `, ${location.address.state}`;
+                if (location.address?.zip) {
+                    address += ` ${location.address.zip}`;
+                }
+            }
         }
+        return address;
     }
     
     if (location.coordinates?.lat && location.coordinates?.long) {
@@ -29,14 +37,16 @@ export const locationToString = (location: location): string => {
 
 export const locationToShortString = (location: location): string => {
     
-    if (location.address != null) {
-        if (location.address.street != null) {
-            return `${location.address.street}`;
-        }
+    if (location.address?.street) {
+        return `${location.address.street}`;
     }
     
-    if (location.coordinates != null) {
+    if (location.coordinates?.lat && location.coordinates?.long) {
         return `${location.coordinates.lat}, ${location.coordinates.long}`
+    }
+
+    if (location.text) {
+        return `${location.text}`;
     }
 
     return "UNKNOWN";
