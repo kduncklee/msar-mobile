@@ -18,7 +18,7 @@ const LogSystemField = ({ member, update, timestamp }: LogSystemFieldProps) => {
             <Text style={[styles.valueText, { color: colors.grayText }]}>
                 {userToString(member)}
             </Text>
-            <Text style={[elements.fieldText, { textAlign: "center" }]}>
+            <Text style={[elements.fieldText, { textAlign: "center" }]} selectable={true}>
                 {update}
             </Text>
             <Text style={styles.logTimestamp}>
