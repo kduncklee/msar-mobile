@@ -1,37 +1,80 @@
 import { useEffect, useState, useRef } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ScrollView, Text, FlatList } from 'react-native';
+import { useQueryClient, useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { stringToResponseType } from '../../types/enums';
 import colors from '../../styles/colors';
 import { logType } from '../../types/enums';
-import { logEntry } from '../../types/logEntry';
+import { logEntry, logEntryFromRespsonse } from '../../types/logEntry';
 import LogResponseField from '../fields/log/LogResponseField';
 import LogMessageField from '../fields/log/LogMessageField';
 import LogSystemField from '../fields/log/LogUpdateField';
-import msarEventEmitter from '../../utility/msarEventEmitter';
-import * as Notifications from 'expo-notifications';
+import TextAreaField from '../fields/TextAreaField';
+
+
 
 type CalloutLogTabProps = {
     logList: logEntry[]
 }
 
-const CalloutLogTab = ({ logList }: CalloutLogTabProps) => {
+
+const CalloutLogTab = ({queryKey, queryFn}) => {
+    const queryClient = useQueryClient()
+
+    const {
+        data,
+        error,
+        fetchNextPage,
+        hasNextPage,
+        isLoading,
+        isFetching,
+        isFetchingNextPage,
+        status,
+    } = useInfiniteQuery({
+        queryKey: queryKey,
+        queryFn: queryFn,
+        getNextPageParam: (lastPage, pages) => lastPage?.next,
+    })
+
+    const logList = data?.pages
+          ? data?.pages?.flatMap((page) =>
+              page?.results.map((r) => logEntryFromRespsonse(r))
+          ) : [];
+
+    if (!logList) {
+        return (<TextAreaField value={'Loading...'} />);
+    }
+
+    const refreshList = () => {
+        console.log('refresh');
+        queryClient.invalidateQueries(queryKey[0]);
+    }
+
+    const getMore = () => {
+        console.log('more');
+        if(!isFetching && hasNextPage) {
+            fetchNextPage();
+        }
+    };
 
     return (
-        <>
-            {
-                logList.map((entry: logEntry, index: number) => {
-                    switch (entry.type) {
+        <FlatList
+                data={logList}
+                renderItem={({item}) => {
+                    switch (item.type) {
                         case logType.RESPONSE:
-                            return (<LogResponseField key={entry.id} member={entry.member} response={stringToResponseType(entry.update)} timestamp={entry.created_at} />);
+                            return (<LogResponseField key={item.id} member={item.member} response={stringToResponseType(item.update)} timestamp={item.created_at} />);
                         case logType.SYSTEM:
-                            return (<LogSystemField key={entry.id} member={entry.member} update={entry.update} timestamp={entry.created_at} />);
+                            return (<LogSystemField key={item.id} member={item.member} update={item.update} timestamp={item.created_at} />);
                         case logType.MESSAGE:
-                            return (<LogMessageField key={entry.id} member={entry.member} message={entry.message} timestamp={entry.created_at} />);
+                            return (<LogMessageField key={item.id} member={item.member} message={item.message} timestamp={item.created_at} />);
                     }
-                })
-            }
-            <View style={{ marginTop: 60 }} />
-        </>
+                }}
+                inverted
+                onStartReached={() => console.log('start')}
+                onEndReached={() => getMore() }
+                onRefresh={() => refreshList() }
+                refreshing={isFetching && !isFetchingNextPage}
+        />
     );
 }
 
