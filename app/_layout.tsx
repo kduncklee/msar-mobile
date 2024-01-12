@@ -1,10 +1,23 @@
 import { useEffect } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 import NetInfo from '@react-native-community/netinfo'
+import * as Sentry from "@sentry/react-native";
 import { QueryClient, QueryClientProvider, focusManager, onlineManager } from "@tanstack/react-query";
 import * as Notifications from 'expo-notifications';
 import { Slot, router } from 'expo-router';
+import { SentryDsn } from "../utility/constants";
 import msarEventEmitter from '../utility/msarEventEmitter';
+
+Sentry.init({
+  dsn: SentryDsn,
+  enableInExpoDevelopment: true,
+  tracesSampleRate: 1.0,
+  integrations: [
+    new Sentry.ReactNativeTracing({
+      enableAppStartTracking: false,
+    }),
+  ],
+});
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -83,4 +96,4 @@ const Layout = () => {
     );
 }
 
-export default Layout;
+export default Sentry.wrap(Layout);
