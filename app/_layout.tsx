@@ -23,7 +23,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       gcTime: 1000 * 60 * 60 * 24, // 24 hours
-      staleTime: 1000 * 5, // 5 seconds
+      staleTime: 1000 * 10, // 10 seconds
     },
   },
 });
@@ -39,7 +39,8 @@ onlineManager.setEventListener(setOnline => {
 // React query: Refetch on App focus
 function onAppStateChange(status: AppStateStatus) {
   if (Platform.OS !== 'web') {
-    focusManager.setFocused(status === 'active')
+      console.log('onAppStateChange');
+      focusManager.setFocused(status === 'active')
   }
 }
 const useAppStateRefresh = () => {

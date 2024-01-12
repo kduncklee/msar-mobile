@@ -22,7 +22,6 @@ const useCalloutsQuery = (status?: string) => {
         console.log(status);
         const response = await apiGetCallouts(status);
         const callouts: calloutSummary[] = [];
-        console.log(response);
         response.results.forEach((result: any) => {
             // Perform operations on each result item here
             callouts.push(calloutSummaryFromResponse(result));
@@ -41,8 +40,6 @@ const Page = () => {
     const [status, setStatus] = useState(defaultStatus);
     const queryClient = useQueryClient()
     const query = useCalloutsQuery(status);
-
-    console.log(query);
 
     const tabs: tabItem[] = [
         {
@@ -76,11 +73,13 @@ const Page = () => {
     }, []);
 
     const refreshReceived = data => {
+        console.log('Callouts refreshReceived');
         loadCallouts();
     }
 
     const loadCallouts = async () => {
-        queryClient.invalidateQueries("callouts");
+        console.log('loadCallouts');
+        queryClient.invalidateQueries({ queryKey: ['callouts'] });
     }
 
     const tabChanged = (index: number) => {

@@ -12,6 +12,25 @@ let chatEndpoint: string = server + "/api/announcement/log/";
 let devicesEndpoint: string = server + "/api/devices/";
 let tokenValidationEndpoint: string = server + "/api/?format=json";
 
+const fetchJsonWithCredentials = async (url: string): Promise<any> => {
+    const credentials = await getCredentials();
+    if (!credentials.token) {
+        throw new Error('No token');
+    }
+
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+            'Authorization': 'Token ' + credentials.token,
+            'Content-Type': 'application/json'
+        }
+    });
+    if (!response.ok) {
+        throw new Error('Network response was ' + response.status);
+    }
+    return response.json();
+}
+
 export const apiGetToken = async (username: string, password: string): Promise<loginResponse> => {
 
     return fetch(tokenEndpoint, {
@@ -66,37 +85,12 @@ export const apiValidateToken = async (): Promise<tokenValidationResponse> => {
 }
 
 export const apiGetCallouts = async (status?: string): Promise<any> => {
-
-    const credentials = await getCredentials();
-    if (!credentials.token) {
-        return { error: "no token"}
-    }
-
-    var statusArg = "";
+    var args = "?ordering=-id";
     if (status) {
-        statusArg = `?status=${status}`
+        args += `&status=${status}`
     }
-    
-    //console.log(credentials.token);
-    return fetch(calloutsEndpoint + statusArg, {
-        method: "GET",
-        headers: {
-            'Authorization': 'Token ' + credentials.token
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        //console.log(data);
-        return data;
-    })
-    .catch(error => {
-        console.log(error);
-        return {
-            non_field_errors: [
-                "Server Error"
-            ]
-        };
-    })
+
+    return fetchJsonWithCredentials(calloutsEndpoint + args);
 }
 
 export const apiCreateCallout = async (callout: callout): Promise<any> => {
@@ -127,29 +121,9 @@ export const apiCreateCallout = async (callout: callout): Promise<any> => {
 }
 
 export const apiGetCallout = async (id: number): Promise<any> => {
-    const credentials = await getCredentials();
-    if (!credentials.token) {
-        return { error: "no token"}
-    }
-
-    return fetch(calloutsEndpoint + id + '/', {
-        method: "GET",
-        headers: {
-            'Authorization': 'Token ' + credentials.token,
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        //console.log("get callout response: " + JSON.stringify(data));
+    return fetchJsonWithCredentials(calloutsEndpoint + id + '/').then(data => {
         return calloutFromResponse(data);
-    })
-    .catch(error => {
-        console.log(error);
-        return {
-            error: "Server Error"
-        };
-    })
+    });
 }
 
 export const apiUpdateCallout = async (id: number, callout: callout): Promise<any> => {
@@ -208,47 +182,20 @@ export const apiRespondToCallout = async (id: number, response: string): Promise
     })
 }
 
-const apiGetLogResponseFromUrl = async (url: string): Promise<calloutGetLogResponse> => {
 
-    const credentials = await getCredentials();
-    if (!credentials.token) {
-        return { error: "no token"}
-    }
+const apiGetLogResponseFromUrl = async (url: string, pageParam?: string): Promise<calloutGetLogResponse> => {
+    var fullUrl = pageParam ? pageParam : url + '?ordering=-id';
+    console.log('full url', fullUrl);
 
-    return fetch(url, {
-        method: "GET",
-        headers: {
-            'Authorization': 'Token ' + credentials.token,
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        //console.log("get callout log response: " + JSON.stringify(data));
-        var results: logEntry[] = [];
-        data.results.forEach(result => {
-            results.push(logEntryFromRespsonse(result));
-        });
-
-        return {
-            count: data.count,
-            results: results
-        };
-    })
-    .catch(error => {
-        console.log(error);
-        return {
-            error: "Server Error"
-        };
-    })
+    return fetchJsonWithCredentials(fullUrl);
 }
 
-export const apiGetCalloutLog = async (id: number): Promise<calloutGetLogResponse> => {
-    return apiGetLogResponseFromUrl(calloutsEndpoint + id + '/log/');
+export const apiGetCalloutLog = async (id: number, pageParam?: string): Promise<calloutGetLogResponse> => {
+    return apiGetLogResponseFromUrl(calloutsEndpoint + id + '/log/', pageParam);
 }
 
-export const apiGetChatLog = async (): Promise<calloutGetLogResponse> => {
-    return apiGetLogResponseFromUrl(chatEndpoint);
+export const apiGetChatLog = async ({pageParam} : {pageParam: string}): Promise<calloutGetLogResponse> => {
+    return apiGetLogResponseFromUrl(chatEndpoint, pageParam);
 }
 
 
