@@ -25,15 +25,8 @@ import * as Notifications from 'expo-notifications';
 const useCalloutQuery = (id: string) => {
     const idInt: number = parseInt(id);
     return useQuery({
-        queryKey: ['callout', idInt],
+        queryKey: ['calloutInfo', idInt],
         queryFn: () => apiGetCallout(idInt)
-    })
-}
-const useCalloutLogQuery = (id: string) => {
-    const idInt: number = parseInt(id);
-    return useQuery({
-        queryKey: ['calloutLog', idInt],
-        queryFn: () => apiGetCalloutLog(idInt)
     })
 }
 
@@ -66,12 +59,12 @@ const Page = () => {
     const [logMessageText, setLogMessageText] = useState('');
     const [isActive, setIsActive] = useState(false);
 
+    const idInt: number = parseInt(id);
+
     const queryClient = useQueryClient()
     const calloutQuery = useCalloutQuery(id);
-    const logQuery = useCalloutLogQuery(id);
 
     const callout = calloutQuery.data;
-    const logList = logQuery.data?.results;
 
     const tabs: tabItem[] = [
         {
@@ -125,8 +118,9 @@ const Page = () => {
     }, [callout]);
 
     const refreshCallout = () => {
-        queryClient.invalidateQueries("callout");
-        queryClient.invalidateQueries("calloutLog");
+        console.log('refreshCallout');
+        queryClient.invalidateQueries({ queryKey: ['calloutInfo'] });
+        queryClient.invalidateQueries({ queryKey: ['calloutLog'] });
     }
 
     const refreshReceived = data => {
@@ -218,13 +212,11 @@ const Page = () => {
                                         callout={callout} />
                                 </ScrollView>
                             }
-                            {currentTab === 1 && !!logList &&
-                                <ScrollView ref={scrollViewRef}
-                                    style={styles.scrollView}
-                                    onContentSizeChange={() =>
-                                        {scrollViewRef.current?.scrollToEnd()}}>
-                                    <CalloutLogTab logList={logList} />
-                                </ScrollView>
+                            {currentTab === 1 &&
+                                <CalloutLogTab
+                                    queryKey={['calloutLog', idInt]}
+                                    queryFn={({pageParam}) => apiGetCalloutLog(idInt, pageParam)}
+                                />
                             }
                             {currentTab === 2 &&
                                 <ScrollView ref={scrollViewRef}

@@ -4,7 +4,7 @@ import { StyleSheet, View, Text, Platform } from "react-native";
 import { useQueryClient } from "@tanstack/react-query";
 import colors from "../../styles/colors";
 import { elements } from "../../styles/elements";
-import { clearCredentials, getCredentials, getCriticalAlertsEnabled, setCriticalAlertsEnabled } from "../../storage/storage";
+import { clearCredentials, getCredentials, getCriticalAlertsEnabled, setCriticalAlertsEnabled, getServer, clearServer } from "../../storage/storage";
 import "../../storage/global";
 import InformationField from "../../components/fields/InformationField";
 import FormCheckbox from "../../components/inputs/FormCheckbox";
@@ -15,6 +15,7 @@ import pushNotifications from "../../utility/pushNotifications";
 const Page = () => {
 
     const [username, setUsername] = useState('Loading...');
+    const [server, setServer] = useState('Loading...');
     const [pushEnabled, setPushEnabled] = useState(false);
     const [criticalAlerts, setCriticalAlerts] = useState(true);
     const queryClient = useQueryClient()
@@ -35,6 +36,12 @@ const Page = () => {
             setUsername(credentials.username);
         }
         console.log(credentials);
+        const s = await getServer();
+        if (s) {
+            setServer(s);
+        } else {
+            setServer('Production');
+        }
     }
 
     const checkPushNotifications = async () => {
@@ -79,6 +86,7 @@ const Page = () => {
         
         await pushNotifications.removePushToken();
         await clearCredentials();
+        await clearServer();
         global.currentCredentials = null;
         queryClient.invalidateQueries();
         router.replace('/');
@@ -98,6 +106,10 @@ const Page = () => {
             <View style={styles.userContainer}>
                 <Text style={elements.mediumText}>Username</Text>
                 <Text style={[elements.mediumText, styles.userText]}>{username}</Text>
+            </View>
+            <View style={styles.userContainer}>
+                <Text style={elements.mediumText}>Server</Text>
+                <Text style={[elements.mediumText, styles.userText]}>{server}</Text>
             </View>
             <FormCheckbox
                 title={'Notifications'}

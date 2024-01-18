@@ -7,7 +7,7 @@ import FormTextInput from '../components/inputs/FormTextInput';
 import SmallButton from '../components/inputs/SmallButton';
 import { apiGetToken, apiValidateToken } from '../remote/api';
 import { loginResponse } from '../remote/responses';
-import { getCredentials, storeCredentials, clearCredentials } from '../storage/storage';
+import { getCredentials, storeCredentials, clearCredentials, getServer, storeServer, clearServer } from '../storage/storage';
 import ActivityModal from '../components/modals/ActivityModal';
 import "../storage/global";
 import * as Notifications from 'expo-notifications';
@@ -57,8 +57,13 @@ const Page = () => {
         if (!creds.token || !creds.username) {
             return;
         }
+        const server = await getServer();
 
-        setUsername(creds.username);
+        if (server) {
+            setUsername(`_${server}_${creds.username}`);
+        } else {
+            setUsername(creds.username);
+        }
         setPassword("");
         setShowSpinner(true);
 
@@ -94,8 +99,20 @@ const Page = () => {
     const login = async () => {
         setShowSpinner(true);
 
+        let server = undefined;
+        let server_username = username;
+        const match = username.match(/_([^_]+)_(.+)/);
+        if (match) {
+            server = match[1];
+            server_username = match[2];
+            console.log(server, server_username);
+            await storeServer(server);
+        } else {
+            console.log('clear server', server_username);
+            await clearServer();
+        }
         console.log("apiGetToken");
-        const response: loginResponse = await apiGetToken(username, password);
+        const response: loginResponse = await apiGetToken(server_username, password);
         setShowSpinner(false);
         if (response.non_field_errors) {
             let errorString: string = response.non_field_errors.join('\n');
@@ -106,7 +123,7 @@ const Page = () => {
         }
 
         if (response.token) {
-            await storeCredentials(username, response.token);
+            await storeCredentials(server_username, response.token);
             global.currentCredentials = await getCredentials();
             router.push('/');
         }

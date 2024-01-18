@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpacity, Text, View, KeyboardAvoidingView } from 'react-native';
-import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { SafeAreaView, StyleSheet, StatusBar, Platform, View, KeyboardAvoidingView } from 'react-native';
+import { useQueryClient } from "@tanstack/react-query";
 import Header from '../../components/Header';
 import colors from '../../styles/colors';
 import { elements } from '../../styles/elements';
@@ -8,20 +8,10 @@ import CalloutLogTab from '../../components/callouts/CalloutLogTab';
 import LogInput from '../../components/callouts/LogInput';
 import { apiGetChatLog, apiPostChatLog } from '../../remote/api';
 
-const useChatQuery = () => {
-    return useQuery({
-        queryKey: ['chat'],
-        queryFn: () => apiGetChatLog()
-    })
-}
-
 const Page = () => {
 
-    const scrollViewRef = useRef(null);
     const [logMessageText, setLogMessageText] = useState('');
     const queryClient = useQueryClient()
-    const chatQuery = useChatQuery();
-    const logList = chatQuery.data?.results;
 
     useEffect(() => {
         if (Platform.OS === 'ios') {
@@ -32,7 +22,7 @@ const Page = () => {
     }, []);
 
     const refreshChat = () => {
-        queryClient.invalidateQueries("chat");
+        queryClient.invalidateQueries({ queryKey: ['chat'] });
     }
 
     const onLogMessageTextChanged = (text: string) => {
@@ -56,19 +46,12 @@ const Page = () => {
                                 keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -500} // Adjust the offset as needed
                             >
                         <View style={styles.contentContainer}>
-                            {!!logList && <>
-                                <ScrollView ref={scrollViewRef}
-                                    style={styles.scrollView}
-                                    onContentSizeChange={() =>
-                                        {scrollViewRef.current?.scrollToEnd()}}>
-                                    <CalloutLogTab  logList={logList} />
-                                </ScrollView>
-                                <LogInput
+                            <CalloutLogTab queryKey={['chat']} queryFn={apiGetChatLog} />
+                            <LogInput
                                     onTextChange={onLogMessageTextChanged}
                                     text={logMessageText}
                                     onSendPress={submitLogMessage}
                                     onPhotoPress={() => console.log('photo')} />
-                            </>}
                         </View>
                         </KeyboardAvoidingView>
             </SafeAreaView>

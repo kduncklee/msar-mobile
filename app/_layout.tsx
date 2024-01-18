@@ -1,16 +1,29 @@
 import { useEffect } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 import NetInfo from '@react-native-community/netinfo'
+import * as Sentry from "@sentry/react-native";
 import { QueryClient, QueryClientProvider, focusManager, onlineManager } from "@tanstack/react-query";
 import * as Notifications from 'expo-notifications';
 import { Slot, router } from 'expo-router';
+import { SentryDsn } from "../utility/constants";
 import msarEventEmitter from '../utility/msarEventEmitter';
+
+Sentry.init({
+  dsn: SentryDsn,
+  enableInExpoDevelopment: true,
+  tracesSampleRate: 1.0,
+  integrations: [
+    new Sentry.ReactNativeTracing({
+      enableAppStartTracking: false,
+    }),
+  ],
+});
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       gcTime: 1000 * 60 * 60 * 24, // 24 hours
-      staleTime: 1000 * 5, // 5 seconds
+      staleTime: 1000 * 10, // 10 seconds
     },
   },
 });
@@ -26,7 +39,8 @@ onlineManager.setEventListener(setOnline => {
 // React query: Refetch on App focus
 function onAppStateChange(status: AppStateStatus) {
   if (Platform.OS !== 'web') {
-    focusManager.setFocused(status === 'active')
+      console.log('onAppStateChange');
+      focusManager.setFocused(status === 'active')
   }
 }
 const useAppStateRefresh = () => {
@@ -83,4 +97,4 @@ const Layout = () => {
     );
 }
 
-export default Layout;
+export default Sentry.wrap(Layout);
