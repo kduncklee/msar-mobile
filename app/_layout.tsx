@@ -2,7 +2,9 @@ import { useEffect } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 import NetInfo from '@react-native-community/netinfo'
 import * as Sentry from "@sentry/react-native";
-import { QueryClient, QueryClientProvider, focusManager, onlineManager } from "@tanstack/react-query";
+import { RootSiblingParent } from 'react-native-root-siblings';
+import Toast from 'react-native-root-toast';
+import { QueryCache, QueryClient, QueryClientProvider, focusManager, onlineManager } from "@tanstack/react-query";
 import * as Notifications from 'expo-notifications';
 import { Slot, router } from 'expo-router';
 import { SentryDsn } from "../utility/constants";
@@ -10,7 +12,7 @@ import msarEventEmitter from '../utility/msarEventEmitter';
 
 Sentry.init({
   dsn: SentryDsn,
-  enableInExpoDevelopment: true,
+  sendDefaultPii: true,
   tracesSampleRate: 1.0,
   integrations: [
     new Sentry.ReactNativeTracing({
@@ -26,6 +28,12 @@ const queryClient = new QueryClient({
       staleTime: 1000 * 10, // 10 seconds
     },
   },
+  queryCache: new QueryCache({
+    onError: (error) => {
+      Sentry.captureException(error);
+      Toast.show(`Something went wrong: ${error.message}`);
+    },
+  }),
 });
 
 // React query: Online status management
@@ -91,9 +99,11 @@ const Layout = () => {
     useNotificationObserver();
 
     return (
-      <QueryClientProvider client={queryClient}>
-        <Slot />
-      </QueryClientProvider>
+      <RootSiblingParent>
+        <QueryClientProvider client={queryClient}>
+          <Slot />
+        </QueryClientProvider>
+      </RootSiblingParent>
     );
 }
 

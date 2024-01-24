@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpacity, Text, View, KeyboardAvoidingView } from 'react-native';
-import { useQueryClient, useQuery } from "@tanstack/react-query";
+import Toast from 'react-native-root-toast';
+import * as Sentry from "@sentry/react-native";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 import Header from '../../components/Header';
 import colors from '../../styles/colors';
 import { elements } from '../../styles/elements';
@@ -17,18 +19,10 @@ import CalloutPersonnelTab from '../../components/callouts/CalloutPersonnelTab';
 import { tabItem } from '../../types/tabItem';
 import LogInput from '../../components/callouts/LogInput';
 import { callout, calloutResponseBadge } from '../../types/callout';
-import { apiGetCallout, apiGetCalloutLog, apiPostCalloutLog, apiRespondToCallout } from '../../remote/api';
-import ActivityModal from '../../components/modals/ActivityModal';
+import { useCalloutQuery, apiGetCalloutLog, apiPostCalloutLog, apiRespondToCallout } from '../../remote/api';
 import msarEventEmitter from '../../utility/msarEventEmitter';
 import * as Notifications from 'expo-notifications';
 
-const useCalloutQuery = (id: string) => {
-    const idInt: number = parseInt(id);
-    return useQuery({
-        queryKey: ['calloutInfo', idInt],
-        queryFn: () => apiGetCallout(idInt)
-    })
-}
 
 const Page = () => {
 
@@ -43,7 +37,6 @@ const Page = () => {
     const opacity = useSharedValue(0);
 
     const [modalVisible, setModalVisible] = useState(false);
-    const [showSpinner, setShowSpinner] = useState(false);
     const [spinnerMessage, setSpinnerMessage] = useState('');
     let defaultTab: number = 0;
     if (type != null) {
@@ -63,6 +56,14 @@ const Page = () => {
 
     const queryClient = useQueryClient()
     const calloutQuery = useCalloutQuery(id);
+    const calloutResponseMutation = useMutation({
+      mutationFn: ({ idInt, text }) => apiRespondToCallout(idInt, text),
+      retry: 3,
+    });
+    const calloutLogMutation = useMutation({
+      mutationFn: ({ idInt, text }) => apiPostCalloutLog(idInt, text),
+      retry: 3,
+    });
 
     const callout = calloutQuery.data;
 
@@ -155,11 +156,23 @@ const Page = () => {
 
     const submitCalloutResponse = async (responseString: string) => {
         const idInt: number = parseInt(id);
-        setSpinnerMessage("Submitting Response...");
-        setShowSpinner(true);
-        const response = await apiRespondToCallout(idInt, responseString);
-        setShowSpinner(false);
-        msarEventEmitter.emit('refreshCallout', { id: idInt });
+        calloutResponseMutation.mutate(
+          {
+            idInt: idInt,
+            text: responseString,
+          },
+          {
+            onSuccess: (data, error, variables, context) => {
+              msarEventEmitter.emit("refreshCallout", { id: idInt });
+            },
+            onError: (error, variables, context) => {
+              Sentry.captureException(error);
+              Toast.show(`Unable to set status: ${error.message}`, {
+                duration: Toast.durations.LONG,
+              });
+            },
+          }
+        );
     }
 
     const onLogMessageTextChanged = (text: string) => {
@@ -168,13 +181,24 @@ const Page = () => {
 
     const submitLogMessage = async () => {
         const idInt: number = parseInt(id);
-        const logMessage: string = logMessageText;
         setLogMessageText('');
-        setShowSpinner(true);
-        const response = await apiPostCalloutLog(idInt, logMessage);
-        setShowSpinner(false);
-
-        msarEventEmitter.emit('refreshCallout', { id: idInt });
+        calloutLogMutation.mutate(
+          {
+            idInt: idInt,
+            text: logMessageText,
+          },
+          {
+            onSuccess: (data, error, variables, context) => {
+              msarEventEmitter.emit("refreshCallout", { id: idInt });
+            },
+            onError: (error, variables, context) => {
+              Sentry.captureException(error);
+              Toast.show(`Unable to send message: ${error.message}`, {
+                duration: Toast.durations.LONG,
+              });
+            },
+          }
+        );
     }
 
     const trayAnimatedStyle = useAnimatedStyle(() => {
@@ -253,9 +277,6 @@ const Page = () => {
                 <Animated.View style={[styles.modalBackground, modalAnimatedStyle]}>
                     <TouchableOpacity onPress={cancelRespondModal} style={{ flex: 1 }} />
                 </Animated.View>
-            }
-            {!!showSpinner &&
-                <ActivityModal message={spinnerMessage} />
             }
         </>
     )

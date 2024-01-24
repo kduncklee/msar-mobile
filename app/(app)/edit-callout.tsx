@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpacity, Text, View, KeyboardAvoidingView, Alert } from 'react-native';
+import Toast from 'react-native-root-toast';
+import * as Sentry from "@sentry/react-native";
+import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import Header from '../../components/Header';
 import colors from '../../styles/colors';
 import { elements } from '../../styles/elements';
@@ -13,7 +16,7 @@ import DropdownMultiselect from '../../components/inputs/DropdownMultiselect';
 import ActivityModal from '../../components/modals/ActivityModal';
 import "../../storage/global"
 import { callout } from '../../types/callout';
-import { apiCreateCallout, apiUpdateCallout, apiGetCallout } from '../../remote/api';
+import { apiCreateCallout, apiUpdateCallout, useCalloutQuery } from '../../remote/api';
 import * as notificationListHelper from "../../utility/notificationListHelper"
 import { location, locationToString } from '../../types/location';
 import msarEventEmitter from '../../utility/msarEventEmitter';
@@ -38,8 +41,20 @@ const Page = () => {
     const [locationText, setLocationText] = useState('');
     const [locationDescText, setLocationDescText] = useState('');
     const [handlingUnit, setHandlingUnit] = useState<string>(null);
-    const [existingData, setExistingData] = useState<callout>(null);
     const { location } = useGlobalSearchParams();
+    var existingData;
+    if (id) {
+        const calloutQuery = useCalloutQuery(id);
+        existingData = calloutQuery.data;
+    }
+
+    const calloutCreateMutation = useMutation({
+        mutationFn: (callout) => apiCreateCallout(callout),
+      });
+    const calloutUpdateMutation = useMutation({
+        mutationFn: ({ idInt, callout }) => apiUpdateCallout(idInt, callout),
+      });
+
     var headerTitle: string = "Create Callout";
 
     let callOutTypeSelect = [
@@ -68,10 +83,6 @@ const Page = () => {
 
         global.selectedLocation = null;
 
-        if (id) {
-            getCallout();
-        }
-
     }, []);
 
     useEffect(() => {
@@ -87,19 +98,6 @@ const Page = () => {
         }
     }, [existingData]);
 
-    const getCallout = async () => {
-
-        const idInt: number = parseInt(id);
-        setSpinnerMessage('Loading Callout...');
-        setShowSpinner(true);
-        const response = await apiGetCallout(idInt);
-        console.log(response);
-        setShowSpinner(false);
-        //if it's a callout
-        setExistingData(response);
-        //else
-        //show error
-    }
 
     const populateFields = () => {
 
@@ -212,15 +210,25 @@ const Page = () => {
 
         setSpinnerMessage("Creating Callout...");
         setShowSpinner(true);
-        const response: any = await apiCreateCallout(generateCallout());
-        setShowSpinner(false);
-        if (typeof response.id === 'number' && typeof response.title === 'string') {
-            msarEventEmitter.emit('refreshCallout',{});
-            router.replace({ pathname: 'view-callout', params: { id: response.id.toString(), title: response.title } })
-        }
 
-        console.log(response);
-
+        calloutCreateMutation.mutate(generateCallout(),
+            {
+              onSuccess: (data, error, variables, context) => {
+                console.log(data);
+                msarEventEmitter.emit('refreshCallout',{});
+                router.replace({ pathname: 'view-callout', params: { id: data.id.toString(), title: data.title } })
+              },
+              onError: (error, variables, context) => {
+                Sentry.captureException(error);
+                Toast.show(`Unable to create callout: ${error.message}`, {
+                  duration: Toast.durations.LONG,
+                });
+              },
+              onSettled: (data, error, variables, context) => {
+                setShowSpinner(false);
+              },
+            }
+          );
     }
 
     const updateCallout = async () => {
@@ -232,17 +240,33 @@ const Page = () => {
 
         setSpinnerMessage("Updating Callout...");
         setShowSpinner(true);
-        const response: any = await apiUpdateCallout(idInt, generateCallout());
-        setShowSpinner(false);
-        if (typeof response.id === 'number' && typeof response.title === 'string') {
-            msarEventEmitter.emit('refreshCallout',{id: idInt});
-            router.back();
-        }
 
-        console.log(response);
+        calloutUpdateMutation.mutate(
+          { idInt: idInt, callout: generateCallout() },
+          {
+            onSuccess: (data, error, variables, context) => {
+              console.log(data);
+              msarEventEmitter.emit("refreshCallout", {});
+              router.replace({
+                pathname: "view-callout",
+                params: { id: data.id.toString(), title: data.title },
+              });
+            },
+            onError: (error, variables, context) => {
+              Sentry.captureException(error);
+              Toast.show(`Unable to update callout: ${error.message}`, {
+                duration: Toast.durations.LONG,
+              });
+            },
+            onSettled: (data, error, variables, context) => {
+              setShowSpinner(false);
+            },
+          }
+        );
     }
 
     const validateFields = (): boolean => {
+        // TODO: add validation
         return true;
     }
 

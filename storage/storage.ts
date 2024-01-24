@@ -54,11 +54,11 @@ export const storeServer = async (server: string) => {
     await storeData("server", server);
 }
 
-export const getServer = async (): string => {
+export const getServer = async (): Promise<string> => {
     return getData("server");
 }
 
-export const clearServer = async (): string => {
+export const clearServer = async (): Promise<string> => {
     await removeData("server");
 }
 

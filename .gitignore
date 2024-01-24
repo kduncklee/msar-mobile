@@ -14,6 +14,7 @@ utility/constants.ts
 ios/
 android/
 build-*.aab
+build-*.ipa
 build*.apks
 
 # Native
@@ -36,13 +37,15 @@ yarn-error.*
 .DS_Store
 *.pem
 
-# Emacs
+# Editors
 *~
 \#*\#
 .\#*
+.vscode/
 
 # local env files
 .env*.local
+.env
 
 # typescript
 *.tsbuildinfo

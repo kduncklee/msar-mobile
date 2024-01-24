@@ -74,6 +74,7 @@ const CalloutLogTab = ({queryKey, queryFn}) => {
                 onEndReached={() => getMore() }
                 onRefresh={() => refreshList() }
                 refreshing={isFetching && !isFetchingNextPage}
+                removeClippedSubviews={false}  // needed for text selection
         />
     );
 }

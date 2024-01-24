@@ -35,7 +35,9 @@ const LogMessageField = ({ member, message, timestamp }: LogMessageFieldProps) =
             email phone matchers={[LatLngMatcher]}
             text={message}
             />
-            <Text style={[styles.messageTimestamp,{
+            <Text
+                selectable={true}
+                style={[styles.messageTimestamp,{
                 "textAlign": isSelf ? "right" : "left",
                 "color": isSelf ? colors.lightText : colors.grayText
             }]}>

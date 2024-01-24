@@ -3,13 +3,14 @@ import { callout, calloutFromResponse } from "../types/callout";
 import { logEntry, logEntryFromRespsonse } from "../types/logEntry";
 import { calloutGetLogResponse, loginResponse, tokenValidationResponse } from "./responses";
 import { Platform } from "react-native";
+import { useQuery, useMutation } from "@tanstack/react-query";
 
 let local_server: string = "http://192.168.1.120:8000";
 let legacy_server: string = "https://malibusarhours.org/calloutapi";
 let dev_server: string = "https://msar-dev-app.azurewebsites.net";
 let staging_server: string = "https://staging.app.malibusarhours.org";
 let prod_server: string = "https://app.malibusarhours.org";
-const server = async (): string => {
+const server = async (): Promise<string> => {
     const server = await getServer();
     switch (server) {
         case 'local':
@@ -24,30 +25,45 @@ const server = async (): string => {
     return prod_server;
 }
 
-const tokenEndpoint = async (): string => { return await server() + "/api-token-auth/"; }
-const calloutsEndpoint = async (): string => { return await server() + "/api/callouts/"; }
-const chatEndpoint = async (): string => await server() + "/api/announcement/log/";
-const devicesEndpoint = async (): string => { return await server() + "/api/devices/"; }
-const tokenValidationEndpoint = async (): string => { return await server() + "/api/?format=json"; }
+const tokenEndpoint = async (): Promise<string> =>
+  (await server()) + "/api-token-auth/";
+const calloutsEndpoint = async (): Promise<string> =>
+  (await server()) + "/api/callouts/";
+const chatEndpoint = async (): Promise<string> =>
+  (await server()) + "/api/announcement/log/";
+const devicesEndpoint = async (): Promise<string> =>
+  (await server()) + "/api/devices/";
+const tokenValidationEndpoint = async (): Promise<string> =>
+  (await server()) + "/api/?format=json";
 
-const fetchJsonWithCredentials = async (url: string): Promise<any> => {
-    const credentials = await getCredentials();
-    if (!credentials.token) {
-        throw new Error('No token');
-    }
+const fetchJsonWithCredentials = async (
+  url: string,
+  method: string = "GET",
+  body?: any
+): Promise<any> => {
+  const credentials = await getCredentials();
+  if (!credentials.token) {
+    throw new Error("No token");
+  }
 
-    const response = await fetch(url, {
-        method: "GET",
-        headers: {
-            'Authorization': 'Token ' + credentials.token,
-            'Content-Type': 'application/json'
-        }
-    });
-    if (!response.ok) {
-        throw new Error('Network response was ' + response.status);
-    }
-    return response.json();
-}
+  let options = {
+    method: method,
+    headers: {
+      Authorization: "Token " + credentials.token,
+      "Content-Type": "application/json",
+    },
+  };
+  if (body) {
+    options.body = JSON.stringify(body);
+  }
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    const msg = await response.text();
+    console.log(response.status, msg);
+    throw new Error("Network response was " + response.status + ": " + msg);
+  }
+  return response.json();
+};
 
 export const apiGetToken = async (username: string, password: string): Promise<loginResponse> => {
 
@@ -112,30 +128,7 @@ export const apiGetCallouts = async (status?: string): Promise<any> => {
 }
 
 export const apiCreateCallout = async (callout: callout): Promise<any> => {
-    const credentials = await getCredentials();
-    if (!credentials.token) {
-        return { error: "no token"}
-    }
-
-    return fetch(await calloutsEndpoint(), {
-        method: "POST",
-        headers: {
-            'Authorization': 'Token ' + credentials.token,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(callout)
-    })
-    .then(response => response.json())
-    .then(data => {
-        //console.log("created response: " + JSON.stringify(data));
-        return calloutFromResponse(data);
-    })
-    .catch(error => {
-        console.log(error);
-        return {
-            error: "Server Error"
-        };
-    })
+    return fetchJsonWithCredentials(await calloutsEndpoint(), "POST", callout);
 }
 
 export const apiGetCallout = async (id: number): Promise<any> => {
@@ -145,60 +138,25 @@ export const apiGetCallout = async (id: number): Promise<any> => {
 }
 
 export const apiUpdateCallout = async (id: number, callout: callout): Promise<any> => {
-    const credentials = await getCredentials();
-    if (!credentials.token) {
-        return { error: "no token"}
-    }
-
-    return fetch(await calloutsEndpoint() + id + '/', {
-        method: "PUT",
-        headers: {
-            'Authorization': 'Token ' + credentials.token,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(callout)
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log("created response: " + JSON.stringify(data));
-        return calloutFromResponse(data);
-    })
-    .catch(error => {
-        console.log(error);
-        return {
-            error: "Server Error"
-        };
-    })
+    return fetchJsonWithCredentials(
+      (await calloutsEndpoint()) + id + "/",
+      "PUT",
+      callout
+    );
 }
 
-export const apiRespondToCallout = async (id: number, response: string): Promise<any> => {
-    const credentials = await getCredentials();
-    if (!credentials.token) {
-        return { error: "no token"}
+export const apiRespondToCallout = async (
+  id: number,
+  response: string
+): Promise<any> => {
+  return fetchJsonWithCredentials(
+    (await calloutsEndpoint()) + id + "/respond/",
+    "POST",
+    {
+      response: response,
     }
-
-    return fetch(await calloutsEndpoint() + id + '/respond/', {
-        method: "POST",
-        headers: {
-            'Authorization': 'Token ' + credentials.token,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            response: response
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        //console.log("created response: " + JSON.stringify(data));
-        return data
-    })
-    .catch(error => {
-        console.log(error);
-        return {
-            error: "Server Error"
-        };
-    })
-}
+  );
+};
 
 
 const apiGetLogResponseFromUrl = async (url: string, pageParam?: string): Promise<calloutGetLogResponse> => {
@@ -218,33 +176,10 @@ export const apiGetChatLog = async ({pageParam} : {pageParam: string}): Promise<
 
 
 const apiPostLogFromUrl = async (url: string, message: string): Promise<any> => {
-    const credentials = await getCredentials();
-    if (!credentials.token) {
-        return { error: "no token"}
-    }
-
-    return fetch(url, {
-        method: "POST",
-        headers: {
-            'Authorization': 'Token ' + credentials.token,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            type: "message",
-            message: message
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        //console.log("created log entry: " + JSON.stringify(data));
-        return data
-    })
-    .catch(error => {
-        console.log(error);
-        return {
-            error: "Server Error"
-        };
-    })
+    return fetchJsonWithCredentials(url, "POST", {
+      type: "message",
+      message: message,
+    });
 }
 
 export const apiPostCalloutLog = async (id: number, message: string): Promise<any> => {
@@ -318,5 +253,13 @@ export const apiRemoveDeviceId = async (token: string): Promise<any> => {
         return {
             error: "Server Error"
         };
+    })
+}
+
+export const useCalloutQuery = (id: string) => {
+    const idInt: number = parseInt(id);
+    return useQuery({
+        queryKey: ['calloutInfo', idInt],
+        queryFn: () => apiGetCallout(idInt)
     })
 }
