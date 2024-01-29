@@ -257,7 +257,7 @@ const Page = () => {
                                     <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>Respond</Text>
                                 </TouchableOpacity>
                             }
-                            {currentTab === 1 && isActive &&
+                            {currentTab === 1 &&
                                 <LogInput
                                     onTextChange={onLogMessageTextChanged}
                                     text={logMessageText}
