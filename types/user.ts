@@ -10,11 +10,12 @@ export type user = {
 }
 
 export const userToString = (user: user): string => {
-
+    if (!user) return 'System';
     return user.full_name;
 }
 
 export const isUserSelf = (user: user): boolean => {
+    if (!user) return false;
 
     if (global.currentCredentials) {
         //console.log(global.currentCredentials);

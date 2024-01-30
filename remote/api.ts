@@ -2,6 +2,7 @@ import { getCredentials, getServer } from "../storage/storage";
 import { callout, calloutFromResponse } from "../types/callout";
 import { logEntry, logEntryFromRespsonse } from "../types/logEntry";
 import { calloutGetLogResponse, loginResponse, tokenValidationResponse } from "./responses";
+import * as Application from 'expo-application';
 import { Platform } from "react-native";
 import { useQuery, useMutation } from "@tanstack/react-query";
 
@@ -202,7 +203,7 @@ export const apiSetDeviceId = async (token: string, critical?: boolean): Promise
     }
 
     const tokenInfo = {
-        name: "expo",
+        name: Application.nativeApplicationVersion,
         registration_id: token,
         device_id: deviceId,
         active: true,

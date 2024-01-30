@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import * as Application from 'expo-application';
 import { Link, router } from "expo-router"
 import { StyleSheet, View, Text, Platform } from "react-native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -111,6 +112,10 @@ const Page = () => {
                 <Text style={elements.mediumText}>Server</Text>
                 <Text style={[elements.mediumText, styles.userText]}>{server}</Text>
             </View>
+            <View style={styles.userContainer}>
+                <Text style={elements.mediumText}>Version</Text>
+                <Text style={[elements.mediumText, styles.userText]}>{Application.nativeApplicationVersion}</Text>
+            </View>
             <FormCheckbox
                 title={'Notifications'}
                 checked={pushEnabled}
@@ -150,6 +155,7 @@ const styles = StyleSheet.create({
         marginRight: 0
     },
     userContainer: {
+        marginTop: 10,
         flexDirection: "row"
     },
     userText: {
