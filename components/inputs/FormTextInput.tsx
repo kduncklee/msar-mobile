@@ -8,20 +8,18 @@ type FormTextInputProps = {
     icon?: ImageRequireSource
     placeholder: string,
     value?: string,
+    error?: any,
     rightButton?: ImageRequireSource,
     secure?: boolean,
     returnKey?: ReturnKeyType,
     autoCorrect?: boolean,
     onSubmit?: () => void,
     onRightPress?: (value: any) => void,
+    onBlur?: (e: any) => void,
     onChange: (text: string) => void
 }
 
-const FormTextInput = ({ title, placeholder, value, icon, rightButton, onRightPress, onChange, secure=false, returnKey, onSubmit, autoCorrect=true }: FormTextInputProps) => {
-
-    const textChanged = (text: string) => {
-        onChange(text);
-    }
+const FormTextInput = ({ title, placeholder, value, error, icon, rightButton, onRightPress, onBlur, onChange, secure=false, returnKey, onSubmit, autoCorrect=true }: FormTextInputProps) => {
 
     const handleDoneButtonPress = () => {
         Keyboard.dismiss();
@@ -40,13 +38,16 @@ const FormTextInput = ({ title, placeholder, value, icon, rightButton, onRightPr
             {!!title &&
                 <Text style={elements.fieldTitle}>{title}</Text>
             }
+            {!!error?.message &&
+                    <Text style={elements.smallYellowText}>{ error.message }</Text>}
             <View style={[elements.inputContainer, { height: 50 }]}>
                 {!!icon &&
                     <Image source={icon} style={elements.fieldImage} />
                 }
                 <TextInput
                     style={[elements.fieldText, { flex: 1, padding: 8 }]}
-                    onChangeText={textChanged}
+                    onBlur={onBlur}
+                    onChangeText={onChange}
                     value={value}
                     returnKeyType={returnKeyType}
                     onSubmitEditing={handleDoneButtonPress}

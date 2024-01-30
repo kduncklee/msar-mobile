@@ -8,10 +8,11 @@ type FormTextAreaProps = {
     placeholder: string,
     value?: string,
     height: number,
+    onBlur?: (e: any) => void,
     onChange: (text: string) => void
 }
 
-const FormTextArea = ({title, placeholder, value, height, onChange}: FormTextAreaProps) => {
+const FormTextArea = ({title, placeholder, value, height, onBlur, onChange}: FormTextAreaProps) => {
 
     const textChanged = (text: string) => {
         onChange(text);
@@ -26,6 +27,7 @@ const FormTextArea = ({title, placeholder, value, height, onChange}: FormTextAre
                 <TextInput
                     style={[elements.fieldText, {flex: 1, padding: 8, backgroundColor: "#ff000000"}]}
                     multiline={true}
+                    onBlur={onBlur}
                     onChangeText={textChanged}
                     value={value}
                     placeholder={placeholder}

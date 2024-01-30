@@ -35,10 +35,8 @@ const DropdownSelector = ({ title, options, placeholder,selectedValue, onSelect 
                     itemContainerStyle={{ backgroundColor: colors.primaryBg }}
                     activeColor={colors.secondaryBg}
                     itemTextStyle={{ color: colors.primaryText }}
-                    onChange={item => {
-                        //setValue(item.value);
-                        onSelect(item);
-                    }} />
+                    onChange={onSelect}
+                />
             </View>
         </View>
     );
