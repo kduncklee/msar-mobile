@@ -3,33 +3,16 @@ import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpa
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import Header from '../../components/Header';
 import CalloutCell from '../../components/callouts/CalloutCell';
-import { calloutSummary, calloutSummaryFromResponse } from '../../types/calloutSummary';
+import { activeTabStatusQuery, archivedTabStatusQuery, calloutSummary } from '../../types/calloutSummary';
 import colors from '../../styles/colors';
 import TabSelector from '../../components/TabSelector/TabSelector';
 import { elements } from '../../styles/elements';
 import { router } from 'expo-router';
-import { apiGetCallouts } from '../../remote/api';
+import { useCalloutListQuery } from '../../remote/api';
 import ActivityModal from '../../components/modals/ActivityModal';
 import { tabItem } from '../../types/tabItem';
 import '../../storage/global';
 import msarEventEmitter from '../../utility/msarEventEmitter';
-import pushNotifications from '../../utility/pushNotifications';
-
-const useCalloutsQuery = (status?: string) => {
-  return useQuery({
-    queryKey: ["callouts", status],
-    queryFn: async () => {
-        console.log(status);
-        const response = await apiGetCallouts(status);
-        const callouts: calloutSummary[] = [];
-        response.results.forEach((result: any) => {
-            // Perform operations on each result item here
-            callouts.push(calloutSummaryFromResponse(result));
-        });
-        return callouts;
-    }
-  })
-}
 
 const defaultStatus = "active&status=resolved";
 
@@ -39,7 +22,7 @@ const Page = () => {
     const [archiveCount, setArchiveCount] = useState(null);
     const [status, setStatus] = useState(defaultStatus);
     const queryClient = useQueryClient()
-    const query = useCalloutsQuery(status);
+    const query = useCalloutListQuery(status);
 
     const tabs: tabItem[] = [
         {
@@ -54,10 +37,6 @@ const Page = () => {
 
 
     useEffect(() => {
-
-        pushNotifications.registerForPushNotificationsAsync();
-
-
         if (Platform.OS === 'ios') {
             StatusBar.setBarStyle('light-content');
         } else if (Platform.OS === 'android') {
@@ -84,9 +63,9 @@ const Page = () => {
 
     const tabChanged = (index: number) => {
         if (index === 1) {
-            setStatus("archived");
+            setStatus(archivedTabStatusQuery);
         } else {
-            setStatus(defaultStatus);
+            setStatus(activeTabStatusQuery);
         }
     }
 

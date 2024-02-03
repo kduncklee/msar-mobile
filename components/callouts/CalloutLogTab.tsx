@@ -17,7 +17,7 @@ type CalloutLogTabProps = {
 }
 
 
-const CalloutLogTab = ({queryKey, queryFn}) => {
+const CalloutLogTab = ({useInfiniteQueryFn}) => {
     const queryClient = useQueryClient()
 
     const {
@@ -28,12 +28,9 @@ const CalloutLogTab = ({queryKey, queryFn}) => {
         isLoading,
         isFetching,
         isFetchingNextPage,
+        refetch,
         status,
-    } = useInfiniteQuery({
-        queryKey: queryKey,
-        queryFn: queryFn,
-        getNextPageParam: (lastPage, pages) => lastPage?.next,
-    })
+    } = useInfiniteQueryFn();
 
     const logList = data?.pages
           ? data?.pages?.flatMap((page) =>
@@ -46,7 +43,7 @@ const CalloutLogTab = ({queryKey, queryFn}) => {
 
     const refreshList = () => {
         console.log('refresh');
-        queryClient.invalidateQueries(queryKey[0]);
+        refetch();
     }
 
     const getMore = () => {

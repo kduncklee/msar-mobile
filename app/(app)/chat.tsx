@@ -7,7 +7,7 @@ import colors from '../../styles/colors';
 import { elements } from '../../styles/elements';
 import CalloutLogTab from '../../components/callouts/CalloutLogTab';
 import LogInput from '../../components/callouts/LogInput';
-import { apiGetChatLog, apiPostChatLog } from '../../remote/api';
+import { apiPostChatLog, useChatLogInfiniteQuery } from '../../remote/api';
 
 const Page = () => {
 
@@ -59,7 +59,7 @@ const Page = () => {
                                 keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -500} // Adjust the offset as needed
                             >
                         <View style={styles.contentContainer}>
-                            <CalloutLogTab queryKey={['chat']} queryFn={apiGetChatLog} />
+                            <CalloutLogTab useInfiniteQueryFn={() => useChatLogInfiniteQuery()} />
                             <LogInput
                                     onTextChange={onLogMessageTextChanged}
                                     text={logMessageText}

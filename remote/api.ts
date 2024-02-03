@@ -4,7 +4,8 @@ import { logEntry, logEntryFromRespsonse } from "../types/logEntry";
 import { calloutGetLogResponse, loginResponse, tokenValidationResponse } from "./responses";
 import * as Application from 'expo-application';
 import { Platform } from "react-native";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, QueryClient, useInfiniteQuery } from "@tanstack/react-query";
+import { calloutSummary, calloutSummaryFromResponse } from "../types/calloutSummary";
 
 let local_server: string = "http://192.168.1.120:8000";
 let legacy_server: string = "https://malibusarhours.org/calloutapi";
@@ -257,10 +258,94 @@ export const apiRemoveDeviceId = async (token: string): Promise<any> => {
     })
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// React Query
+//////////////////////////////////////////////////////////////////////////////
+
+////// Callout List
+const calloutListQueryParams = (status?: string) => {
+  return {
+    queryKey: ["calloutList", status],
+    queryFn: async () => {
+      console.log(status);
+      const response = await apiGetCallouts(status);
+      const callouts: calloutSummary[] = [];
+      response.results.forEach((result: any) => {
+        // Perform operations on each result item here
+        callouts.push(calloutSummaryFromResponse(result));
+      });
+      return callouts;
+    },
+  };
+};
+
+export const prefetchCalloutListQuery = async (
+  queryClient: QueryClient,
+  status?: string
+) => {
+  return queryClient.prefetchQuery(calloutListQueryParams(status));
+};
+
+export const useCalloutListQuery = (status?: string) => {
+  return useQuery(calloutListQueryParams(status));
+};
+
+////// Callout
+const calloutQueryParams = (id: string) => {
+  const idInt: number = parseInt(id);
+  return {
+    queryKey: ["calloutInfo", idInt],
+    queryFn: () => apiGetCallout(idInt),
+  };
+};
+
+export const prefetchCalloutQuery = async (
+  queryClient: QueryClient,
+  id: string
+) => {
+  return queryClient.prefetchQuery(calloutQueryParams(id));
+};
+
 export const useCalloutQuery = (id: string) => {
-    const idInt: number = parseInt(id);
-    return useQuery({
-        queryKey: ['calloutInfo', idInt],
-        queryFn: () => apiGetCallout(idInt)
-    })
-}
+  return useQuery(calloutQueryParams(id));
+};
+
+////// Callout Log
+const calloutLogQueryParams = (id: string) => {
+  const idInt: number = parseInt(id);
+  return {
+    queryKey: ["calloutLog", idInt],
+    queryFn: ({ pageParam }) => apiGetCalloutLog(idInt, pageParam),
+    initialPageParam: "",
+    getNextPageParam: (lastPage, pages) => lastPage?.next,
+  };
+};
+
+export const prefetchCalloutLogQuery = async (
+  queryClient: QueryClient,
+  id: string
+) => {
+  return queryClient.prefetchInfiniteQuery(calloutLogQueryParams(id));
+};
+
+export const useCalloutLogInfiniteQuery = (id: string) => {
+  return useInfiniteQuery(calloutLogQueryParams(id));
+};
+
+////// Chat 
+const chatLogQueryParams = () => {
+  return {
+    queryKey: ["chat"],
+    queryFn: ({ pageParam }) => apiGetChatLog(pageParam),
+    initialPageParam: "",
+    getNextPageParam: (lastPage, pages) => lastPage?.next,
+  };
+};
+
+export const prefetchChatLogQuery = async (queryClient: QueryClient) => {
+  return queryClient.prefetchInfiniteQuery(chatLogQueryParams());
+};
+
+export const useChatLogInfiniteQuery = () => {
+  return useInfiniteQuery(chatLogQueryParams());
+};

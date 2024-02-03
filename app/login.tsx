@@ -10,15 +10,7 @@ import { loginResponse } from '../remote/responses';
 import { getCredentials, storeCredentials, clearCredentials, getServer, storeServer, clearServer } from '../storage/storage';
 import ActivityModal from '../components/modals/ActivityModal';
 import "../storage/global";
-import * as Notifications from 'expo-notifications';
 
-Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-        shouldShowAlert: true,
-        shouldPlaySound: false,
-        shouldSetBadge: false,
-    }),
-});
 
 const Page = () => {
 

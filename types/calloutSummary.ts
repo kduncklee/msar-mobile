@@ -46,6 +46,10 @@ export const calloutSummaryFromResponse = (data: any): calloutSummary => {
     }
 }
 
+export const activeTabStatusQuery = "active&status=resolved";
+export const archivedTabStatusQuery = "archived";
+
+
 export const textForCalloutStatus = (type: calloutStatus): string => {
     switch (type) {
         case calloutStatus.ACTIVE:

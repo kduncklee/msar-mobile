@@ -1,14 +1,16 @@
 import { useEffect } from 'react';
-import { AppState, AppStateStatus } from 'react-native';
+import { AppState, AppStateStatus, Platform } from 'react-native';
 import NetInfo from '@react-native-community/netinfo'
 import * as Sentry from "@sentry/react-native";
 import { RootSiblingParent } from 'react-native-root-siblings';
 import Toast from 'react-native-root-toast';
 import { QueryCache, QueryClient, QueryClientProvider, focusManager, onlineManager } from "@tanstack/react-query";
-import * as Notifications from 'expo-notifications';
 import { Slot, router } from 'expo-router';
 import { SentryDsn } from "../utility/constants";
 import msarEventEmitter from '../utility/msarEventEmitter';
+import { setupPushNotifications, usePushNotifications } from '../utility/pushNotifications';
+import { prefetchCalloutListQuery, prefetchCalloutLogQuery, prefetchCalloutQuery, prefetchChatLogQuery } from '../remote/api';
+import { activeTabStatusQuery } from '../types/calloutSummary';
 
 Sentry.init({
   dsn: SentryDsn,
@@ -58,45 +60,42 @@ const useAppStateRefresh = () => {
     }, []);
 }
 
-const useNotificationObserver = () => {
-    useEffect(() => {
-      let isMounted = true;
-  
-      function redirect(notification: Notifications.Notification) {
-        const url = notification.request.content.data?.url;
-        if (url) {
-          if (url === 'view-callout') {
-            router.push({ pathname: 'view-callout', params: { id: notification.request.content.data?.id, type: notification.request.content.data?.type } })
-            msarEventEmitter.emit('refreshCallout',{});
-          } else {
-            router.push({ pathname: url })
-          }
-        }
-      }
-  
-      Notifications.getLastNotificationResponseAsync()
-        .then(response => {
-          if (!isMounted || !response?.notification) {
-            return;
-          }
-          redirect(response?.notification);
-        });
-  
-      const subscription = Notifications.addNotificationResponseReceivedListener(response => {
-        redirect(response.notification);
+
+function redirect(notification) {
+  const url = notification.data?.url;
+  if (url) {
+    if (url === 'view-callout') {
+      router.push({
+        pathname: "view-callout",
+        params: { id: notification.data?.id, type: notification.data?.type },
       });
-  
-      return () => {
-        isMounted = false;
-        subscription.remove();
-      };
-    }, []);
+      msarEventEmitter.emit('refreshCallout',{});
+    } else {
+      router.push({ pathname: url })
+    }
   }
+}
+
+const prefetch = (notification) => {
+  const url = notification.data?.url;
+  const id = notification.data?.id;
+  if (url) {
+    if (url === "view-callout") {
+      prefetchCalloutQuery(queryClient, id);
+      prefetchCalloutLogQuery(queryClient, id);
+      prefetchCalloutListQuery(queryClient, activeTabStatusQuery);
+    } else if (url === "chat") {
+      prefetchChatLogQuery(queryClient);
+    }
+  }
+};
+
+setupPushNotifications(prefetch);
 
 const Layout = () => {
 
     useAppStateRefresh();
-    useNotificationObserver();
+    usePushNotifications(redirect, prefetch);
 
     return (
       <RootSiblingParent>

@@ -10,6 +10,7 @@ web-build/
 *.keystore
 credentials.json
 google-services.json
+GoogleService-Info.plist
 utility/constants.ts
 ios/
 android/

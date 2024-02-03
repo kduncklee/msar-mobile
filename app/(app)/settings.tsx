@@ -10,7 +10,7 @@ import "../../storage/global";
 import InformationField from "../../components/fields/InformationField";
 import FormCheckbox from "../../components/inputs/FormCheckbox";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import pushNotifications from "../../utility/pushNotifications";
+import * as PushNotifications from "../../utility/pushNotifications";
 
 
 const Page = () => {
@@ -46,7 +46,7 @@ const Page = () => {
     }
 
     const checkPushNotifications = async () => {
-        let token = await pushNotifications.getToken();
+        let token = await PushNotifications.getToken();
         if (token != null) {
             setPushEnabled(true);
         }
@@ -60,11 +60,11 @@ const Page = () => {
         const pushStatus = !pushEnabled;
 
         if (!pushStatus) {
-            await pushNotifications.removePushToken();
+            await PushNotifications.removePushToken();
         } else {
-            let token = await pushNotifications.getToken();
+            let token = await PushNotifications.getToken();
             if (token != null) {
-                await pushNotifications.sendPushToken(token,criticalAlerts);
+                await PushNotifications.sendPushToken(token,criticalAlerts);
             }
         }
 
@@ -75,9 +75,9 @@ const Page = () => {
         const criticalAlertsEnabled = !criticalAlerts;
 
         await setCriticalAlertsEnabled(criticalAlertsEnabled);
-        let token = await pushNotifications.getToken();
+        let token = await PushNotifications.getToken();
         if (token != null) {
-            await pushNotifications.sendPushToken(token,criticalAlertsEnabled);
+            await PushNotifications.sendPushToken(token,criticalAlertsEnabled);
         }
 
         setCriticalAlerts(criticalAlertsEnabled);
@@ -85,7 +85,7 @@ const Page = () => {
 
     const onSignOutPress = async () => {
         
-        await pushNotifications.removePushToken();
+        await PushNotifications.removePushToken();
         await clearCredentials();
         await clearServer();
         global.currentCredentials = null;

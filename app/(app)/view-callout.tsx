@@ -19,9 +19,8 @@ import CalloutPersonnelTab from '../../components/callouts/CalloutPersonnelTab';
 import { tabItem } from '../../types/tabItem';
 import LogInput from '../../components/callouts/LogInput';
 import { callout, calloutResponseBadge } from '../../types/callout';
-import { useCalloutQuery, apiGetCalloutLog, apiPostCalloutLog, apiRespondToCallout } from '../../remote/api';
+import { useCalloutQuery, apiPostCalloutLog, apiRespondToCallout, useCalloutLogInfiniteQuery } from '../../remote/api';
 import msarEventEmitter from '../../utility/msarEventEmitter';
-import * as Notifications from 'expo-notifications';
 
 
 const Page = () => {
@@ -30,8 +29,6 @@ const Page = () => {
     const [headerTitle, setHeaderTitle] = useState(title);
     const safeAreaInsets = useSafeAreaInsets();
     const scrollViewRef = useRef(null);
-
-    const notificationListener = useRef<Notifications.Subscription>();
 
     const translateY = useSharedValue(600);
     const opacity = useSharedValue(0);
@@ -90,10 +87,6 @@ const Page = () => {
         } else if (Platform.OS === 'android') {
             StatusBar.setBackgroundColor(colors.primaryBg);
         }
-
-        notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-            refreshCallout();
-        });
 
         msarEventEmitter.on('refreshCallout', refreshReceived);
 
@@ -238,8 +231,7 @@ const Page = () => {
                             }
                             {currentTab === 1 &&
                                 <CalloutLogTab
-                                    queryKey={['calloutLog', idInt]}
-                                    queryFn={({pageParam}) => apiGetCalloutLog(idInt, pageParam)}
+                                  useInfiniteQueryFn={() => useCalloutLogInfiniteQuery(id)}
                                 />
                             }
                             {currentTab === 2 &&
