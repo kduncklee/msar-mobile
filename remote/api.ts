@@ -265,7 +265,7 @@ export const apiRemoveDeviceId = async (token: string): Promise<any> => {
 ////// Callout List
 const calloutListQueryParams = (status?: string) => {
   return {
-    queryKey: ["calloutList", status],
+    queryKey: ["callouts", status],
     queryFn: async () => {
       console.log(status);
       const response = await apiGetCallouts(status);

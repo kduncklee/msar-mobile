@@ -3,8 +3,10 @@ import { Platform } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
 import * as Sentry from "@sentry/react-native";
+import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import { apiRemoveDeviceId, apiSetDeviceId } from '../remote/api';
+import { getCriticalAlertsEnabled } from '../storage/storage';
 
 
 
@@ -78,9 +80,9 @@ const setupChannels = async () => {
       importance,
     },
     {
-      id: "callout-alarm",
+      id: "callout-critical",
       name: "New Callout - critical",
-      bypassDnd: true,
+      bypassDnd: true,  // Doesn't seem to work
       vibrationPattern: calloutPattern,
       sound,
       importance,
@@ -108,18 +110,27 @@ const setupChannels = async () => {
     },
   ]);
   
+  // Notifee can't set the alarm channel. Use this instead.
+  Notifications.setNotificationChannelAsync('callout-alarm2', {
+    name: 'New Callout - Critical Alarm',
+    audioAttributes: {
+      usage: Notifications.AndroidAudioUsage.ALARM,
+    },
+    importance: Notifications.AndroidImportance.MAX,
+    vibrationPattern: [0, 200, 200, 600, 600, 200, 200, 600, 600, 200, 200, 600, 600, 200, 200, 600, 600],
+  });
 }
 
 
-const displayNotification = (remoteMessage) => {
-  const critical = !!remoteMessage.data?.critical;
+const displayNotification = async (remoteMessage) => {
+  const critical = !!remoteMessage.data?.critical && await getCriticalAlertsEnabled();
   const ios_critical = critical ? {
     critical: true,
     criticalVolume: 1.0,
   } : {};
   var channel: string;
   if (remoteMessage.data?.channel) {
-    channel = remoteMessage.data?.channel + (critical ? '-alarm' : '');
+    channel = remoteMessage.data?.channel + (critical ? '-alarm2' : '');
   } else {
     channel = 'default';
   }
