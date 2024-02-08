@@ -90,8 +90,6 @@ const prefetch = (notification) => {
   }
 };
 
-setupPushNotifications(prefetch);
-
 const Layout = () => {
 
     useAppStateRefresh();
