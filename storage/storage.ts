@@ -58,25 +58,32 @@ export const getServer = async (): Promise<string> => {
     return getData("server");
 }
 
-export const clearServer = async (): Promise<string> => {
-    await removeData("server");
+export const clearServer = async (): Promise<void> => {
+    return removeData("server");
 }
 
-export const setCriticalAlertsEnabled = async (enabled: boolean) => {
-    let criticalAlerts: string = "0";
-    if (enabled) {
-        criticalAlerts = "1";
-    }
-
-    await storeData("criticalAlerts", criticalAlerts);
+export const getCriticalAlertsVolume = async (): Promise<number> => {
+    const jsonValue = await getData("critical-alert-volume");
+    return (jsonValue != null) ? JSON.parse(jsonValue) : 1.0;
 }
 
-export const getCriticalAlertsEnabled = async () => {
-    const criticalAlerts = await getData("criticalAlerts");
-    if (criticalAlerts !== undefined && criticalAlerts === "0") {
-        return false;
-    } else {
-        return true;
-    }
+export const storeCriticalAlertsVolume = async (value: number) => {
+    await storeData("critical-alert-volume", JSON.stringify(value));
 }
 
+export const getSoundForChannel = async (channel: string): Promise<string> => {
+    return getData("sound-" + channel);
+}
+
+export const storeSoundForChannel = async (channel: string, sound: string) => {
+    await storeData("sound-" + channel, sound);
+}
+
+export const getCriticalForChannel = async (channel: string): Promise<boolean> => {
+    const jsonValue = await getData("critical-" + channel);
+    return (jsonValue != null) ? JSON.parse(jsonValue) : false;
+}
+
+export const storeCriticalForChannel = async (channel: string, critical: boolean) => {
+    await storeData("critical-" + channel, JSON.stringify(critical));
+}

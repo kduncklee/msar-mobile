@@ -2,7 +2,7 @@
   "expo": {
     "name": "Malibu SAR",
     "slug": "msar-mobile",
-    "version": "1.4.3",
+    "version": "1.5.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -17,7 +17,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "org.malibusar.app",
-      "buildNumber": "16",
+      "buildNumber": "18",
       "icon": "./assets/icon.png",
       "googleServicesFile": "./GoogleService-Info.plist",
       "config": {
@@ -36,7 +36,7 @@
         "backgroundColor": "#2B3038"
       },
       "package": "org.malibusar.app",
-      "versionCode": 22,
+      "versionCode": 25,
       "googleServicesFile": "./google-services.json"
     },
     "web": {
@@ -57,6 +57,23 @@
           "ios": {
             "useFrameworks": "static"
           }
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "sounds": [
+            "assets/sounds/distortion_1_time.mp3",
+            "assets/sounds/distortion_3_times.mp3",
+            "assets/sounds/radio_1_time.mp3",
+            "assets/sounds/radio_4_times.mp3",
+            "assets/sounds/sweet_1_time.mp3",
+            "assets/sounds/sweet_6_times.mp3",
+            "assets/sounds/trumpets_1_time.mp3",
+            "assets/sounds/trumpets_4_times.mp3",
+            "assets/sounds/yucatan_1_time.mp3",
+            "assets/sounds/yucatan_6_times.mp3"
+          ]
         }
       ]
     ],

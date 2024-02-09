@@ -42,7 +42,7 @@ export const elements = StyleSheet.create({
         borderRadius: 8
     },
     fieldTitle: {
-        fontSize: 14,
+        fontSize: 16,
         fontWeight: "500",
         color: colors.secondaryYellow,
         marginBottom: 6

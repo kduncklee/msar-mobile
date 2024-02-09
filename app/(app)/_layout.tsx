@@ -1,7 +1,7 @@
 import { Redirect, Stack } from 'expo-router';
 import { useEffect } from 'react';
 import "../../storage/global";
-import { registerForPushNotificationsAsync } from '../../utility/pushNotifications';
+import { checkNotificationDefaults, registerForPushNotificationsAsync } from '../../utility/pushNotifications';
 
 export default function AppLayout() {
 
@@ -12,14 +12,12 @@ export default function AppLayout() {
   useEffect(() => {
     console.log('inner layout useEffect');
     registerForPushNotificationsAsync();
+    checkNotificationDefaults();
   }, []);
 
   // This layout can be deferred because it's not the root layout.
   return (
         <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen
-                name="settings"
-                options={{ presentation: 'modal'}} />
         </Stack>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, ImageRequireSource, Image, TouchableOpacity } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown'
 import { elements } from '../../styles/elements';
 import colors from '../../styles/colors'
@@ -9,10 +9,12 @@ type DropdownSelectorProps = {
     options: any[],
     placeholder: string,
     selectedValue?: any,
+    rightButton?: ImageRequireSource,
+    onRightPress?: (value: any) => void,
     onSelect: (values: any) => void
 }
 
-const DropdownSelector = ({ title, options, placeholder,selectedValue, onSelect }: DropdownSelectorProps) => {
+const DropdownSelector = ({ title, options, placeholder, selectedValue, rightButton, onRightPress, onSelect }: DropdownSelectorProps) => {
 
     return (
         <View style={styles.container}>
@@ -39,6 +41,15 @@ const DropdownSelector = ({ title, options, placeholder,selectedValue, onSelect 
                         //setValue(item.value);
                         onSelect(item);
                     }} />
+                    {onRightPress &&
+                        <TouchableOpacity
+                            activeOpacity={0.8}
+                            onPress={onRightPress}>
+                            {rightButton &&
+                                <Image source={rightButton} style={elements.fieldImage} />
+                            }
+                        </TouchableOpacity>
+                    }
             </View>
         </View>
     );

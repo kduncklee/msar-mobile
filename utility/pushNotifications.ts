@@ -4,11 +4,29 @@ import messaging from '@react-native-firebase/messaging';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
 import * as Sentry from "@sentry/react-native";
 import * as Notifications from 'expo-notifications';
-import Constants from 'expo-constants';
 import { apiRemoveDeviceId, apiSetDeviceId } from '../remote/api';
-import { getCriticalAlertsEnabled } from '../storage/storage';
+import { getCriticalAlertsVolume, getCriticalForChannel, getSoundForChannel, storeCriticalAlertsVolume, storeCriticalForChannel, storeSoundForChannel } from '../storage/storage';
 
+export const availableSounds = [
+  { label: 'System Default', value: 'default' },
+  { label: 'Distortion - Short', value: 'distortion_1_time' },
+  { label: 'Distortion - Long', value: 'distortion_3_times' },
+  { label: 'Radio - Short', value: 'radio_1_time' },
+  { label: 'Radio - Long', value: 'radio_4_times' },
+  { label: 'Sweet - Short', value: 'sweet_1_time' },
+  { label: 'Sweet - Long', value: 'sweet_6_times' },
+  { label: 'Trumpets - Short', value: 'trumpets_1_time' },
+  { label: 'Trumpets - Long', value: 'trumpets_4_times' },
+  { label: 'Yucatan - Short', value: 'yucatan_1_time' },
+  { label: 'Yucatan - Long', value: 'yucatan_6_times' },
+];
 
+const vibrationForChannel = {
+  "callout": "long",
+  "callout-resolved": "medium",
+  "log": "short",
+  "announcement": "short",
+}
 
 async function checkApplicationPermission() {
   const settings = await notifee.requestPermission({
@@ -31,8 +49,8 @@ export const getToken = async () => {
   return messaging().getToken();
 }
 
-export const sendPushToken = async (token: string, critical?: boolean) => {
-  const response: any = await apiSetDeviceId(token, critical);
+export const sendPushToken = async (token: string) => {
+  const response: any = await apiSetDeviceId(token, true);
 }
 
 export const removePushToken = async () => {
@@ -58,97 +76,104 @@ export const registerForPushNotificationsAsync = async () => {
 }
 
 const setupChannels = async () => {
-  const standardPattern = [250, 250, 250, 250];
-  const resolvedPattern = [5000, 500, 500, 500];
-  const calloutPattern = [200, 200, 600, 600, 200, 200, 600, 600, 200, 200, 600, 600, 200, 200, 600, 600];
-  const importance = AndroidImportance.DEFAULT;
-  const sound = 'default';
+  const importance = Notifications.AndroidImportance.MAX;
+  const groupId = 'main';
+  const vibrations = {
+    'short': [0, 250, 250, 250, 250],
+    'medium': [0, 500, 500, 500, 500, 500, 500],
+    'long': [0, 200, 200, 600, 600, 200, 200, 600, 600, 200, 200, 600, 600, 200, 200, 600, 600],
+  };
 
-  await notifee.createChannels([
-    {
-      id: "default",
-      name: "default",
-      vibrationPattern: standardPattern,
-      sound,
-      importance,
-    },
-    {
-      id: "callout",
-      name: "New Callout",
-      vibrationPattern: calloutPattern,
-      sound,
-      importance,
-    },
-    {
-      id: "callout-critical",
-      name: "New Callout - critical",
-      bypassDnd: true,  // Doesn't seem to work
-      vibrationPattern: calloutPattern,
-      sound,
-      importance,
-    },
-    {
-      id: "callout-resolved",
-      name: "Callout Resolved",
-      vibrationPattern: resolvedPattern,
-      sound,
-      importance,
-    },
-    {
-      id: "log",
-      name: "Log Updates",
-      vibrationPattern: standardPattern,
-      sound,
-      importance,
-    },
-    {
-      id: "announcement",
-      name: "Announcements",
-      vibrationPattern: standardPattern,
-      sound,
-      importance,
-    },
-  ]);
-  
-  // Notifee can't set the alarm channel. Use this instead.
-  Notifications.setNotificationChannelAsync('callout-alarm2', {
-    name: 'New Callout - Critical Alarm',
-    audioAttributes: {
-      usage: Notifications.AndroidAudioUsage.ALARM,
-    },
-    importance: Notifications.AndroidImportance.MAX,
-    vibrationPattern: [0, 200, 200, 600, 600, 200, 200, 600, 600, 200, 200, 600, 600, 200, 200, 600, 600],
-  });
+  Notifications.setNotificationChannelGroupAsync(groupId, {name:'main'});
+
+  for (const soundEnum of availableSounds) {
+    const sound = soundEnum.value;
+    Object.entries(vibrations).forEach(([vibration, pattern]) => {
+      const channel = `${sound}-${vibration}`;
+      Notifications.setNotificationChannelAsync(channel, {
+        name: channel,
+        groupId,
+        importance,
+        sound: sound + '.mp3',
+        vibrationPattern: pattern,
+      });
+
+      Notifications.setNotificationChannelAsync(channel + '-alarm', {
+        name: channel + ' - Alarm',
+        importance,
+        groupId,
+        sound: sound + '.mp3',
+        vibrationPattern: pattern,
+        audioAttributes: {
+          usage: Notifications.AndroidAudioUsage.ALARM,
+        },
+      });
+    });
+  }
 }
 
 
 const displayNotification = async (remoteMessage) => {
-  const critical = !!remoteMessage.data?.critical && await getCriticalAlertsEnabled();
+  const channel: string = remoteMessage.data?.channel ?? 'default';
+  const critical = await getCriticalForChannel(channel);
   const ios_critical = critical ? {
     critical: true,
-    criticalVolume: 1.0,
+    criticalVolume: await getCriticalAlertsVolume(),
   } : {};
-  var channel: string;
-  if (remoteMessage.data?.channel) {
-    channel = remoteMessage.data?.channel + (critical ? '-alarm2' : '');
-  } else {
-    channel = 'default';
-  }
-  console.log('display', remoteMessage.data?.body, critical, ios_critical, channel);
+  const sound = await getSoundForChannel(channel) ?? 'default';
+  const vibration = vibrationForChannel[channel] ?? "short";
+  const android_channel = `${sound}-${vibration}` + (critical ? '-alarm' : '');
+  console.log('display', remoteMessage.data?.body, critical, ios_critical, channel, sound, android_channel);
   notifee.displayNotification({
     title: remoteMessage.data?.title,
     body: remoteMessage.data?.body,
     data: remoteMessage.data,
     android: {
-      channelId: channel,
+      channelId: android_channel,
       pressAction: { id: 'default' },
-      sound: 'default',
     },
     ios: {
-      sound: 'default',
+      sound: sound + '.mp3',
+      interruptionLevel: 'timeSensitive',
       ...(ios_critical)
     }
   });
+}
+
+export const testDisplayNotification = async (channel:string = "callout") => {
+  //storeSoundForChannel(channel, "radio_alert-standard");
+  const remoteMessage = {
+    data: {
+      title: channel,
+      body: 'test message',
+      channel,
+      //critical: false
+    }
+  }
+  displayNotification(remoteMessage);
+}
+
+export const restoreNotificationDefaults = async () => {
+  storeSoundForChannel('callout', 'yucatan_6_times');
+  storeCriticalForChannel('callout', true);
+  storeSoundForChannel('callout-resolved', 'trumpets_1_time');
+  storeCriticalForChannel('callout-resolved', true);
+  storeSoundForChannel('log', 'sweet_1_time');
+  storeCriticalForChannel('log', true);
+  storeSoundForChannel('announcement', 'sweet_1_time');
+  storeCriticalForChannel('announcement', true);
+  storeCriticalAlertsVolume(1.0);
+}
+
+export const checkNotificationDefaults = async () => {
+  if (
+    (await getSoundForChannel("callout")) == null ||
+    (await getSoundForChannel("callout-resolved")) == null ||
+    (await getSoundForChannel("log")) == null ||
+    (await getSoundForChannel("announcement")) == null
+  ) {
+    restoreNotificationDefaults();
+  }
 }
 
 export const setupPushNotifications = (onReceive) => {
@@ -207,7 +232,9 @@ export const usePushNotifications = (onPress, onReceive) => {
 
     bootstrap();
 
-    setupChannels();
+    if (Platform.OS === "android") {
+      setupChannels();
+    }
 
     return () => {
       onMessageUnsubscribe();

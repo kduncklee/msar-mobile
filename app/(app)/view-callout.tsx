@@ -64,6 +64,8 @@ const Page = () => {
 
     const callout = calloutQuery.data;
 
+    console.log('view-callout modalVisible =', modalVisible);
+
     const tabs: tabItem[] = [
         {
             title: "Information"
@@ -128,12 +130,14 @@ const Page = () => {
     }
 
     const respondToCallout = () => {
+        console.log('respondToCallout');
         translateY.value = withSpring(0 - safeAreaInsets.bottom, { damping: 20, stiffness: 100 });
         opacity.value = withTiming(0.8, { duration: 500 });
         setModalVisible(true);
     }
 
     const cancelRespondModal = () => {
+        console.log('cancelRespondModal');
         setModalVisible(false);
         translateY.value = withTiming(600, {
             duration: 500, // Adjust the duration as needed
