@@ -4,10 +4,10 @@ import "@expo/metro-runtime";
 
 // This file should only import and register the root. No components or exports
 // should be added here.
-import { renderRootComponent } from "expo-router/src/renderRootComponent";
-import { setupPushNotifications } from 'utility/pushNotifications';
+import { App } from 'expo-router/build/qualified-entry';
+import { renderRootComponent } from 'expo-router/build/renderRootComponent';
 
-import { App } from "expo-router/_app";
+import { setupPushNotifications } from 'utility/pushNotifications';
 
 // TODO: re-enable prefetch
 setupPushNotifications(() => {});

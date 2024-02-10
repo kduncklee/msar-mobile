@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import * as Application from 'expo-application';
 import { router } from "expo-router"
-import { ScrollView, StyleSheet, View, Text, Platform, SafeAreaView } from "react-native";
+import { ScrollView, StyleSheet, View, Text, Platform, SafeAreaView, TouchableOpacity } from "react-native";
 import { useQueryClient } from "@tanstack/react-query";
 import colors from "../../styles/colors";
 import { elements } from "../../styles/elements";
 import { clearCredentials, getCredentials, getServer, clearServer, getCriticalAlertsVolume, storeCriticalAlertsVolume } from "../../storage/storage";
 import "../../storage/global";
 import FormCheckbox from "../../components/inputs/FormCheckbox";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import * as PushNotifications from "../../utility/pushNotifications";
 import NotificationSettings from "../../components/NotificationSettings";
 import FormSlider from "../../components/inputs/FormSlider";

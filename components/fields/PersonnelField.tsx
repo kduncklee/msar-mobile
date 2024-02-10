@@ -1,6 +1,5 @@
-import { StyleSheet, View, Text, Image } from 'react-native';
+import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
 import colors from '../../styles/colors'
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import { opResponse } from '../../types/operationalPeriod';
 import { userToString } from '../../types/user';
 import { makePhoneCall } from '../../utility/phone';
