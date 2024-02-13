@@ -16,7 +16,7 @@
     "@react-native-community/slider": "4.4.2",
     "@react-native-firebase/app": "^18.8.0",
     "@react-native-firebase/messaging": "^18.8.0",
-    "@sentry/react-native": "5.17.0",
+    "@sentry/react-native": "^5.17.0",
     "@tanstack/react-query": "^5.17.0",
     "@types/react": "~18.2.45",
     "expo": "^50.0.6",

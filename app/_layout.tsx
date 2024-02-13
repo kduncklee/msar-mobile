@@ -5,12 +5,15 @@ import * as Sentry from "@sentry/react-native";
 import { RootSiblingParent } from 'react-native-root-siblings';
 import Toast from 'react-native-root-toast';
 import { QueryCache, QueryClient, QueryClientProvider, focusManager, onlineManager } from "@tanstack/react-query";
-import { Slot, router } from 'expo-router';
+import { Slot, router, useNavigationContainerRef } from 'expo-router';
 import { SentryDsn } from "../utility/constants";
 import msarEventEmitter from '../utility/msarEventEmitter';
 import { setupPushNotifications, usePushNotifications } from '../utility/pushNotifications';
 import { prefetchCalloutListQuery, prefetchCalloutLogQuery, prefetchCalloutQuery, prefetchChatLogQuery } from '../remote/api';
 import { activeTabStatusQuery } from '../types/calloutSummary';
+import React from 'react';
+
+const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
 
 Sentry.init({
   dsn: SentryDsn,
@@ -18,7 +21,7 @@ Sentry.init({
   tracesSampleRate: 1.0,
   integrations: [
     new Sentry.ReactNativeTracing({
-      enableAppStartTracking: false,
+      routingInstrumentation,
     }),
   ],
 });
@@ -91,6 +94,14 @@ const prefetch = (notification) => {
 };
 
 const Layout = () => {
+  // Capture the NavigationContainer ref and register it with the instrumentation.
+  const ref = useNavigationContainerRef();
+
+  React.useEffect(() => {
+    if (ref) {
+      routingInstrumentation.registerNavigationContainer(ref);
+    }
+  }, [ref]);
 
     useAppStateRefresh();
     usePushNotifications(redirect, prefetch);
