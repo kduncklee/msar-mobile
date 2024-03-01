@@ -87,3 +87,21 @@ export const getCriticalForChannel = async (channel: string): Promise<boolean> =
 export const storeCriticalForChannel = async (channel: string, critical: boolean) => {
     await storeData("critical-" + channel, JSON.stringify(critical));
 }
+
+export const storeSnoozeExpires = async (value: number) => {
+    await storeData("snoozeExpires", JSON.stringify(value));
+}
+
+export const getSnoozeExpires = async (): Promise<number> => {
+    const jsonValue = await getData("snoozeExpires");
+    return (jsonValue != null) ? JSON.parse(jsonValue) : 0;
+}
+
+export const getIsSnoozing = async (): Promise<boolean> => {
+    const snoozeExpireTime = await getSnoozeExpires();
+    return (snoozeExpireTime - new Date().getTime()) > 0;
+}
+
+export const clearSnoozeExpires = async (): Promise<void> => {
+    return removeData("snoozeExpires");
+}

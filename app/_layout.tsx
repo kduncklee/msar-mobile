@@ -1,16 +1,13 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { AppState, AppStateStatus, Platform } from 'react-native';
 import NetInfo from '@react-native-community/netinfo'
 import * as Sentry from "@sentry/react-native";
 import { RootSiblingParent } from 'react-native-root-siblings';
 import Toast from 'react-native-root-toast';
 import { QueryCache, QueryClient, QueryClientProvider, focusManager, onlineManager } from "@tanstack/react-query";
-import { Slot, router, useNavigationContainerRef } from 'expo-router';
+import { Slot, useNavigationContainerRef } from 'expo-router';
 import { SentryDsn } from "../utility/constants";
-import msarEventEmitter from '../utility/msarEventEmitter';
-import { setupPushNotifications, usePushNotifications } from '../utility/pushNotifications';
-import { prefetchCalloutListQuery, prefetchCalloutLogQuery, prefetchCalloutQuery, prefetchChatLogQuery } from '../remote/api';
-import { activeTabStatusQuery } from '../types/calloutSummary';
+import { usePushNotifications } from '../utility/pushNotifications';
 import React from 'react';
 
 const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
@@ -64,35 +61,6 @@ const useAppStateRefresh = () => {
 }
 
 
-function redirect(notification) {
-  const url = notification.data?.url;
-  if (url) {
-    if (url === 'view-callout') {
-      router.push({
-        pathname: "view-callout",
-        params: { id: notification.data?.id, type: notification.data?.type },
-      });
-      msarEventEmitter.emit('refreshCallout',{});
-    } else {
-      router.push({ pathname: url })
-    }
-  }
-}
-
-const prefetch = (notification) => {
-  const url = notification.data?.url;
-  const id = notification.data?.id;
-  if (url) {
-    if (url === "view-callout") {
-      prefetchCalloutQuery(queryClient, id);
-      prefetchCalloutLogQuery(queryClient, id);
-      prefetchCalloutListQuery(queryClient, activeTabStatusQuery);
-    } else if (url === "chat") {
-      prefetchChatLogQuery(queryClient);
-    }
-  }
-};
-
 const Layout = () => {
   // Capture the NavigationContainer ref and register it with the instrumentation.
   const ref = useNavigationContainerRef();
@@ -104,7 +72,7 @@ const Layout = () => {
   }, [ref]);
 
     useAppStateRefresh();
-    usePushNotifications(redirect, prefetch);
+    usePushNotifications(queryClient);
 
     return (
       <RootSiblingParent>

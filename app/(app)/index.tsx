@@ -3,9 +3,14 @@ import { SafeAreaView, StyleSheet, StatusBar, Platform, Image, View, TouchableOp
 import { router } from 'expo-router';
 import colors from '../../styles/colors';
 import { elements } from '../../styles/elements';
+import SnoozeModal from 'components/modals/SnoozeModal';
+import { getSnoozeExpires, storeSnoozeExpires } from 'storage/storage';
 
 const Page = () => {
     const [topMargin, setTopMargin] = useState(0);
+    const [snoozeModalVisible, setSnoozeModalVisible] = useState(false);
+    const [snoozeExpireTime, setSnoozeExpireTime] = useState(0);
+    const [snoozeTitle, setSnoozeTitle] = useState('Snooze');
 
     useEffect(() => {
         if (Platform.OS === 'ios') {
@@ -17,6 +22,45 @@ const Page = () => {
             setTopMargin(StatusBar.currentHeight + 20);
         }
     }, []);
+
+
+    useEffect(() => {
+        getSnoozeExpires().then(setSnoozeExpireTime);
+    }, []);
+
+
+    const updateSnooze = () => {
+        const snoozeRemaining = snoozeExpireTime - new Date().getTime();
+        const snoozing = snoozeRemaining > 0;
+        const title = snoozing ? 
+          ("Snoozing until " + new Date(snoozeExpireTime).toLocaleTimeString() ) :
+          "Snooze";
+        setSnoozeTitle(title);
+        return snoozeRemaining;
+    }
+
+    useEffect(() => {
+        const snoozeRemaining = updateSnooze();
+        const interval = setInterval(updateSnooze, snoozeRemaining); 
+        return () => clearInterval(interval); 
+    }, [snoozeExpireTime]);
+
+    const snoozeSelected = (minutes: number) => {
+        console.log(minutes);
+        setSnoozeModalVisible(false);
+        if (0 && !minutes) {
+            storeSnoozeExpires(0);
+            setSnoozeExpireTime(0);
+            return;
+        }
+        const minutesToMs = 60 * 1000;
+        const currentTime = new Date().getTime();
+        const expireTime = currentTime + minutes * minutesToMs;
+        const expireDate = new Date(expireTime);
+        storeSnoozeExpires(expireTime);
+        setSnoozeExpireTime(expireTime);
+        console.log(expireTime, expireDate.toLocaleTimeString());
+    }
 
     return (
         <>
@@ -42,8 +86,19 @@ const Page = () => {
                             <Text style={styles.buttonText}>Settings</Text>
                         </View>
                     </TouchableOpacity>
+                    <TouchableOpacity activeOpacity={0.5}
+                        onPress={() => setSnoozeModalVisible(true)}>
+                        <View style={[elements.tray,styles.contentTray]}>
+                            <Text style={styles.buttonText}>{snoozeTitle}</Text>
+                        </View>
+                    </TouchableOpacity>
                 </ScrollView>
             </SafeAreaView>
+
+            <SnoozeModal
+                modalVisible={snoozeModalVisible}
+                onSelect={snoozeSelected}
+                onCancel={() => setSnoozeModalVisible(false)} />
         </>
     )
 }
@@ -54,13 +109,12 @@ const styles = StyleSheet.create({
         position: "absolute",
         width: "100%",
         height: "100%",
-        zIndex: 1,
+        zIndex: -5,
         resizeMode: "cover"
     },
     container: {
         flex: 1,
         backgroundColor: colors.clear,
-        zIndex: 2
     },
     contentContainer: {
         flex: 1,
@@ -88,8 +142,8 @@ const styles = StyleSheet.create({
     logoImage: {
         margin: 20,
         alignSelf: "center",
-        width: 300,
-        height: 300,
+        width: 200,
+        height: 200,
         resizeMode: "contain"
     },
     buttonTray: {

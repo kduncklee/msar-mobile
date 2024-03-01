@@ -149,7 +149,9 @@ const Page = () => {
                                 value={password}
                                 onChange={passwordChanged}
                                 placeholder={'Password'}
-                                secure={true} />
+                                secure={true}
+                                autoCorrect={false}
+                                autoCapitalize={'none'} />
                             <View style={styles.buttonTray}>
                                 <SmallButton
                                     title={'Login'}

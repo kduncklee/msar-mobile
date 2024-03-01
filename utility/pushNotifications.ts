@@ -1,11 +1,14 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { Platform } from 'react-native';
+import { router } from 'expo-router';
 import messaging from '@react-native-firebase/messaging';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
 import * as Sentry from "@sentry/react-native";
 import * as Notifications from 'expo-notifications';
-import { apiRemoveDeviceId, apiSetDeviceId } from '../remote/api';
-import { getCriticalAlertsVolume, getCriticalForChannel, getSoundForChannel, storeCriticalAlertsVolume, storeCriticalForChannel, storeSoundForChannel } from '../storage/storage';
+import { apiRemoveDeviceId, apiSetDeviceId, prefetchCalloutListQuery, prefetchCalloutLogQuery, prefetchCalloutQuery, prefetchChatLogQuery } from '../remote/api';
+import { getCriticalAlertsVolume, getCriticalForChannel, getIsSnoozing, getSoundForChannel, storeCriticalAlertsVolume, storeCriticalForChannel, storeSoundForChannel } from '../storage/storage';
+import msarEventEmitter from '../utility/msarEventEmitter';
+import { activeTabStatusQuery } from 'types/calloutSummary';
 
 export const availableSounds = [
   { label: 'System Default', value: 'default' },
@@ -110,19 +113,28 @@ const setupChannels = async () => {
       });
     });
   }
+
+  Notifications.setNotificationChannelAsync('silent', {
+    name: 'silent',
+    groupId,
+    importance,
+  });
 }
 
 
 const displayNotification = async (remoteMessage) => {
   const channel: string = remoteMessage.data?.channel ?? 'default';
-  const critical = await getCriticalForChannel(channel);
+  const snoozed = await getIsSnoozing();
+  const critical = !snoozed && (await getCriticalForChannel(channel));
   const ios_critical = critical ? {
     critical: true,
     criticalVolume: await getCriticalAlertsVolume(),
   } : {};
   const sound = await getSoundForChannel(channel) ?? 'default';
+  const ios_sound = snoozed ? {sound: sound + '.mp3'} : {};
   const vibration = vibrationForChannel[channel] ?? "short";
-  const android_channel = `${sound}-${vibration}` + (critical ? '-alarm' : '');
+  var android_channel = `${sound}-${vibration}` + (critical ? '-alarm' : '');
+  if (snoozed) { android_channel = 'silent' };
   console.log('display', remoteMessage.data?.body, critical, ios_critical, channel, sound, android_channel);
   notifee.displayNotification({
     title: remoteMessage.data?.title,
@@ -133,7 +145,7 @@ const displayNotification = async (remoteMessage) => {
       pressAction: { id: 'default' },
     },
     ios: {
-      sound: sound + '.mp3',
+      ...(ios_sound),
       interruptionLevel: 'timeSensitive',
       ...(ios_critical)
     }
@@ -176,6 +188,40 @@ export const checkNotificationDefaults = async () => {
   }
 }
 
+function getPrefetchForQueryClient(queryClient) {
+  const prefetch = (notification) => {
+    const url = notification.data?.url;
+    const id = notification.data?.id;
+    if (url) {
+      if (url === "view-callout") {
+        prefetchCalloutQuery(queryClient, id);
+        prefetchCalloutLogQuery(queryClient, id);
+        prefetchCalloutListQuery(queryClient, activeTabStatusQuery);
+      } else if (url === "chat") {
+        prefetchChatLogQuery(queryClient);
+      }
+    }
+  };
+  return prefetch;
+}
+
+function doRedirect(notification) {
+  const url = notification.data?.url;
+  if (url) {
+    console.log("redirect", url);
+    if (url === "view-callout") {
+      router.push({
+        pathname: "view-callout",
+        params: { id: notification.data?.id, type: notification.data?.type },
+      });
+      msarEventEmitter.emit("refreshCallout", {});
+    } else {
+      router.push({ pathname: url });
+    }
+  }
+  return null;
+}
+
 export const setupPushNotifications = (onReceive) => {
   console.log('setupPush');
   messaging().setBackgroundMessageHandler(async remoteMessage => {
@@ -185,9 +231,19 @@ export const setupPushNotifications = (onReceive) => {
   });
 }
 
+export const doInitialRedirect = async () => {
+  const initialNotification = await notifee.getInitialNotification();
 
+  if (initialNotification) {
+    console.log('Notification caused application to open', initialNotification.notification);
+    console.log('Press action used to open the app', initialNotification.pressAction);
+    doRedirect(initialNotification.notification);
+  }
+}
 
-export const usePushNotifications = (onPress, onReceive) => {
+export const usePushNotifications = (queryClient) => {
+  const prefetch = getPrefetchForQueryClient(queryClient);
+
   const notifeeOnEvent = async ({ type, detail }) => {
     const { notification, pressAction } = detail;
     switch (type) {
@@ -196,41 +252,30 @@ export const usePushNotifications = (onPress, onReceive) => {
         break;
       case EventType.PRESS:
         console.log("User pressed notification", notification);
-        await onPress(notification);
+        doRedirect(notification);
         break;
     }
   };
-
-  async function bootstrap() {
-    const initialNotification = await notifee.getInitialNotification();
-  
-    if (initialNotification) {
-      console.log('Notification caused application to open', initialNotification.notification);
-      console.log('Press action used to open the app', initialNotification.pressAction);
-      await onPress(initialNotification.notification);
-    }
-  }
 
   useEffect(() => {
     const onMessageUnsubscribe = messaging().onMessage(
       async (remoteMessage) => {
         console.log("onMessage", remoteMessage);
         displayNotification(remoteMessage);
-        onReceive(remoteMessage);
+        prefetch(remoteMessage);
       }
     );
 
     const onNotificationOpenedAppUnsubscribe =
       messaging().onNotificationOpenedApp(async (remoteMessage) => {
         console.log("onNotificationOpenedApp", remoteMessage);
-        await onPress(remoteMessage);
+        doRedirect(remoteMessage);
       });
 
     const notifeeOnForegroundUnsubscribe =
       notifee.onForegroundEvent(notifeeOnEvent);
     notifee.onBackgroundEvent(notifeeOnEvent);
 
-    bootstrap();
 
     if (Platform.OS === "android") {
       setupChannels();

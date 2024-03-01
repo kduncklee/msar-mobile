@@ -12,12 +12,13 @@ type FormTextInputProps = {
     secure?: boolean,
     returnKey?: ReturnKeyType,
     autoCorrect?: boolean,
+    autoCapitalize?:  'none' | 'sentences' | 'words' | 'characters' | undefined,
     onSubmit?: () => void,
     onRightPress?: (value: any) => void,
     onChange: (text: string) => void
 }
 
-const FormTextInput = ({ title, placeholder, value, icon, rightButton, onRightPress, onChange, secure=false, returnKey, onSubmit, autoCorrect=true }: FormTextInputProps) => {
+const FormTextInput = ({ title, placeholder, value, icon, rightButton, onRightPress, onChange, secure=false, returnKey, onSubmit, autoCorrect=true, autoCapitalize='sentences' }: FormTextInputProps) => {
 
     const textChanged = (text: string) => {
         onChange(text);
@@ -53,7 +54,9 @@ const FormTextInput = ({ title, placeholder, value, icon, rightButton, onRightPr
                     placeholder={placeholder}
                     placeholderTextColor={colors.grayText}
                     secureTextEntry={secure}
-                    autoCorrect={autoCorrect} />
+                    autoCorrect={autoCorrect}
+                    autoCapitalize={autoCapitalize}
+                />
                 {onRightPress &&
                     <TouchableOpacity
                         activeOpacity={0.8}

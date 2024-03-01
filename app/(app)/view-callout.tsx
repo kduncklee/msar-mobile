@@ -10,9 +10,6 @@ import { useLocalSearchParams } from 'expo-router';
 import { calloutStatus, responseType } from '../../types/enums';
 import { textForResponseType } from '../../types/calloutSummary';
 import TabSelector from '../../components/TabSelector/TabSelector';
-import CalloutRespond from '../../components/callouts/CalloutRespond';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring, Easing } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CalloutInformationTab from '../../components/callouts/CalloutInformationTab';
 import CalloutLogTab from '../../components/callouts/CalloutLogTab';
 import CalloutPersonnelTab from '../../components/callouts/CalloutPersonnelTab';
@@ -21,20 +18,16 @@ import LogInput from '../../components/callouts/LogInput';
 import { callout, calloutResponseBadge } from '../../types/callout';
 import { useCalloutQuery, apiPostCalloutLog, apiRespondToCallout, useCalloutLogInfiniteQuery } from '../../remote/api';
 import msarEventEmitter from '../../utility/msarEventEmitter';
+import CalloutRespondModal from '../../components/modals/CalloutRespondModal';
 
 
 const Page = () => {
 
     const { id, title, type } = useLocalSearchParams<{ id: string, title: string, type?: string }>();
     const [headerTitle, setHeaderTitle] = useState(title);
-    const safeAreaInsets = useSafeAreaInsets();
     const scrollViewRef = useRef(null);
 
-    const translateY = useSharedValue(600);
-    const opacity = useSharedValue(0);
-
     const [modalVisible, setModalVisible] = useState(false);
-    const [spinnerMessage, setSpinnerMessage] = useState('');
     let defaultTab: number = 0;
     if (type != null) {
         if (type === 'log') {
@@ -129,26 +122,10 @@ const Page = () => {
         refreshCallout();
     }
 
-    const respondToCallout = () => {
-        console.log('respondToCallout');
-        translateY.value = withSpring(0 - safeAreaInsets.bottom, { damping: 20, stiffness: 100 });
-        opacity.value = withTiming(0.8, { duration: 500 });
-        setModalVisible(true);
-    }
-
-    const cancelRespondModal = () => {
-        console.log('cancelRespondModal');
-        setModalVisible(false);
-        translateY.value = withTiming(600, {
-            duration: 500, // Adjust the duration as needed
-        });
-        opacity.value = withTiming(0, { duration: 500 });
-    }
-
     const responseSelected = (response: responseType) => {
         console.log(textForResponseType(response));
         submitCalloutResponse(textForResponseType(response));
-        cancelRespondModal();
+        setModalVisible(false);
     }
 
     const submitCalloutResponse = async (responseString: string) => {
@@ -198,20 +175,6 @@ const Page = () => {
         );
     }
 
-    const trayAnimatedStyle = useAnimatedStyle(() => {
-
-        return {
-            transform: [{ translateY: translateY.value }],
-        };
-    });
-
-    const modalAnimatedStyle = useAnimatedStyle(() => {
-
-        return {
-            opacity: opacity.value
-        };
-    });
-
 
     return (
         <>
@@ -249,7 +212,7 @@ const Page = () => {
                                 <TouchableOpacity
                                     activeOpacity={0.8}
                                     style={[elements.capsuleButton, styles.respondCalloutButton]}
-                                    onPress={() => respondToCallout()}>
+                                    onPress={() => setModalVisible(true)}>
                                     <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>Respond</Text>
                                 </TouchableOpacity>
                             }
@@ -265,15 +228,10 @@ const Page = () => {
                     </>
                 }
             </SafeAreaView>
-            <Animated.View style={[styles.respondTray, trayAnimatedStyle]}>
-                <View style={{ flex: 1 }} />
-                <CalloutRespond onCancel={cancelRespondModal} onSelect={responseSelected} />
-            </Animated.View>
-            {!!modalVisible &&
-                <Animated.View style={[styles.modalBackground, modalAnimatedStyle]}>
-                    <TouchableOpacity onPress={cancelRespondModal} style={{ flex: 1 }} />
-                </Animated.View>
-            }
+            <CalloutRespondModal 
+                modalVisible={modalVisible}
+                onSelect={responseSelected}
+                onCancel={() => setModalVisible(false)} />
         </>
     )
 }
@@ -299,22 +257,6 @@ const styles = StyleSheet.create({
         right: 0,
         bottom: 0
     },
-    respondTray: {
-        zIndex: 100,
-        margin: 0,
-        position: "absolute",
-        left: 0,
-        right: 0,
-        bottom: 0
-    },
-    modalBackground: {
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: colors.black
-    }
 })
 
 export default Page;

@@ -1,7 +1,7 @@
-import { Redirect, Stack } from 'expo-router';
+import { Redirect, Stack, router } from 'expo-router';
 import { useEffect } from 'react';
 import "../../storage/global";
-import { checkNotificationDefaults, registerForPushNotificationsAsync } from '../../utility/pushNotifications';
+import { checkNotificationDefaults, doInitialRedirect, registerForPushNotificationsAsync } from '../../utility/pushNotifications';
 
 export default function AppLayout() {
 
@@ -13,6 +13,10 @@ export default function AppLayout() {
     console.log('inner layout useEffect');
     registerForPushNotificationsAsync();
     checkNotificationDefaults();
+  }, []);
+
+  useEffect(() => {
+    doInitialRedirect();
   }, []);
 
   // This layout can be deferred because it's not the root layout.
