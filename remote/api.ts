@@ -38,7 +38,7 @@ const devicesEndpoint = async (): Promise<string> =>
 const tokenValidationEndpoint = async (): Promise<string> =>
   (await server()) + "/api/?format=json";
 
-const fetchJsonWithCredentials = async (
+const fetchWithCredentials = async (
   url: string,
   method: string = "GET",
   body?: any
@@ -64,7 +64,15 @@ const fetchJsonWithCredentials = async (
     console.log(response.status, msg);
     throw new Error("Network response was " + response.status + ": " + msg);
   }
-  return response.json();
+  return response;
+};
+
+const fetchJsonWithCredentials = async (
+  url: string,
+  method: string = "GET",
+  body?: any
+): Promise<any> => {
+    return (await fetchWithCredentials(url, method, body)).json();
 };
 
 export const apiGetToken = async (username: string, password: string): Promise<loginResponse> => {
@@ -192,71 +200,66 @@ export const apiPostChatLog = async (message: string): Promise<any> => {
     return apiPostLogFromUrl(await chatEndpoint(), message);
 }
 
-export const apiSetDeviceId = async (token: string, critical?: boolean): Promise<any> => {
-    const credentials = await getCredentials();
-    if (!credentials.token) {
-        return { error: "no token"}
-    }
-
-    let deviceId: string = "msar";
-    if (critical !== undefined && critical === false) {
-        deviceId = null
-    }
-
+export const apiSetDeviceId = async (token: string, active: boolean = true) => {
     const tokenInfo = {
         name: Application.nativeApplicationVersion,
         registration_id: token,
-        device_id: deviceId,
-        active: true,
+        device_id: active ? "msar" : "msar-disabled",
+        active: active,
         type: Platform.OS === 'ios' ? 'ios' : 'android'
     }
 
-    return fetch(await devicesEndpoint(), {
-        method: "POST",
-        headers: {
-            'Authorization': 'Token ' + credentials.token,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(tokenInfo)
-    })
-    .then(response => response.json())
-    .then(data => {
+    try {
+        const data = await fetchJsonWithCredentials(
+            await devicesEndpoint(), "POST", tokenInfo);
         console.log("assigned push token: " + JSON.stringify(data));
-        //return calloutFromResponse(data);
-    })
-    .catch(error => {
+    } catch (error) {
         console.log(error);
-        return {
-            error: "Server Error"
-        };
-    })
-}
-
-export const apiRemoveDeviceId = async (token: string): Promise<any> => {
-    const credentials = await getCredentials();
-    if (!credentials.token) {
-        return { error: "no token"}
+        alert('Error saving push token: ' + error.message);
     }
-
-    return fetch(await devicesEndpoint() + token + "/", {
-        method: "DELETE",
-        headers: {
-            'Authorization': 'Token ' + credentials.token,
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log("removed push token: " + JSON.stringify(data));
-        //return calloutFromResponse(data);
-    })
-    .catch(error => {
-        console.log(error);
-        return {
-            error: "Server Error"
-        };
-    })
 }
+
+export const apiRemoveDeviceId = async (token: string) => {
+    try {
+        const data = await fetchWithCredentials(
+            await devicesEndpoint() + token + "/", "DELETE");
+        console.log("removed push token: " + JSON.stringify(data));
+    } catch (error) {
+        console.log(error);
+        alert('Error removing push token: ' + error.message);
+    }
+}
+
+export const apiGetDeviceId = async (token: string): Promise<any> => {
+    if (!token) return Promise.reject();
+    try {
+        const data = await fetchJsonWithCredentials(
+            await devicesEndpoint() + token + "/", "GET");
+        console.log("get push token: " + JSON.stringify(data));
+        return data;
+    } catch (error) {
+        // 404 indicates it is not stored.
+        console.log(error);
+        return Promise.reject();
+    }
+}
+
+export const apiIsDeviceIdActive = async (token: string): Promise<boolean> => {
+    return (await apiGetDeviceId(token)).active;
+}
+
+export const apiUpdateDeviceId = async (token: string) => {
+    apiGetDeviceId(token).then(
+        (data) => {
+            if (data.name != Application.nativeApplicationVersion) {
+                console.log('updating stored version');
+                apiSetDeviceId(token, data.active);
+            }
+        },
+        () => apiSetDeviceId(token, true)
+    );
+}
+
 
 //////////////////////////////////////////////////////////////////////////////
 // React Query

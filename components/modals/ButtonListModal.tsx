@@ -30,6 +30,9 @@ type ButtonListModalProps = {
   onCancel: () => void;
 };
 
+const TRANSLATE_Y_START = 1200;
+const ANIMATION_DURATION = 500;
+
 const ButtonListModal = ({
   buttons,
   title,
@@ -37,7 +40,7 @@ const ButtonListModal = ({
   onSelect,
   onCancel,
 }: ButtonListModalProps) => {
-  const translateY = useSharedValue(600);
+  const translateY = useSharedValue(TRANSLATE_Y_START);
   const opacity = useSharedValue(0);
   const safeAreaInsets = useSafeAreaInsets();
 
@@ -55,13 +58,13 @@ const ButtonListModal = ({
       damping: 20,
       stiffness: 100,
     });
-    opacity.value = withTiming(0.8, { duration: 500 });
+    opacity.value = withTiming(0.8, { duration: ANIMATION_DURATION });
   };
 
   const hideModal = () => {
     console.log("hideModal");
-    translateY.value = withTiming(600, { duration: 500 });
-    opacity.value = withTiming(0, { duration: 500 });
+    translateY.value = withTiming(TRANSLATE_Y_START, { duration: ANIMATION_DURATION });
+    opacity.value = withTiming(0, { duration: ANIMATION_DURATION });
   };
 
   const trayAnimatedStyle = useAnimatedStyle(() => {

@@ -5,7 +5,7 @@ import messaging from '@react-native-firebase/messaging';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
 import * as Sentry from "@sentry/react-native";
 import * as Notifications from 'expo-notifications';
-import { apiRemoveDeviceId, apiSetDeviceId, prefetchCalloutListQuery, prefetchCalloutLogQuery, prefetchCalloutQuery, prefetchChatLogQuery } from '../remote/api';
+import { apiIsDeviceIdActive, apiRemoveDeviceId, apiSetDeviceId, apiUpdateDeviceId, prefetchCalloutListQuery, prefetchCalloutLogQuery, prefetchCalloutQuery, prefetchChatLogQuery } from '../remote/api';
 import { getCriticalAlertsVolume, getCriticalForChannel, getIsSnoozing, getSoundForChannel, storeCriticalAlertsVolume, storeCriticalForChannel, storeSoundForChannel } from '../storage/storage';
 import msarEventEmitter from '../utility/msarEventEmitter';
 import { activeTabStatusQuery } from 'types/calloutSummary';
@@ -52,8 +52,13 @@ export const getToken = async () => {
   return messaging().getToken();
 }
 
-export const sendPushToken = async (token: string) => {
-  const response: any = await apiSetDeviceId(token, true);
+export const sendPushToken = async (active: boolean = true) => {
+  const token = await getToken();
+  await apiSetDeviceId(token, active);
+}
+
+export const checkPushToken = async (): Promise<boolean> => {
+  return getToken().then(apiIsDeviceIdActive);
 }
 
 export const removePushToken = async () => {
@@ -74,8 +79,12 @@ export const registerForPushNotificationsAsync = async () => {
   }
 
   const token = await getToken();
-  console.log("registered", token);
-  await sendPushToken(token);
+  if (token) {
+    console.log("registered", token);
+    apiUpdateDeviceId(token);
+  } else {
+    alert("Failed to get push token");
+  }
 }
 
 const setupChannels = async () => {

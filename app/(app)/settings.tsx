@@ -14,7 +14,6 @@ import FormSlider from "../../components/inputs/FormSlider";
 import HorrizontalLine from "../../components/HorrizontalLine";
 import Header from "../../components/Header";
 
-
 const Page = () => {
 
     const [username, setUsername] = useState('Loading...');
@@ -27,7 +26,7 @@ const Page = () => {
     useEffect(() => {
 
         loadCredentials();
-        checkPushNotifications();
+        PushNotifications.checkPushToken().then(setPushEnabled);
         loadNotificationSettings();
 
     }, []);
@@ -46,13 +45,6 @@ const Page = () => {
         }
     }
 
-    const checkPushNotifications = async () => {
-        let token = await PushNotifications.getToken();
-        if (token != null) {
-            setPushEnabled(true);
-        }
-    }
-
     const loadNotificationSettings = async () => {
         const volume = await getCriticalAlertsVolume();
         console.log('loaded volume', volume);
@@ -66,14 +58,7 @@ const Page = () => {
     const onPushToggle = async () => {
         const pushStatus = !pushEnabled;
 
-        if (!pushStatus) {
-            await PushNotifications.removePushToken();
-        } else {
-            let token = await PushNotifications.getToken();
-            if (token != null) {
-                await PushNotifications.sendPushToken(token);
-            }
-        }
+        await PushNotifications.sendPushToken(pushStatus);
 
         setPushEnabled(pushStatus);
     }
