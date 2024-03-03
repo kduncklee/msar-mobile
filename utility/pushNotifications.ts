@@ -140,7 +140,7 @@ const displayNotification = async (remoteMessage) => {
     criticalVolume: await getCriticalAlertsVolume(),
   } : {};
   const sound = await getSoundForChannel(channel) ?? 'default';
-  const ios_sound = snoozed ? {sound: sound + '.mp3'} : {};
+  const ios_sound = snoozed ? {} : {sound: sound + '.mp3'};
   const vibration = vibrationForChannel[channel] ?? "short";
   var android_channel = `${sound}-${vibration}` + (critical ? '-alarm' : '');
   if (snoozed) { android_channel = 'silent' };
