@@ -53,7 +53,7 @@ export const elements = StyleSheet.create({
         color: colors.grayText,
     },
     fieldText: {
-        fontSize: 14,
+        fontSize: 16,
         fontWeight: "300",
         color: colors.primaryText,
     },

@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
 
     messageAuthor: {
         marginVertical: 8,
-        fontSize: 12,
+        fontSize: 14,
         fontWeight: "400",
         textAlign: "left",
         color: colors.grayText
