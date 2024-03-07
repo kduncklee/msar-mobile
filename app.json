@@ -2,7 +2,7 @@
   "expo": {
     "name": "Malibu SAR",
     "slug": "msar-mobile",
-    "version": "1.5.5",
+    "version": "1.5.6",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -17,7 +17,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "org.malibusar.app",
-      "buildNumber": "23",
+      "buildNumber": "24",
       "icon": "./assets/icon.png",
       "googleServicesFile": "./GoogleService-Info.plist",
       "config": {
@@ -36,7 +36,7 @@
         "backgroundColor": "#2B3038"
       },
       "package": "org.malibusar.app",
-      "versionCode": 29,
+      "versionCode": 30,
       "googleServicesFile": "./google-services.json"
     },
     "web": {
@@ -65,12 +65,17 @@
           "sounds": [
             "assets/sounds/distortion_1_time.mp3",
             "assets/sounds/distortion_3_times.mp3",
+            "assets/sounds/mdc_new_call.mp3",
             "assets/sounds/radio_1_time.mp3",
             "assets/sounds/radio_4_times.mp3",
+            "assets/sounds/serene_multi_ding.mp3",
+            "assets/sounds/ships_bells.mp3",
+            "assets/sounds/simple_ding.mp3",
             "assets/sounds/sweet_1_time.mp3",
             "assets/sounds/sweet_6_times.mp3",
             "assets/sounds/trumpets_1_time.mp3",
             "assets/sounds/trumpets_4_times.mp3",
+            "assets/sounds/wooden_drum.mp3",
             "assets/sounds/yucatan_1_time.mp3",
             "assets/sounds/yucatan_6_times.mp3"
           ]
