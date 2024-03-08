@@ -8,6 +8,7 @@ import * as Notifications from 'expo-notifications';
 import { apiIsDeviceIdActive, apiRemoveDeviceId, apiSetDeviceId, apiUpdateDeviceId, prefetchCalloutListQuery, prefetchCalloutLogQuery, prefetchCalloutQuery, prefetchChatLogQuery } from '../remote/api';
 import { getCriticalAlertsVolume, getCriticalForChannel, getIsSnoozing, getSoundForChannel, storeCriticalAlertsVolume, storeCriticalForChannel, storeSoundForChannel } from '../storage/storage';
 import msarEventEmitter from '../utility/msarEventEmitter';
+import { queryClient } from "utility/reactQuery";
 import { activeTabStatusQuery } from 'types/calloutSummary';
 
 export const availableSounds = [
@@ -202,22 +203,19 @@ export const checkNotificationDefaults = async () => {
   }
 }
 
-function getPrefetchForQueryClient(queryClient) {
-  const prefetch = (notification) => {
-    const url = notification.data?.url;
-    const id = notification.data?.id;
-    if (url) {
-      if (url === "view-callout") {
-        prefetchCalloutQuery(queryClient, id);
-        prefetchCalloutLogQuery(queryClient, id);
-        prefetchCalloutListQuery(queryClient, activeTabStatusQuery);
-      } else if (url === "chat") {
-        prefetchChatLogQuery(queryClient);
-      }
+const prefetch = (notification) => {
+  const url = notification.data?.url;
+  const id = notification.data?.id;
+  if (url) {
+    if (url === "view-callout") {
+      prefetchCalloutQuery(queryClient, id);
+      prefetchCalloutLogQuery(queryClient, id);
+      prefetchCalloutListQuery(queryClient, activeTabStatusQuery);
+    } else if (url === "chat") {
+      prefetchChatLogQuery(queryClient);
     }
-  };
-  return prefetch;
-}
+  }
+};
 
 function doRedirect(notification) {
   const url = notification.data?.url;
@@ -236,12 +234,12 @@ function doRedirect(notification) {
   return null;
 }
 
-export const setupPushNotifications = (onReceive) => {
+export const setupPushNotificationsBackground = () => {
   console.log('setupPush');
   messaging().setBackgroundMessageHandler(async remoteMessage => {
     console.log('Message handled in the background!', remoteMessage);
     displayNotification(remoteMessage);
-    onReceive(remoteMessage);
+    prefetch(remoteMessage);
   });
 }
 
@@ -255,9 +253,7 @@ export const doInitialRedirect = async () => {
   }
 }
 
-export const usePushNotifications = (queryClient) => {
-  const prefetch = getPrefetchForQueryClient(queryClient);
-
+export const usePushNotifications = () => {
   const notifeeOnEvent = async ({ type, detail }) => {
     const { notification, pressAction } = detail;
     switch (type) {

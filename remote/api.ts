@@ -214,8 +214,7 @@ export const apiSetDeviceId = async (token: string, active: boolean = true) => {
             await devicesEndpoint(), "POST", tokenInfo);
         console.log("assigned push token: " + JSON.stringify(data));
     } catch (error) {
-        console.log(error);
-        alert('Error saving push token: ' + error.message);
+        console.log('Error saving push token: ' + error.message);
     }
 }
 

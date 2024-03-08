@@ -18,7 +18,8 @@ const Page = () => {
 
     const [username, setUsername] = useState('Loading...');
     const [server, setServer] = useState('Loading...');
-    const [pushEnabled, setPushEnabled] = useState(false);
+    const [notificationLoading, setNotificationLoading] = useState('Loading...');
+    const [pushEnabled, setPushEnabled] = useState(null);
     const [criticalAlertsVolume, setCriticalAlertsVolume] = useState(null);
     const queryClient = useQueryClient()
 
@@ -26,7 +27,9 @@ const Page = () => {
     useEffect(() => {
 
         loadCredentials();
-        PushNotifications.checkPushToken().then(setPushEnabled);
+        PushNotifications.checkPushToken().then(
+            setPushEnabled,
+            () => setNotificationLoading('Unable to connect'));
         loadNotificationSettings();
 
     }, []);
@@ -84,6 +87,50 @@ const Page = () => {
         router.replace('/');
     }
 
+    const notifications = (
+      <>
+        <FormCheckbox
+          title={"Notifications"}
+          checked={pushEnabled}
+          onToggle={onPushToggle}
+        />
+        {pushEnabled && (
+          <>
+            <HorrizontalLine title="Notification Sounds" />
+            <TouchableOpacity
+              style={styles.buttonContainer}
+              activeOpacity={0.5}
+              onPress={onRestoreNotificationDefaultsPress}
+            >
+              <Text style={[elements.mediumText, styles.signOutText]}>
+                Restore default notification sounds
+              </Text>
+            </TouchableOpacity>
+            {Platform.OS === "ios" && (
+              <FormSlider
+                title={"Critical Alert Volume"}
+                value={criticalAlertsVolume}
+                onChange={onCriticalAlertSlidingComplete}
+              />
+            )}
+            <NotificationSettings title={"New Callout"} channel={"callout"} />
+            <NotificationSettings
+              title={"Callout 10-22"}
+              channel={"callout-resolved"}
+            />
+            <NotificationSettings
+              title={"Updates for a Callout"}
+              channel={"log"}
+            />
+            <NotificationSettings
+              title={"Announcements"}
+              channel={"announcement"}
+            />
+          </>
+        )}
+      </>
+    )
+
     return (
       <SafeAreaView style={styles.container}>
         <Header title={"Settings"} backButton={true} />
@@ -104,45 +151,10 @@ const Page = () => {
               {Application.nativeApplicationVersion}
             </Text>
           </View>
-          <FormCheckbox
-            title={"Notifications"}
-            checked={pushEnabled}
-            onToggle={onPushToggle}
-          />
-          {pushEnabled && (
-            <>
-              <HorrizontalLine title="Notification Sounds" />
-              <TouchableOpacity
-                style={styles.buttonContainer}
-                activeOpacity={0.5}
-                onPress={onRestoreNotificationDefaultsPress}
-              >
-                <Text style={[elements.mediumText, styles.signOutText]}>
-                  Restore default notification sounds
-                </Text>
-              </TouchableOpacity>
-              {Platform.OS === "ios" && (
-                <FormSlider
-                  title={"Critical Alert Volume"}
-                  value={criticalAlertsVolume}
-                  onChange={onCriticalAlertSlidingComplete}
-                />
-              )}
-              <NotificationSettings title={"New Callout"} channel={"callout"} />
-              <NotificationSettings
-                title={"Callout 10-22"}
-                channel={"callout-resolved"}
-              />
-              <NotificationSettings
-                title={"Updates for a Callout"}
-                channel={"log"}
-              />
-              <NotificationSettings
-                title={"Announcements"}
-                channel={"announcement"}
-              />
-            </>
-          )}
+          <HorrizontalLine />
+          {(pushEnabled == null) ?
+            (<Text style={elements.mediumText}>{notificationLoading}</Text>) :
+            notifications}
           <HorrizontalLine />
           <View style={styles.bottomContainer}>
             <TouchableOpacity
