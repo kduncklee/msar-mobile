@@ -2,7 +2,7 @@
   "expo": {
     "name": "Malibu SAR",
     "slug": "msar-mobile",
-    "version": "1.5.6",
+    "version": "1.6.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -17,7 +17,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "org.malibusar.app",
-      "buildNumber": "24",
+      "buildNumber": "25",
       "icon": "./assets/icon.png",
       "googleServicesFile": "./GoogleService-Info.plist",
       "config": {
@@ -36,13 +36,20 @@
         "backgroundColor": "#2B3038"
       },
       "package": "org.malibusar.app",
-      "versionCode": 30,
+      "versionCode": 31,
       "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      [
+        "notification-service-expo-plugin",
+        {
+          "devTeam": "UJDB5NH948",
+          "iosNSEFilePath": "./assets/native/NotificationService.m"
+        }
+      ],
       "expo-router",
       "@react-native-firebase/app",
       "@react-native-firebase/messaging",
@@ -52,7 +59,7 @@
           "android": {
             "extraMavenRepos": [
               "../../node_modules/@notifee/react-native/android/libs"
-              ]
+            ]
           },
           "ios": {
             "useFrameworks": "static"
@@ -80,7 +87,16 @@
             "assets/sounds/yucatan_6_times.mp3"
           ]
         }
-      ]
+      ],
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "msar-mobile-react-native",
+          "organization": "msar"
+        }
+      ],
+      "expo-secure-store"
     ],
     "scheme": "msar",
     "extra": {

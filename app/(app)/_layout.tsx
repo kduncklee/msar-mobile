@@ -2,6 +2,7 @@ import { Redirect, Stack, router } from 'expo-router';
 import { useEffect } from 'react';
 import "../../storage/global";
 import { checkNotificationDefaults, doInitialRedirect, registerForPushNotificationsAsync } from '../../utility/pushNotifications';
+import { migrateSharedStorage } from 'storage/mmkv';
 
 export default function AppLayout() {
 
@@ -13,6 +14,7 @@ export default function AppLayout() {
     console.log('inner layout useEffect');
     registerForPushNotificationsAsync();
     checkNotificationDefaults();
+    migrateSharedStorage();
   }, []);
 
   useEffect(() => {

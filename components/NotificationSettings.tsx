@@ -6,7 +6,7 @@ import {
   getSoundForChannel,
   storeCriticalForChannel,
   storeSoundForChannel,
-} from "../storage/storage";
+} from "../storage/mmkv";
 import DropdownSelector from "./inputs/DropdownSelector";
 import FormCheckbox from "./inputs/FormCheckbox";
 

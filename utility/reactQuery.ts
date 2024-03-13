@@ -10,7 +10,9 @@ import {
 import { experimental_createPersister } from "@tanstack/query-persist-client-core";
 import * as Sentry from "@sentry/react-native";
 import Toast from "react-native-root-toast";
+import superjson from 'superjson';
 import { clientStorage } from "storage/mmkv";
+
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,6 +22,8 @@ export const queryClient = new QueryClient({
       persister: experimental_createPersister({
         storage: clientStorage,
         maxAge: 1000 * 60 * 60 * 24, // 24 hours
+        serialize: superjson.stringify,
+        deserialize: superjson.parse,
       }),
     },
   },

@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import colors from '../../styles/colors';
 import { elements } from '../../styles/elements';
 import SnoozeModal from 'components/modals/SnoozeModal';
-import { getSnoozeExpires, storeSnoozeExpires } from 'storage/storage';
+import { getSnoozeExpires, storeSnoozeExpires } from 'storage/mmkv';
 
 const Page = () => {
     const [topMargin, setTopMargin] = useState(0);
@@ -25,7 +25,7 @@ const Page = () => {
 
 
     useEffect(() => {
-        getSnoozeExpires().then(setSnoozeExpireTime);
+        setSnoozeExpireTime(getSnoozeExpires());
     }, []);
 
 

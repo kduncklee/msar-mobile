@@ -5,7 +5,8 @@ import { ScrollView, StyleSheet, View, Text, Platform, SafeAreaView, TouchableOp
 import { useQueryClient } from "@tanstack/react-query";
 import colors from "../../styles/colors";
 import { elements } from "../../styles/elements";
-import { clearCredentials, getCredentials, getServer, clearServer, getCriticalAlertsVolume, storeCriticalAlertsVolume } from "../../storage/storage";
+import { clearCredentials, getCredentials, getServer, clearServer } from "../../storage/storage";
+import { getCriticalAlertsVolume, storeCriticalAlertsVolume } from "../../storage/mmkv";
 import "../../storage/global";
 import FormCheckbox from "../../components/inputs/FormCheckbox";
 import * as PushNotifications from "../../utility/pushNotifications";
@@ -48,10 +49,10 @@ const Page = () => {
         }
     }
 
-    const loadNotificationSettings = async () => {
-        const volume = await getCriticalAlertsVolume();
+    const loadNotificationSettings = () => {
+        const volume = getCriticalAlertsVolume();
         console.log('loaded volume', volume);
-        if (volume == null) {
+        if (volume == undefined) {
             setCriticalAlertsVolume(0.9);
         } else {
             setCriticalAlertsVolume(volume);
@@ -73,7 +74,7 @@ const Page = () => {
     }
 
     const onRestoreNotificationDefaultsPress = async () => {
-        await PushNotifications.restoreNotificationDefaults();
+        PushNotifications.restoreNotificationDefaults();
         router.replace('/');
     }
 

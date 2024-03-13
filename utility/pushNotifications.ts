@@ -6,7 +6,7 @@ import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
 import * as Sentry from "@sentry/react-native";
 import * as Notifications from 'expo-notifications';
 import { apiIsDeviceIdActive, apiRemoveDeviceId, apiSetDeviceId, apiUpdateDeviceId, prefetchCalloutListQuery, prefetchCalloutLogQuery, prefetchCalloutQuery, prefetchChatLogQuery } from '../remote/api';
-import { getCriticalAlertsVolume, getCriticalForChannel, getIsSnoozing, getSoundForChannel, storeCriticalAlertsVolume, storeCriticalForChannel, storeSoundForChannel } from '../storage/storage';
+import { getIsSnoozing, getCriticalAlertsVolume, getCriticalForChannel, getSoundForChannel, storeCriticalAlertsVolume, storeCriticalForChannel, storeSoundForChannel } from '../storage/mmkv';
 import msarEventEmitter from '../utility/msarEventEmitter';
 import { queryClient } from "utility/reactQuery";
 import { activeTabStatusQuery } from 'types/calloutSummary';
@@ -139,13 +139,13 @@ const setupChannels = async () => {
 
 const displayNotification = async (remoteMessage) => {
   const channel: string = remoteMessage.data?.channel ?? 'default';
-  const snoozed = await getIsSnoozing();
-  const critical = !snoozed && (await getCriticalForChannel(channel));
+  const snoozed = getIsSnoozing();
+  const critical = !snoozed && getCriticalForChannel(channel);
   const ios_critical = critical ? {
     critical: true,
-    criticalVolume: await getCriticalAlertsVolume(),
+    criticalVolume: getCriticalAlertsVolume(),
   } : {};
-  const sound = await getSoundForChannel(channel) ?? 'default';
+  const sound = getSoundForChannel(channel) ?? 'default';
   const ios_sound = snoozed ? {} : {sound: sound + '.mp3'};
   const vibration = vibrationForChannel[channel] ?? "short";
   var android_channel = `${sound}-${vibration}` + (critical ? '-alarm' : '');
@@ -174,13 +174,12 @@ export const testDisplayNotification = async (channel:string = "callout") => {
       title: channel,
       body: 'test message',
       channel,
-      //critical: false
     }
   }
   displayNotification(remoteMessage);
 }
 
-export const restoreNotificationDefaults = async () => {
+export const restoreNotificationDefaults = () => {
   storeSoundForChannel('callout', 'yucatan_6_times');
   storeCriticalForChannel('callout', true);
   storeSoundForChannel('callout-resolved', 'trumpets_1_time');
@@ -192,12 +191,12 @@ export const restoreNotificationDefaults = async () => {
   storeCriticalAlertsVolume(1.0);
 }
 
-export const checkNotificationDefaults = async () => {
+export const checkNotificationDefaults = () => {
   if (
-    (await getSoundForChannel("callout")) == null ||
-    (await getSoundForChannel("callout-resolved")) == null ||
-    (await getSoundForChannel("log")) == null ||
-    (await getSoundForChannel("announcement")) == null
+    (getSoundForChannel("callout")) == undefined ||
+    (getSoundForChannel("callout-resolved")) == undefined ||
+    (getSoundForChannel("log")) == undefined ||
+    (getSoundForChannel("announcement")) == undefined
   ) {
     restoreNotificationDefaults();
   }
@@ -235,10 +234,12 @@ function doRedirect(notification) {
 }
 
 export const setupPushNotificationsBackground = () => {
-  console.log('setupPush');
+  console.log('setupPushNotificationsBackground');
   messaging().setBackgroundMessageHandler(async remoteMessage => {
     console.log('Message handled in the background!', remoteMessage);
-    displayNotification(remoteMessage);
+    if (Platform.OS !== 'ios') {  // iOS handled in Notification Service Extenstion
+      displayNotification(remoteMessage);
+    }
     prefetch(remoteMessage);
   });
 }
@@ -271,6 +272,7 @@ export const usePushNotifications = () => {
     const onMessageUnsubscribe = messaging().onMessage(
       async (remoteMessage) => {
         console.log("onMessage", remoteMessage);
+        // Display for iOS too: NSE does not run for foreground notifications.
         displayNotification(remoteMessage);
         prefetch(remoteMessage);
       }

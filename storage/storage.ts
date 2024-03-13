@@ -9,7 +9,7 @@ const storeData = async (key: string, value: string) => {
     }
 };
 
-const getData = async (key: string) => {
+export const getData = async (key: string) => {
     try {
         const value = await AsyncStorage.getItem(key);
         return value;
@@ -20,7 +20,7 @@ const getData = async (key: string) => {
     }
 };
 
-const removeData = async (key: string) => {
+export const removeData = async (key: string) => {
     try {
         await AsyncStorage.removeItem(key)
       } catch(e) {
@@ -60,48 +60,4 @@ export const getServer = async (): Promise<string> => {
 
 export const clearServer = async (): Promise<void> => {
     return removeData("server");
-}
-
-export const getCriticalAlertsVolume = async (): Promise<number> => {
-    const jsonValue = await getData("critical-alert-volume");
-    return (jsonValue != null) ? JSON.parse(jsonValue) : 1.0;
-}
-
-export const storeCriticalAlertsVolume = async (value: number) => {
-    await storeData("critical-alert-volume", JSON.stringify(value));
-}
-
-export const getSoundForChannel = async (channel: string): Promise<string> => {
-    return getData("sound-" + channel);
-}
-
-export const storeSoundForChannel = async (channel: string, sound: string) => {
-    await storeData("sound-" + channel, sound);
-}
-
-export const getCriticalForChannel = async (channel: string): Promise<boolean> => {
-    const jsonValue = await getData("critical-" + channel);
-    return (jsonValue != null) ? JSON.parse(jsonValue) : false;
-}
-
-export const storeCriticalForChannel = async (channel: string, critical: boolean) => {
-    await storeData("critical-" + channel, JSON.stringify(critical));
-}
-
-export const storeSnoozeExpires = async (value: number) => {
-    await storeData("snoozeExpires", JSON.stringify(value));
-}
-
-export const getSnoozeExpires = async (): Promise<number> => {
-    const jsonValue = await getData("snoozeExpires");
-    return (jsonValue != null) ? JSON.parse(jsonValue) : 0;
-}
-
-export const getIsSnoozing = async (): Promise<boolean> => {
-    const snoozeExpireTime = await getSnoozeExpires();
-    return (snoozeExpireTime - new Date().getTime()) > 0;
-}
-
-export const clearSnoozeExpires = async (): Promise<void> => {
-    return removeData("snoozeExpires");
 }
