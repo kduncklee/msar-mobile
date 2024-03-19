@@ -98,8 +98,6 @@ export const clearSnoozeExpires = () => {
 
 export const migrateSharedStorage = async () => {
     console.log('pre-migrateSharedStorage');
-    const e = new Date().getTime() + 60000;
-    storeSnoozeExpires(e);
     if (sharedStorage.getBoolean('migrateSharedStorage')) return;
     console.log('migrateSharedStorage');
     const channels = ['callout', 'callout-resolved', 'log', 'announcement'];
