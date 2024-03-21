@@ -4,13 +4,38 @@ import { router } from 'expo-router';
 import colors from '../../styles/colors';
 import { elements } from '../../styles/elements';
 import SnoozeModal from 'components/modals/SnoozeModal';
-import { getSnoozeExpires, storeSnoozeExpires } from 'storage/mmkv';
+import { getSnoozeExpires, storeSnoozeExpires, useLastRead } from 'storage/mmkv';
+import { useCalloutListQuery, useChatLogInfiniteQuery } from 'remote/api';
+import { logEntriesFromInfiniteQueryData } from 'types/logEntry';
+import { activeTabStatusQuery } from 'types/calloutSummary';
+import Badge from 'components/Badge';
+
+// Warning: this limits at PAGE_SIZE. We should never have that many active.
+const useNumberActiveCallouts = (): number => {
+    // Use the active&resolved query because it acts like a prefetch.
+    const query = useCalloutListQuery(activeTabStatusQuery);
+    if (query.data) {
+        return query.data.filter(x => x.status === 'active').length;
+    }
+    return 0;
+}
+
+const useChatUnread = (): boolean => {
+    const { data } = useChatLogInfiniteQuery();
+    const logList = logEntriesFromInfiniteQueryData(data);
+    const lastId = logList ? logList[0]?.id : 0;
+    const [lastLogRead, setLastLogRead] = useLastRead(0);
+    const hasUnread = (lastLogRead == undefined) || (lastLogRead < lastId);
+    return hasUnread;
+}
 
 const Page = () => {
     const [topMargin, setTopMargin] = useState(0);
     const [snoozeModalVisible, setSnoozeModalVisible] = useState(false);
     const [snoozeExpireTime, setSnoozeExpireTime] = useState(0);
     const [snoozeTitle, setSnoozeTitle] = useState('Snooze');
+    const chatHasUnread = useChatUnread();
+    const numberActiveCallouts = useNumberActiveCallouts();
 
     useEffect(() => {
         if (Platform.OS === 'ios') {
@@ -72,12 +97,14 @@ const Page = () => {
                         onPress={() => router.push('/callout-list')}>
                         <View style={[elements.tray,styles.contentTray]}>
                             <Text style={styles.buttonText}>Callouts</Text>
+                            {!!numberActiveCallouts && <Badge style={styles.badge}>{numberActiveCallouts}</Badge>}
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity activeOpacity={0.5}
                         onPress={() => router.push('/chat')}>
                         <View style={[elements.tray,styles.contentTray]}>
-                            <Text style={styles.buttonText}>Announcements / Chat</Text>
+                            <Text style={styles.buttonText}>Announcements</Text>
+                            {chatHasUnread && <Badge style={styles.badge}>!</Badge>}
                         </View>
                     </TouchableOpacity>
                     <TouchableOpacity activeOpacity={0.5}
@@ -150,7 +177,11 @@ const styles = StyleSheet.create({
         marginTop: 20,
         width: 120,
         alignSelf: "flex-end"
-    }
+    },
+    badge: {
+        position: 'absolute',
+        right: 5
+    },
 })
 
 

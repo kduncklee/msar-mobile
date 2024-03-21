@@ -22,6 +22,8 @@
   [MMKV initializeMMKV:nil groupDir:groupDir logLevel:MMKVLogError];
   
   MMKV *mmkv = [MMKV mmkvWithID:@"mmkv.shared" mode:MMKVMultiProcess];
+  double badgeCount = [mmkv getDoubleForKey:@"badgeCount"] + 1;
+  [mmkv setDouble:badgeCount forKey:@"badgeCount"];
   NSString *channel = self.bestAttemptContent.userInfo[@"channel"];
   NSString *sound = [mmkv getStringForKey:[NSString stringWithFormat:@"sound-%@", channel]];
   NSString *soundFile = [NSString stringWithFormat:@"%@.mp3", sound];
@@ -32,6 +34,8 @@
   NSTimeInterval currentSec = [[NSDate date] timeIntervalSince1970];
   BOOL snoozing = (snoozeExpiresMs - (currentSec * 1000.0)) > 0;
   NSLog(@"%f <?> %f", currentSec * 1000.0, snoozeExpiresMs);
+
+  self.bestAttemptContent.badge = [NSNumber numberWithInt:badgeCount];
 
   if (snoozing) {
     NSLog(@"No sound due to snoozing");

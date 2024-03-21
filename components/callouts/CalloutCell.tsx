@@ -6,6 +6,7 @@ import colors from '../../styles/colors';
 import { getConditionalTimeString } from '../../utility/dateHelper';
 import { locationToShortString } from '../../types/location';
 import { respondedItem } from '../../types/respondedItem';
+import { useLastRead } from 'storage/mmkv';
 
 type CalloutCellProps = {
     summary: calloutSummary,
@@ -13,6 +14,9 @@ type CalloutCellProps = {
 }
 
 const CalloutCell = ({summary, onPress}: CalloutCellProps) => {
+    const [lastLogRead, setLastLogRead] = useLastRead(summary?.id);
+    const hasUnread = (lastLogRead == undefined) || (lastLogRead < summary.log_last_id);
+    //console.log(summary.id, lastLogRead, summary.log_last_id, hasUnread);
 
     const cellPressed = () => {
         onPress(summary);
@@ -55,7 +59,7 @@ const CalloutCell = ({summary, onPress}: CalloutCellProps) => {
                         <View style={[elements.capsule]}>
                             <Text style={elements.smallYellowText}>{getConditionalTimeString(summary.created_at)}</Text>
                         </View>
-                        <View style={[elements.capsule, { marginLeft: 10}]}>
+                        <View style={[elements.capsule, hasUnread ? {backgroundColor: colors.red} : {}, {marginLeft: 10}]}>
                             <Image source={require('assets/icons/log_yellow.png')} style={styles.logImage} />
                             <Text style={elements.smallYellowText}>{summary.log_count}</Text>
                         </View>

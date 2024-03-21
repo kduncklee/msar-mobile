@@ -1,5 +1,5 @@
 import * as SecureStore from "expo-secure-store";
-import { MMKV } from "react-native-mmkv";
+import { MMKV, useMMKVNumber, useMMKVString } from "react-native-mmkv";
 import { getData, removeData } from "./storage";
 
 const key_name = "mmkv_encryption_key";
@@ -51,6 +51,24 @@ export const clientStorage = {
   },
 };
 
+export const useLastRead = (id: number) =>
+  useMMKVNumber("last-read-" + id.toString(), storage);
+
+export const getLastLogRead = (id: number): number => {
+    return storage.getNumber('last-read-' + id.toString());
+}
+
+export const storeLastRead =  (id: number, value: number) => {
+    const last = getLastLogRead(id);
+    if (
+      (value != undefined) && 
+      (last == undefined) || (value > last)
+    ) {
+      console.log("storeLastRead", id, value);
+      storage.set("last-read-" + id.toString(), value);
+    }
+}
+
 
 export const getCriticalAlertsVolume = (): number => {
     const key = "critical-alert-volume";
@@ -94,6 +112,10 @@ export const getIsSnoozing = (): boolean => {
 
 export const clearSnoozeExpires = () => {
     return storeSnoozeExpires(0);
+}
+
+export const storeBadggeCount = (value: number) => {
+    sharedStorage.set("badgeCount", value);
 }
 
 export const migrateSharedStorage = async () => {

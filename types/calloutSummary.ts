@@ -28,7 +28,8 @@ export type calloutSummary = {
     created_at: Date,
     location: location,
     status?: calloutStatus,
-    log_count: number
+    log_count: number,
+    log_last_id: number,
 }
 
 export const calloutSummaryFromResponse = (data: any): calloutSummary => {
@@ -42,7 +43,8 @@ export const calloutSummaryFromResponse = (data: any): calloutSummary => {
         created_at: new Date(data.created_at),
         location: data.location,
         status: stringToCalloutStatus(data.status),
-        log_count: data.log_count
+        log_count: data.log_count,
+        log_last_id: data.log_last_id,
     }
 }
 

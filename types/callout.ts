@@ -23,7 +23,8 @@ export type callout = {
     created_at?: Date,
     my_response?: responseType,
     created_by?: user,
-    log_count?: number
+    log_count?: number,
+    log_last_id?: number,
 }
 
 export const calloutFromResponse = (data: any): callout => {
@@ -47,7 +48,8 @@ export const calloutFromResponse = (data: any): callout => {
         created_at: new Date(data.created_at),
         my_response: stringToResponseType(data.my_response),
         created_by: data.created_by,
-        log_count: data.log_count
+        log_count: data.log_count,
+        log_last_id: data.log_last_id,
     }
 }
 

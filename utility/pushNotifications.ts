@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
-import { Platform } from 'react-native';
+import { AppState, AppStateStatus, Platform } from 'react-native';
 import { router } from 'expo-router';
 import messaging from '@react-native-firebase/messaging';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
 import * as Sentry from "@sentry/react-native";
 import * as Notifications from 'expo-notifications';
 import { apiIsDeviceIdActive, apiRemoveDeviceId, apiSetDeviceId, apiUpdateDeviceId, prefetchCalloutListQuery, prefetchCalloutLogQuery, prefetchCalloutQuery, prefetchChatLogQuery } from '../remote/api';
-import { getIsSnoozing, getCriticalAlertsVolume, getCriticalForChannel, getSoundForChannel, storeCriticalAlertsVolume, storeCriticalForChannel, storeSoundForChannel } from '../storage/mmkv';
+import { getIsSnoozing, getCriticalAlertsVolume, getCriticalForChannel, getSoundForChannel, storeCriticalAlertsVolume, storeCriticalForChannel, storeSoundForChannel, storeBadggeCount } from '../storage/mmkv';
 import msarEventEmitter from '../utility/msarEventEmitter';
 import { queryClient } from "utility/reactQuery";
 import { activeTabStatusQuery } from 'types/calloutSummary';
@@ -268,6 +268,20 @@ export const usePushNotifications = () => {
     }
   };
 
+  function clearBadgeCount() {
+    if (Platform.OS === "ios") {
+      notifee.setBadgeCount(0).then(() => console.log('Badge count removed'));
+      storeBadggeCount(0);  // Shared state with NSE.
+    }
+  }
+
+  function onAppStateChange(status: AppStateStatus) {
+    console.log("push onAppStateChange", status);
+    if (status == "active") {  // app restored to foreground
+      clearBadgeCount();
+    }
+  }
+
   useEffect(() => {
     const onMessageUnsubscribe = messaging().onMessage(
       async (remoteMessage) => {
@@ -288,6 +302,7 @@ export const usePushNotifications = () => {
       notifee.onForegroundEvent(notifeeOnEvent);
     notifee.onBackgroundEvent(notifeeOnEvent);
 
+    const appStateSubscription = AppState.addEventListener("change", onAppStateChange);
 
     if (Platform.OS === "android") {
       setupChannels();
@@ -297,6 +312,7 @@ export const usePushNotifications = () => {
       onMessageUnsubscribe();
       onNotificationOpenedAppUnsubscribe();
       notifeeOnForegroundUnsubscribe();
+      appStateSubscription.remove();
     };
   }, []);
 };

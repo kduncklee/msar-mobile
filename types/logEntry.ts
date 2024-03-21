@@ -26,3 +26,9 @@ export const logEntryFromRespsonse = (data: any): logEntry => {
         created_at: new Date(data.created_at)
     }
 }
+
+export const logEntriesFromInfiniteQueryData = (data: any): logEntry[] =>
+    data?.pages
+        ? data?.pages?.flatMap((page) =>
+            page?.results.map((r) => logEntryFromRespsonse(r))
+        ) : [];

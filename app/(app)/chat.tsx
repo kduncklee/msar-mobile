@@ -59,7 +59,7 @@ const Page = () => {
                                 keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -500} // Adjust the offset as needed
                             >
                         <View style={styles.contentContainer}>
-                            <CalloutLogTab useInfiniteQueryFn={() => useChatLogInfiniteQuery()} />
+                            <CalloutLogTab id={0} useInfiniteQueryFn={() => useChatLogInfiniteQuery()} />
                             <LogInput
                                     onTextChange={onLogMessageTextChanged}
                                     text={logMessageText}

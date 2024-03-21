@@ -14,15 +14,17 @@ export const userToString = (user: user): string => {
     return user.full_name;
 }
 
+const stringEqualsIgnoreCase = (a: string, b:string): boolean => {
+    return a.localeCompare(b, 'en', { sensitivity: 'accent' }) == 0;
+}
+
 export const isUserSelf = (user: user): boolean => {
     if (!user) return false;
 
     if (global.currentCredentials) {
-        //console.log(global.currentCredentials);
+        //console.log(global.currentCredentials, user);
         if (global.currentCredentials.username) {
-            if (global.currentCredentials.username === user.username) {
-                return true;
-            }
+            return stringEqualsIgnoreCase(global.currentCredentials.username, user.username);
         }
     }
 

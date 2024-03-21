@@ -4,20 +4,20 @@ import { useQueryClient, useQuery, useInfiniteQuery } from "@tanstack/react-quer
 import { stringToResponseType } from '../../types/enums';
 import colors from '../../styles/colors';
 import { logType } from '../../types/enums';
-import { logEntry, logEntryFromRespsonse } from '../../types/logEntry';
+import { logEntriesFromInfiniteQueryData, logEntry, logEntryFromRespsonse } from '../../types/logEntry';
 import LogResponseField from '../fields/log/LogResponseField';
 import LogMessageField from '../fields/log/LogMessageField';
 import LogSystemField from '../fields/log/LogUpdateField';
 import TextAreaField from '../fields/TextAreaField';
-
+import { storeLastRead } from 'storage/mmkv';
 
 
 type CalloutLogTabProps = {
-    logList: logEntry[]
+    id: number,
+    useInfiniteQueryFn: any
 }
 
-
-const CalloutLogTab = ({useInfiniteQueryFn}) => {
+const CalloutLogTab = ({id, useInfiniteQueryFn}: CalloutLogTabProps) => {
     const queryClient = useQueryClient()
 
     const {
@@ -32,14 +32,20 @@ const CalloutLogTab = ({useInfiniteQueryFn}) => {
         status,
     } = useInfiniteQueryFn();
 
-    const logList = data?.pages
-          ? data?.pages?.flatMap((page) =>
-              page?.results.map((r) => logEntryFromRespsonse(r))
-          ) : [];
+    const logList: logEntry[] = logEntriesFromInfiniteQueryData(data);
 
-    if (!logList) {
+    if (isLoading) {
         return (<TextAreaField value={'Loading...'} />);
     }
+
+
+    useEffect(() => {
+        if (logList.length) {
+            storeLastRead(id, logList[0].id);
+        } else if (!isLoading) {
+            storeLastRead(id, 0);  // User looked at the empty log.
+        }
+    }, [logList]);
 
     const refreshList = () => {
         console.log('refresh');

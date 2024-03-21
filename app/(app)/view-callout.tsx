@@ -198,6 +198,7 @@ const Page = () => {
                             }
                             {currentTab === 1 &&
                                 <CalloutLogTab
+                                  id={idInt}
                                   useInfiniteQueryFn={() => useCalloutLogInfiniteQuery(id)}
                                 />
                             }

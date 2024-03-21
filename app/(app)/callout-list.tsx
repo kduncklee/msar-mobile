@@ -14,13 +14,11 @@ import { tabItem } from '../../types/tabItem';
 import '../../storage/global';
 import msarEventEmitter from '../../utility/msarEventEmitter';
 
-const defaultStatus = "active&status=resolved";
-
 const Page = () => {
 
     const [showSpinner, setShowSpinner] = useState(false);
     const [archiveCount, setArchiveCount] = useState(null);
-    const [status, setStatus] = useState(defaultStatus);
+    const [status, setStatus] = useState(activeTabStatusQuery);
     const queryClient = useQueryClient()
     const query = useCalloutListQuery(status);
 
@@ -44,7 +42,6 @@ const Page = () => {
         }
         
         msarEventEmitter.on('refreshCallout',refreshReceived);
-        loadCallouts();
         
         return () => {
             msarEventEmitter.off('refreshCallout',refreshReceived);
