@@ -34,18 +34,19 @@ const CalloutLogTab = ({id, useInfiniteQueryFn}: CalloutLogTabProps) => {
 
     const logList: logEntry[] = logEntriesFromInfiniteQueryData(data);
 
+    useEffect(() => {
+        if (!isLoading) {
+            if (logList.length) {
+                storeLastRead(id, logList[0].id);
+            } else {
+                storeLastRead(id, 0);  // User looked at the empty log.
+            }
+        }
+    }, [logList]);
+
     if (isLoading) {
         return (<TextAreaField value={'Loading...'} />);
     }
-
-
-    useEffect(() => {
-        if (logList.length) {
-            storeLastRead(id, logList[0].id);
-        } else if (!isLoading) {
-            storeLastRead(id, 0);  // User looked at the empty log.
-        }
-    }, [logList]);
 
     const refreshList = () => {
         console.log('refresh');
