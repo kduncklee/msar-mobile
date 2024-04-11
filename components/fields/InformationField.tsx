@@ -30,7 +30,10 @@ const InformationField = ({ title, value, valueColor, icon, onIconPress }: Infor
                     </TouchableOpacity>
                 }
                 {!onIconPress &&
-                    <Text style={[styles.valueText, {color: textColor}]}>{value}</Text>
+                    <Text
+                        style={[styles.valueText, {color: textColor}]}
+                        selectable={true}
+                    >{value}</Text>
                 }
             </View>
         </View>

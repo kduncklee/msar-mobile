@@ -88,11 +88,11 @@ const LocationField = ({ location }: LocationFieldProps) => {
             }
             {(locType === locationType.COORDINATES || locType === locationType.ADDRESS) &&
                 <>
-                    <Text style={[elements.smallText, { margin: 16 }]}>
+                    <Text style={[elements.smallText, { margin: 16 }]} selectable={true}>
                         {locationToString(location)}
                     </Text>
                     {location.text &&
-                        <Text style={[elements.smallText, { marginHorizontal: 16, marginBottom: 16 }]}>
+                        <Text style={[elements.smallText, { marginHorizontal: 16, marginBottom: 16 }]} selectable={true}>
                             {location.text}
                         </Text>
                     }

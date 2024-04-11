@@ -19,7 +19,10 @@ const TextAreaField = ({ title, value, valueColor }: TextAreaFieldProps) => {
                 <Text style={styles.titleText}>{title}</Text>
             }
             <View style={styles.valueContainer}>
-                <Text style={[styles.valueText, {color: textColor}]}>{value}</Text>
+                <Text
+                    style={[styles.valueText, {color: textColor}]}
+                    selectable={true}
+                >{value}</Text>
             </View>
         </View>
     );
