@@ -134,6 +134,22 @@ const Page = () => {
             return
         }
 
+        // Check if it is already lat, long. If so, do not search.
+        const latlongRegex = /^\s*(-?\d+[.]\d+)\s*[,/ ]+\s*(-?\d+[.]\d+)\s*$/;
+        const match = addressText.match(latlongRegex);
+        console.log('search', addressText, match);
+        if (match) {
+            const location = {
+              coordinates: {
+                lat: match[1].toString(),
+                long: match[2].toString()
+              }
+            }
+            setLocation(location);
+            return;
+        }
+
+        // Run the search.
         setShowSpinner(true);
         if (markerRef.current != null) {
             markerRef.current.hideCallout();
