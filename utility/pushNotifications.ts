@@ -11,7 +11,10 @@ import msarEventEmitter from '../utility/msarEventEmitter';
 import { queryClient } from "utility/reactQuery";
 import { activeTabStatusQuery } from 'types/calloutSummary';
 
-export const availableSounds = [
+const NO_NOTIFICATION = 'none';
+const SILENT = 'silent2';  // 'silent' was already used with default sound.
+
+const availableChannels = [
   { label: 'System Default', value: 'default' },
   { label: 'Distortion - Short', value: 'distortion_1_time' },
   { label: 'Distortion - Long', value: 'distortion_3_times' },
@@ -29,6 +32,11 @@ export const availableSounds = [
   { label: 'Yucatan - Short', value: 'yucatan_1_time' },
   { label: 'Yucatan - Long', value: 'yucatan_6_times' },
 ];
+
+export const availableSounds = [
+  { label: 'No notification', value: NO_NOTIFICATION },
+  { label: 'Silent', value: SILENT },
+].concat(availableChannels);
 
 const vibrationForChannel = {
   "callout": "long",
@@ -104,7 +112,7 @@ const setupChannels = async () => {
 
   Notifications.setNotificationChannelGroupAsync(groupId, {name:'main'});
 
-  for (const soundEnum of availableSounds) {
+  for (const soundEnum of availableChannels) {
     const sound = soundEnum.value;
     Object.entries(vibrations).forEach(([vibration, pattern]) => {
       const channel = `${sound}-${vibration}`;
@@ -129,16 +137,24 @@ const setupChannels = async () => {
     });
   }
 
-  Notifications.setNotificationChannelAsync('silent', {
-    name: 'silent',
+  Notifications.setNotificationChannelAsync(SILENT, {
+    name: 'Silent',
     groupId,
-    importance,
+    importance: Notifications.AndroidImportance.LOW,
   });
 }
 
+const getChannelForNotification = (remoteMessage) => {
+  const dataChannel: string = remoteMessage.data?.channel ?? 'default';
+  const dataLogType = remoteMessage.data?.logType;
+  const dataAttending = remoteMessage.data?.attending === 'True';
+  const responseChannel = 'callout-response-' + (dataAttending ? 'yes' : 'no');
+  const channel = (dataLogType === 'response') ? responseChannel : dataChannel;
+  return channel;
+}
 
 const displayNotification = async (remoteMessage) => {
-  const channel: string = remoteMessage.data?.channel ?? 'default';
+  const channel = getChannelForNotification(remoteMessage);
   const snoozed = getIsSnoozing();
   const critical = !snoozed && getCriticalForChannel(channel);
   const ios_critical = critical ? {
@@ -146,10 +162,15 @@ const displayNotification = async (remoteMessage) => {
     criticalVolume: getCriticalAlertsVolume(),
   } : {};
   const sound = getSoundForChannel(channel) ?? 'default';
-  const ios_sound = snoozed ? {} : {sound: sound + '.mp3'};
+  if (sound === NO_NOTIFICATION) {
+    console.log('suppress notification', channel);
+    return;
+  }
+  const silent = snoozed || (sound === SILENT);
+  const ios_sound = silent ? {} : {sound: sound + '.mp3'};
   const vibration = vibrationForChannel[channel] ?? "short";
   var android_channel = `${sound}-${vibration}` + (critical ? '-alarm' : '');
-  if (snoozed) { android_channel = 'silent' };
+  if (silent) { android_channel = SILENT };
   console.log('display', remoteMessage.data?.body, critical, ios_critical, channel, sound, android_channel);
   notifee.displayNotification({
     title: remoteMessage.data?.title,
@@ -186,6 +207,10 @@ export const restoreNotificationDefaults = () => {
   storeCriticalForChannel('callout-resolved', true);
   storeSoundForChannel('log', 'sweet_1_time');
   storeCriticalForChannel('log', true);
+  storeSoundForChannel('callout-response-no', 'sweet_1_time');
+  storeCriticalForChannel('callout-response-no', true);
+  storeSoundForChannel('callout-response-yes', 'sweet_1_time');
+  storeCriticalForChannel('callout-response-yes', true);
   storeSoundForChannel('announcement', 'sweet_1_time');
   storeCriticalForChannel('announcement', true);
   storeCriticalAlertsVolume(1.0);
@@ -193,12 +218,25 @@ export const restoreNotificationDefaults = () => {
 
 export const checkNotificationDefaults = () => {
   if (
-    (getSoundForChannel("callout")) == undefined ||
-    (getSoundForChannel("callout-resolved")) == undefined ||
-    (getSoundForChannel("log")) == undefined ||
-    (getSoundForChannel("announcement")) == undefined
+    (getSoundForChannel("callout") == undefined) ||
+    (getSoundForChannel("callout-resolved") == undefined) ||
+    (getSoundForChannel("log") == undefined) ||
+    (getSoundForChannel("announcement") == undefined)
   ) {
     restoreNotificationDefaults();
+  }
+  // These were added later, check separately:
+  if (
+    (getSoundForChannel("callout-response-no") == undefined) ||
+    (getSoundForChannel("callout-response-yes") == undefined)
+  ) {
+    // Copy from log - keeps same behavior as before update.
+    const sound = getSoundForChannel("log");
+    const critical = getCriticalForChannel("log");
+    storeSoundForChannel('callout-response-no', sound);
+    storeCriticalForChannel('callout-response-no', critical);
+    storeSoundForChannel('callout-response-yes', sound);
+    storeCriticalForChannel('callout-response-yes', critical);
   }
 }
 

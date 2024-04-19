@@ -31,7 +31,7 @@ const Page = () => {
         PushNotifications.checkPushToken().then(
             setPushEnabled,
             () => setNotificationLoading('Unable to connect'));
-        loadNotificationSettings();
+        setCriticalAlertsVolume(getCriticalAlertsVolume());
 
     }, []);
 
@@ -47,16 +47,6 @@ const Page = () => {
         } else {
             setServer('Production');
         }
-    }
-
-    const loadNotificationSettings = () => {
-        const volume = getCriticalAlertsVolume();
-        console.log('loaded volume', volume);
-        if (volume == undefined) {
-            setCriticalAlertsVolume(0.9);
-        } else {
-            setCriticalAlertsVolume(volume);
-        };
     }
 
     const onPushToggle = async () => {
@@ -121,7 +111,15 @@ const Page = () => {
             />
             <NotificationSettings
               title={"Updates for a Callout"}
-              channel={"log"}
+              channel={"log"}  // callout-log
+            />
+            <NotificationSettings
+              title={"Callout Responses: 10-7"}
+              channel={"callout-response-no"}
+            />
+            <NotificationSettings
+              title={"Callout Responses: 10-8 & 10-19"}
+              channel={"callout-response-yes"}
             />
             <NotificationSettings
               title={"Announcements"}
