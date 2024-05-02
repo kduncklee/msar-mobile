@@ -6,7 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import colors from "../../styles/colors";
 import { elements } from "../../styles/elements";
 import { clearCredentials, getCredentials, getServer, clearServer } from "../../storage/storage";
-import { getCriticalAlertsVolume, storeCriticalAlertsVolume } from "../../storage/mmkv";
+import { getCriticalAlertsVolume, storage, storeCriticalAlertsVolume } from "../../storage/mmkv";
 import "../../storage/global";
 import FormCheckbox from "../../components/inputs/FormCheckbox";
 import * as PushNotifications from "../../utility/pushNotifications";
@@ -75,6 +75,8 @@ const Page = () => {
         await clearServer();
         global.currentCredentials = null;
         queryClient.invalidateQueries();
+        queryClient.clear();
+        storage.clearAll();
         router.replace('/');
     }
 
