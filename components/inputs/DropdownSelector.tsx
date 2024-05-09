@@ -35,10 +35,9 @@ const DropdownSelector = ({ title, options, placeholder, selectedValue, rightBut
                     value={selectedValue}
                     containerStyle={{ overflow: "hidden", borderRadius: 8, borderColor: colors.grayText, borderWidth: 1, backgroundColor: colors.secondaryBg }}
                     itemContainerStyle={{ backgroundColor: colors.primaryBg }}
-                    activeColor={colors.secondaryBg}
+                    activeColor={colors.selectionBg}
                     itemTextStyle={{ color: colors.primaryText }}
                     onChange={item => {
-                        //setValue(item.value);
                         onSelect(item);
                     }} />
                     {onRightPress &&

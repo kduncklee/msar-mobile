@@ -16,8 +16,7 @@ import DropdownMultiselect from '../../components/inputs/DropdownMultiselect';
 import ActivityModal from '../../components/modals/ActivityModal';
 import "../../storage/global"
 import { callout } from '../../types/callout';
-import { apiCreateCallout, apiUpdateCallout, useCalloutQuery } from '../../remote/api';
-import * as notificationListHelper from "../../utility/notificationListHelper"
+import { apiCreateCallout, apiUpdateCallout, useCalloutQuery, useNotificationsAvailableQuery, useRadioChannelsAvailableQuery } from '../../remote/api';
 import { location, locationToString } from '../../types/location';
 import msarEventEmitter from '../../utility/msarEventEmitter';
 
@@ -33,6 +32,7 @@ const Page = () => {
     const [informant, setInformant] = useState<string>(null);
     const [informantContact, setInformantContact] = useState<string>(null);
     const [radioFrequency, setRadioFrequency] = useState<string>(null);
+    const [additionalRadioFrequencies, setAdditionalRadioFrequencies] = useState<string[]>([]);
     const [circumstances, setCircumstances] = useState<string>(null);
     const [notificationsMade, setNotificationsMade] = useState<string[]>([]);
     const [ten22, setTen22] = useState(false);
@@ -47,6 +47,8 @@ const Page = () => {
         const calloutQuery = useCalloutQuery(id);
         existingData = calloutQuery.data;
     }
+    const notificationsAvailableQuery = useNotificationsAvailableQuery();
+    const radioChanelsAvailableQuery = useRadioChannelsAvailableQuery();
 
     const calloutCreateMutation = useMutation({
         mutationFn: (callout) => apiCreateCallout(callout),
@@ -63,16 +65,49 @@ const Page = () => {
         { label: "Information Only", enum: calloutType.INFORMATION, value: '2' }
     ]
 
-    let radioFrequencySelect = [
-        { label: "LHS Metro", value: '0' },
-        { label: "Malibu Metro", value: '1' },
-        { label: "L-Tac", value: '2' },
-        { label: "MRA MAL", value: '3' }
-    ]
-
     if (id && typeof id === 'string') {
         headerTitle = "Update Callout";
     }
+
+
+    const labelValueItem = (name: string): any => {
+        return {'label': name, 'value': name};
+    }
+
+    let notificationsAvailable = [];
+    if (notificationsAvailableQuery.data) {
+        notificationsAvailableQuery.data.results.forEach((data: any) => {
+            notificationsAvailable.push(labelValueItem(data["name"]));
+        })
+    }
+    notificationsMade.forEach((name: string) => {
+        if (!notificationsAvailable.find((item) => (item.label == name))) {
+            notificationsAvailable.push(labelValueItem(name));
+        }
+    })
+
+
+    let primaryRadioChannelsAvailable = [{'label': '', 'value': undefined}];
+    let additionalRadioChannelsAvailable = [];
+    if (radioChanelsAvailableQuery.data) {
+        radioChanelsAvailableQuery.data.results.forEach((data: any) => {
+            if (data.is_primary) {
+                primaryRadioChannelsAvailable.push(labelValueItem(data.name));
+            }
+            if (data.is_additional) {
+                additionalRadioChannelsAvailable.push(labelValueItem(data.name));
+            }
+        })
+    }
+    if (!primaryRadioChannelsAvailable.find((item) => (item.label == radioFrequency))) {
+        primaryRadioChannelsAvailable.push(labelValueItem(radioFrequency));
+    }
+    additionalRadioFrequencies?.forEach((name: string) => {
+        if (!additionalRadioChannelsAvailable.find((item) => (item.label == name))) {
+            additionalRadioChannelsAvailable.push(labelValueItem(name));
+        }
+    });
+
 
     useEffect(() => {
         if (Platform.OS === 'ios') {
@@ -112,6 +147,7 @@ const Page = () => {
         setInformantContact(existingData.informant_contact);
         setCircumstances(existingData.description);
         setRadioFrequency(existingData.radio_channel);
+        setAdditionalRadioFrequencies(existingData.additional_radio_channels);
         setNotificationsMade(existingData.notifications_made);
         setHandlingUnit(existingData.handling_unit);
         if (existingData.status === calloutStatus.RESOLVED) {
@@ -187,6 +223,7 @@ const Page = () => {
             informant: informant,
             informant_contact: informantContact,
             radio_channel: radioFrequency,
+            additional_radio_channels: additionalRadioFrequencies,
             status: ten22 ? calloutStatus.RESOLVED : calloutStatus.ACTIVE,
             notifications_made: notificationsMade,
             resolution: resolutionNotes,
@@ -315,9 +352,12 @@ const Page = () => {
         setRadioFrequency(item.label);
     }
 
-    const notificationsSelected = (items: string[]) => {
+    const additionalRadioFrequenciesSelected = (items: string[]) => {
+        setAdditionalRadioFrequencies(items);
+    }
 
-        setNotificationsMade(notificationListHelper.indicesToLabels(items));
+    const notificationsSelected = (items: string[]) => {
+        setNotificationsMade(items);
     }
 
     const on1022Toggle = (checked: boolean) => {
@@ -395,15 +435,21 @@ const Page = () => {
                             value={circumstances} />
                         <DropdownSelector
                             title={'Tactical Talkgroup'}
-                            options={radioFrequencySelect}
+                            options={primaryRadioChannelsAvailable}
                             placeholder={'Select Frequency'}
-                            selectedValue={`${radioFrequencySelect.findIndex(item => item.label === radioFrequency)}`}
+                            selectedValue={radioFrequency}
                             onSelect={radioFreqSelected} />
                         <DropdownMultiselect
+                            title={'Other Radio Channels'}
+                            options={additionalRadioChannelsAvailable}
+                            placeholder={'Select Frequencies'}
+                            selectedValues={additionalRadioFrequencies}
+                            onSelect={additionalRadioFrequenciesSelected} />
+                        <DropdownMultiselect
                             title={'Notifications Made'}
-                            options={notificationListHelper.list}
+                            options={notificationsAvailable}
                             placeholder={'Select Notifications'}
-                            selectedValues={notificationListHelper.labelsToIndices(notificationsMade)}
+                            selectedValues={notificationsMade}
                             onSelect={notificationsSelected} />
                         <FormTextInput
                             title={'Handling Unit / Tag #'}

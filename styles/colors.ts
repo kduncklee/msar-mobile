@@ -2,6 +2,7 @@ const colors = {
     "yellow": "#FED32C",
     "primaryBg": "#20242A",
     "secondaryBg": "#2B3038",
+    "selectionBg": "#67ACED",
     "primaryText": "#ffffff",
     "black": "#000000",
     "grayText": "#60646A",

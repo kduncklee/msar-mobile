@@ -78,7 +78,12 @@ const CalloutInformationTab = ({ callout }: CalloutInformationTabProps) => {
                         title={'Tactical Talkgroup'}
                         value={callout.radio_channel} />
                 }
-                {!!callout.notifications_made &&
+                {!!callout.additional_radio_channels?.length &&
+                    <InformationField
+                        title={'Other Radio Channels'}
+                        value={callout.additional_radio_channels.join(', ')} />
+                }
+                {!!callout.notifications_made?.length &&
                     <InformationField
                         title={'Notifications Made'}
                         value={callout.notifications_made.join(', ')} />

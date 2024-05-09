@@ -35,7 +35,7 @@ const DropdownMultiselect = ({ title, options, placeholder, selectedValues, onSe
                     value={selectedValues}
                     containerStyle={{ overflow: "hidden", borderRadius: 8, borderColor: colors.grayText, borderWidth: 1, backgroundColor: colors.secondaryBg }}
                     itemContainerStyle={{ backgroundColor: colors.primaryBg }}
-                    activeColor={colors.secondaryBg}
+                    activeColor={colors.selectionBg}
                     itemTextStyle={{ color: colors.primaryText }}
                     selectedStyle={styles.selectedStyle}
                     onChange={item => {

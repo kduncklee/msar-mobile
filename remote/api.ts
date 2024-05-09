@@ -29,6 +29,10 @@ const server = async (): Promise<string> => {
 
 const tokenEndpoint = async (): Promise<string> =>
   (await server()) + "/api-token-auth/";
+const notificationsAvailableEndpoint = async (): Promise<string> =>
+  (await server()) + "/api/event_notifications/";
+const radioChannelsAvailableEndpoint = async (): Promise<string> =>
+  (await server()) + "/api/radio_channels/";
 const calloutsEndpoint = async (): Promise<string> =>
   (await server()) + "/api/callouts/";
 const chatEndpoint = async (): Promise<string> =>
@@ -127,6 +131,16 @@ export const apiValidateToken = async (): Promise<tokenValidationResponse> => {
         return { valid_token: false }
     })
 }
+
+
+export const apiGetNotificationsAvailable = async (): Promise<any> => {
+    return fetchJsonWithCredentials(await notificationsAvailableEndpoint());
+}
+
+export const apiGetRadioChannelsAvailable = async (): Promise<any> => {
+    return fetchJsonWithCredentials(await radioChannelsAvailableEndpoint());
+}
+
 
 export const apiGetCallouts = async (status?: string): Promise<any> => {
     var args = "?ordering=-id";
@@ -263,6 +277,30 @@ export const apiUpdateDeviceId = async (token: string) => {
 //////////////////////////////////////////////////////////////////////////////
 // React Query
 //////////////////////////////////////////////////////////////////////////////
+
+////// Notifications Available
+const notificationsAvailabletQueryParams = () => {
+  return {
+    queryKey: ["notificationsAvailable"],
+    queryFn: () => apiGetNotificationsAvailable(),
+  };
+};
+
+export const useNotificationsAvailableQuery = () => {
+  return useQuery(notificationsAvailabletQueryParams());
+};
+
+////// RadioChannels Available
+const radioChannelsAvailabletQueryParams = () => {
+  return {
+    queryKey: ["radioChannelsAvailable"],
+    queryFn: () => apiGetRadioChannelsAvailable(),
+  };
+};
+
+export const useRadioChannelsAvailableQuery = () => {
+  return useQuery(radioChannelsAvailabletQueryParams());
+};
 
 ////// Callout List
 const calloutListQueryParams = (status?: string) => {
