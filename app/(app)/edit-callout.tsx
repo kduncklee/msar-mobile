@@ -99,7 +99,7 @@ const Page = () => {
             }
         })
     }
-    if (!primaryRadioChannelsAvailable.find((item) => (item.label == radioFrequency))) {
+    if (radioFrequency && (!primaryRadioChannelsAvailable.find((item) => (item.label == radioFrequency)))) {
         primaryRadioChannelsAvailable.push(labelValueItem(radioFrequency));
     }
     additionalRadioFrequencies?.forEach((name: string) => {

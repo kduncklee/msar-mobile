@@ -36,7 +36,7 @@
         "backgroundColor": "#2B3038"
       },
       "package": "org.malibusar.app",
-      "versionCode": 40,
+      "versionCode": 42,
       "googleServicesFile": "./google-services.json"
     },
     "web": {
