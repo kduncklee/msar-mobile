@@ -88,19 +88,18 @@ const CalloutInformationTab = ({ callout }: CalloutInformationTabProps) => {
                         title={'Notifications Made'}
                         value={callout.notifications_made.join(', ')} />
                 }
-                <View style={elements.informationDiv} />
                 {!!callout.handling_unit &&
                     <InformationField
                         title={'Handling Unit / Tag #'}
                         value={callout.handling_unit} />
                 }
-                <View style={elements.informationDiv} />
-                {!!callout.description &&
+                {!!callout.description && <>
+                    <View style={elements.informationDiv} />
                     <TextAreaField
                         title={'Circumstances'}
                         value={callout.description}
                     />
-                }
+                </>}
                 <View style={{ height: 10 }} />
             </InformationTray>
             {!!callout.location &&
