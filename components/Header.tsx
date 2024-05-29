@@ -62,7 +62,8 @@ const Header = ({ title, backButton = false, onBackPressed, rightButton = false,
                     <Image source={require('assets/icons/back.png')} style={styles.backImage} />
                 </TouchableOpacity>
             }
-            <Text style={[styles.title, { paddingHorizontal: backButton ? 10 : 20 }]}>
+            <Text style={[styles.title, { paddingHorizontal: backButton ? 10 : 20 }]}
+                numberOfLines={1}>
                 {title}
             </Text>
             {timestamp != null && <View style={[elements.capsule, { marginRight: 20 }]}>

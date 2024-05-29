@@ -35,6 +35,9 @@ const CalloutInformationTab = ({ callout }: CalloutInformationTabProps) => {
                 editButton={showEdit}
                 onEditPress={editDetailsPressed}>
                 <View style={{ marginTop: 8 }} />
+                {!!callout.title &&
+                    <TextAreaField value={callout.title} />
+                }
                 {!!callout.created_at &&
                     <InformationField
                         title={'Time of Dispatch'}
