@@ -35,8 +35,8 @@ const CalloutLogTab = ({id, useInfiniteQueryFn}: CalloutLogTabProps) => {
     const logList: logEntry[] = logEntriesFromInfiniteQueryData(data);
 
     useEffect(() => {
-        if (!isLoading) {
-            if (logList.length) {
+        if (!isLoading && logList) {
+            if (logList?.length) {
                 storeLastRead(id, logList[0].id);
             } else {
                 storeLastRead(id, 0);  // User looked at the empty log.
@@ -70,7 +70,9 @@ const CalloutLogTab = ({id, useInfiniteQueryFn}: CalloutLogTabProps) => {
                         case logType.SYSTEM:
                             return (<LogSystemField key={item.id} member={item.member} update={item.update} timestamp={item.created_at} />);
                         case logType.MESSAGE:
-                            return (<LogMessageField key={item.id} member={item.member} message={item.message} timestamp={item.created_at} />);
+                            return (<LogMessageField key={item.id} member={item.member}
+                                message={item.message} timestamp={item.created_at}
+                                status={item.status} id={item.id} callout_id={id} />);
                     }
                 }}
                 inverted

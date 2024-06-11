@@ -2,7 +2,7 @@
   "expo": {
     "name": "Malibu SAR",
     "slug": "msar-mobile",
-    "version": "1.8.2",
+    "version": "1.9.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -17,7 +17,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "org.malibusar.app",
-      "buildNumber": "34",
+      "buildNumber": "35",
       "icon": "./assets/icon.png",
       "googleServicesFile": "./GoogleService-Info.plist",
       "config": {
@@ -36,7 +36,7 @@
         "backgroundColor": "#2B3038"
       },
       "package": "org.malibusar.app",
-      "versionCode": 44,
+      "versionCode": 45,
       "googleServicesFile": "./google-services.json"
     },
     "web": {

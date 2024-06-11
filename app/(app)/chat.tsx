@@ -1,22 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { SafeAreaView, StyleSheet, StatusBar, Platform, View, KeyboardAvoidingView } from 'react-native';
-import Toast from 'react-native-root-toast';
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import Header from '../../components/Header';
 import colors from '../../styles/colors';
 import { elements } from '../../styles/elements';
 import CalloutLogTab from '../../components/callouts/CalloutLogTab';
 import LogInput from '../../components/callouts/LogInput';
-import { apiPostChatLog, useChatLogInfiniteQuery } from '../../remote/api';
+import { useChatLogInfiniteQuery, useChatLogMutation } from '../../remote/api';
 
 const Page = () => {
 
     const [logMessageText, setLogMessageText] = useState('');
     const queryClient = useQueryClient();
-    const chatLogMutation = useMutation({
-      mutationFn: apiPostChatLog,
-      retry: 3,
-    });
+    const chatLogMutation = useChatLogMutation();
 
     useEffect(() => {
         if (Platform.OS === 'ios') {
@@ -36,17 +32,8 @@ const Page = () => {
 
     const submitLogMessage = async () => {
         const logMessage: string = logMessageText;
+        chatLogMutation.mutate({message: logMessage});
         setLogMessageText('');
-        chatLogMutation.mutate(logMessage, {
-          onSuccess: (data, error, variables, context) => {
-            refreshChat();
-          },
-          onError: (error, variables, context) => {
-            Toast.show(`Unable to send message: ${error.message}`, {
-              duration: Toast.durations.LONG,
-            });
-          },
-        });
     }
 
     return (

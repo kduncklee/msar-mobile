@@ -4,8 +4,9 @@ import { logEntry, logEntryFromRespsonse } from "../types/logEntry";
 import { calloutGetLogResponse, loginResponse, tokenValidationResponse } from "./responses";
 import * as Application from 'expo-application';
 import { Platform } from "react-native";
-import { useQuery, useMutation, QueryClient, useInfiniteQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, QueryClient, useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { calloutSummary, calloutSummaryFromResponse } from "../types/calloutSummary";
+import { logStatusType, logType } from "types/enums";
 
 let local_server: string = "http://192.168.1.120:8000";
 let legacy_server: string = "https://malibusarhours.org/calloutapi";
@@ -194,7 +195,7 @@ export const apiGetCalloutLog = async (id: number, pageParam?: string): Promise<
     return apiGetLogResponseFromUrl(await calloutsEndpoint() + id + '/log/', pageParam);
 }
 
-export const apiGetChatLog = async ({pageParam} : {pageParam: string}): Promise<calloutGetLogResponse> => {
+export const apiGetChatLog = async (pageParam: string): Promise<calloutGetLogResponse> => {
     return apiGetLogResponseFromUrl(await chatEndpoint(), pageParam);
 }
 
@@ -388,4 +389,113 @@ export const prefetchChatLogQuery = async (queryClient: QueryClient) => {
 
 export const useChatLogInfiniteQuery = () => {
   return useInfiniteQuery(chatLogQueryParams());
+};
+
+////// Chat / Callout Log Mutations
+export const useCalloutLogMutation = (idInt: number) => {
+  return useLogMutation((message: string) => apiPostCalloutLog(idInt, message), ["calloutLog", idInt]);
+}
+
+export const useChatLogMutation = () => {
+  return useLogMutation(apiPostChatLog, ["chat"]);
+}
+
+export const useLogMutation = (mutationFn, queryKey) => {
+  const queryClient = useQueryClient();
+
+  type LogVariables = {
+    id?: string,
+    message: string,
+  }
+
+  const updateItem = (prev, id, replacement) => {
+    return {
+      ...prev,
+      pages: prev.pages.map((page) => ({
+        ...page,
+        results: page.results.map((item) =>
+          item.id === id
+            ? replacement
+            : item
+        )
+      }))
+    };
+  }
+  const updateItemStatus = (prev, id, status) => {
+    return {
+      ...prev,
+      pages: prev.pages.map((page) => ({
+        ...page,
+        results: page.results.map((item) =>
+          item.id === id
+            ? { ...item, status }
+            : item
+        )
+      }))
+    };
+  }
+
+  return useMutation({
+    mutationFn: async (variables: LogVariables) => 
+      mutationFn(variables.message),
+
+    onMutate: async (variables) => {
+      // Cancel current queries for the message list
+      await queryClient.cancelQueries({ queryKey });
+
+      if (variables.id) { // already existing, this is a retry
+        queryClient.setQueryData(queryKey, (old) => {
+          return updateItemStatus(old, variables.id, logStatusType.PENDING);
+        });
+        return { id: variables.id };
+      }
+
+      const id = "temp_" + Date.now().toString(36);
+
+      // Create optimistic message
+      const optimistic = {
+        id: id,
+        type: logType.MESSAGE,
+        member: { username: global.currentCredentials.username },
+        message: variables.message,
+        status: logStatusType.PENDING,
+        created_at: null,
+      };
+
+      // Add optimistic message to message list
+      queryClient.setQueryData(queryKey, (prev) => {
+        if (!prev) { return prev; }
+        const working = {
+          ...prev,
+          pages: prev.pages.slice()
+        };
+        working.pages[0] = {...working.pages[0]};
+        working.pages[0].results = [optimistic, ...working.pages[0].results];
+        return working;
+      });
+
+      // Return context with the optimistic message's id
+      return { id };
+    },
+
+    onSuccess: (result, variables, context) => {
+      const entry = logEntryFromRespsonse(result);
+      // Replace optimistic message in the list with the result
+      queryClient.setQueryData(queryKey, (old) => {
+        return updateItem(old, context.id, entry);
+      });
+      // Invalidate the cache to get the actual data on server.
+      queryClient.invalidateQueries({ queryKey });
+    },
+
+    onError: (error, variables, context) => {
+      // Remove optimistic message from the list
+      queryClient.setQueryData(queryKey, (old) => {
+        console.log("e id, old", context.id, old);
+        return updateItemStatus(old, context.id, logStatusType.ERROR);
+      });
+    },
+
+    retry: 16,  // 5 minutes (6 in first minute, then 30s each)
+  }, queryClient);
 };

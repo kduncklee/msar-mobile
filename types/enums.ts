@@ -46,6 +46,11 @@ export enum logType {
     MESSAGE = "message"
 }
 
+export enum logStatusType {
+    ERROR = "Error: tap to retry.",
+    PENDING = "Sending ...",
+}
+
 export const stringToLogType = (value: string): logType | undefined => {
     switch (value) {
         case 'response':

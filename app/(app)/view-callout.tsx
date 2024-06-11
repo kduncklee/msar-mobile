@@ -16,7 +16,7 @@ import CalloutPersonnelTab from '../../components/callouts/CalloutPersonnelTab';
 import { tabItem } from '../../types/tabItem';
 import LogInput from '../../components/callouts/LogInput';
 import { callout, calloutResponseBadge } from '../../types/callout';
-import { useCalloutQuery, apiPostCalloutLog, apiRespondToCallout, useCalloutLogInfiniteQuery } from '../../remote/api';
+import { useCalloutQuery, apiRespondToCallout, useCalloutLogInfiniteQuery, useCalloutLogMutation } from '../../remote/api';
 import msarEventEmitter from '../../utility/msarEventEmitter';
 import CalloutRespondModal from '../../components/modals/CalloutRespondModal';
 
@@ -48,12 +48,9 @@ const Page = () => {
     const calloutQuery = useCalloutQuery(id);
     const calloutResponseMutation = useMutation({
       mutationFn: ({ idInt, text }) => apiRespondToCallout(idInt, text),
-      retry: 3,
+      retry: 26,  // 10 minutes (6 in first minute, then 30s each)
     });
-    const calloutLogMutation = useMutation({
-      mutationFn: ({ idInt, text }) => apiPostCalloutLog(idInt, text),
-      retry: 3,
-    });
+    const calloutLogMutation = useCalloutLogMutation(idInt);
 
     const callout = calloutQuery.data;
 
@@ -155,24 +152,8 @@ const Page = () => {
 
     const submitLogMessage = async () => {
         const idInt: number = parseInt(id);
+        calloutLogMutation.mutate({message: logMessageText});
         setLogMessageText('');
-        calloutLogMutation.mutate(
-          {
-            idInt: idInt,
-            text: logMessageText,
-          },
-          {
-            onSuccess: (data, error, variables, context) => {
-              msarEventEmitter.emit("refreshCallout", { id: idInt });
-            },
-            onError: (error, variables, context) => {
-              Sentry.captureException(error);
-              Toast.show(`Unable to send message: ${error.message}`, {
-                duration: Toast.durations.LONG,
-              });
-            },
-          }
-        );
     }
 
 

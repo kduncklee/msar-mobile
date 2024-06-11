@@ -10,6 +10,7 @@ export type logEntry = {
     location?: location,
     message?: string,
     update?: string,
+    status?: string,  // app-only: not sent by server
     created_at: Date
 }
 
@@ -23,6 +24,7 @@ export const logEntryFromRespsonse = (data: any): logEntry => {
         location: data.location,
         message: data.message,
         update: data.update,
+        status: data.status,
         created_at: new Date(data.created_at)
     }
 }
