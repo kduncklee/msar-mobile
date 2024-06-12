@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { SafeAreaView, StyleSheet, StatusBar, Platform, ScrollView, TouchableOpacity, Text, View, KeyboardAvoidingView } from 'react-native';
 import Toast from 'react-native-root-toast';
 import * as Sentry from "@sentry/react-native";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { useQueryClient, useMutation, useMutationState } from "@tanstack/react-query";
 import Header from '../../components/Header';
 import colors from '../../styles/colors';
 import { elements } from '../../styles/elements';
@@ -38,7 +38,6 @@ const Page = () => {
     const [logBadge, setLogBadge] = useState(null);
     const [personnelBadge, setPersonnelBadge] = useState(null);
     const [calloutTimestamp, setCalloutTimestamp] = useState<Date>(null);
-
     const [logMessageText, setLogMessageText] = useState('');
     const [isActive, setIsActive] = useState(false);
 
@@ -46,15 +45,37 @@ const Page = () => {
 
     const queryClient = useQueryClient()
     const calloutQuery = useCalloutQuery(id);
+
+    const calloutResponseKey = ["calloutResponse", idInt];
     const calloutResponseMutation = useMutation({
       mutationFn: ({ idInt, text }) => apiRespondToCallout(idInt, text),
-      retry: 26,  // 10 minutes (6 in first minute, then 30s each)
+      mutationKey: calloutResponseKey,
+      onSuccess: (result, variables, context) => {
+        msarEventEmitter.emit("refreshCallout", { id: idInt });
+      },
+      onError: (error, variables, context) => {
+        Sentry.captureException(error);
+        Toast.show(`Unable to set status: ${error.message}`, {
+          duration: Toast.durations.LONG,
+        });
+      },
+      retry: 26, // 10 minutes (6 in first minute, then 30s each)
     });
+    const calloutResponseMutationState = useMutationState({
+        // this mutation key needs to match the mutation key of the given mutation (see above)
+        filters: { mutationKey: calloutResponseKey, status: 'pending' },
+        select: (mutation) => mutation.state.variables,
+      });
+
     const calloutLogMutation = useCalloutLogMutation(idInt);
 
     const callout = calloutQuery.data;
 
     console.log('view-callout modalVisible =', modalVisible);
+
+    const respondButtonText = (calloutResponseMutationState.length ?
+        ("Sending response " + calloutResponseMutationState[0].text) :
+        (callout.my_response ? "Responded " + callout.my_response : "Respond"));
 
     const tabs: tabItem[] = [
         {
@@ -131,17 +152,6 @@ const Page = () => {
           {
             idInt: idInt,
             text: responseString,
-          },
-          {
-            onSuccess: (data, error, variables, context) => {
-              msarEventEmitter.emit("refreshCallout", { id: idInt });
-            },
-            onError: (error, variables, context) => {
-              Sentry.captureException(error);
-              Toast.show(`Unable to set status: ${error.message}`, {
-                duration: Toast.durations.LONG,
-              });
-            },
           }
         );
     }
@@ -195,7 +205,7 @@ const Page = () => {
                                     activeOpacity={0.8}
                                     style={[elements.capsuleButton, styles.respondCalloutButton]}
                                     onPress={() => setModalVisible(true)}>
-                                    <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>Respond</Text>
+                                    <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>{ respondButtonText }</Text>
                                 </TouchableOpacity>
                             }
                             {currentTab === 1 &&
