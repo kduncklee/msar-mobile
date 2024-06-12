@@ -75,7 +75,7 @@ const Page = () => {
 
     const respondButtonText = (calloutResponseMutationState.length ?
         ("Sending response " + calloutResponseMutationState[0].text) :
-        (callout.my_response ? "Responded " + callout.my_response : "Respond"));
+        (callout && callout.my_response ? "Responded " + callout.my_response : "Respond"));
 
     const tabs: tabItem[] = [
         {
