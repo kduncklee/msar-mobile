@@ -3,6 +3,7 @@ import { calloutStatus, calloutType, responseType, stringToCalloutType, stringTo
 import { location } from "./location"
 import { operationalPeriod, opResponse } from "./operationalPeriod"
 import { user } from "./user"
+import { dataFile, dataFileFromResponse } from "./dataFile"
 
 export type callout = {
     id?: number,
@@ -20,6 +21,7 @@ export type callout = {
     resolution?: string,
     location?: location,
     operational_periods?: operationalPeriod[],
+    files?: dataFile[],
     handling_unit?: string,
     created_at?: Date,
     my_response?: responseType,
@@ -46,6 +48,7 @@ export const calloutFromResponse = (data: any): callout => {
         resolution: data.resolution,
         location: data.location,
         operational_periods: data.operational_periods,
+        files: data.files.map(dataFileFromResponse),
         handling_unit: data.handling_unit,
         created_at: new Date(data.created_at),
         my_response: stringToResponseType(data.my_response),

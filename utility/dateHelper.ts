@@ -63,6 +63,9 @@ export const getFullTimeString = (date: Date): string => {
 }
 
 export const getConditionalTimeString = (date: Date): string => {
+     if (!date?.getMonth) {
+         return 'unknown';
+     }
      const day = 24 * 60 * 60 * 1000;
      if (Date.now() - date < day) {
          return getTimeString(date);

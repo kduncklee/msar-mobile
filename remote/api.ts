@@ -1,3 +1,4 @@
+import * as FileSystem from 'expo-file-system';
 import { getCredentials, getServer } from "../storage/storage";
 import { callout, calloutFromResponse } from "../types/callout";
 import { logEntry, logEntryFromRespsonse } from "../types/logEntry";
@@ -42,27 +43,32 @@ const devicesEndpoint = async (): Promise<string> =>
   (await server()) + "/api/devices/";
 const tokenValidationEndpoint = async (): Promise<string> =>
   (await server()) + "/api/?format=json";
+const filesEndpoint = async (): Promise<string> =>
+  (await server()) + "/api/files/";
 
-const fetchWithCredentials = async (
-  url: string,
-  method: string = "GET",
-  body?: any
-): Promise<any> => {
+const authorizationHeader = async () => {
   const credentials = await getCredentials();
   if (!credentials.token) {
     throw new Error("No token");
   }
+  return "Token " + credentials.token;
+}
+
+const fetchWithCredentials = async (
+  url: string,
+  method: string = "GET",
+  body?: any,
+  contentType?: string
+): Promise<any> => {
 
   let options = {
     method: method,
     headers: {
-      Authorization: "Token " + credentials.token,
-      "Content-Type": "application/json",
+      Authorization: await authorizationHeader(),
+      "Content-Type": contentType ? contentType : "application/json",
     },
+    body: body ? body : null,
   };
-  if (body) {
-    options.body = JSON.stringify(body);
-  }
   const response = await fetch(url, options);
   if (!response.ok) {
     const msg = await response.text();
@@ -77,7 +83,18 @@ const fetchJsonWithCredentials = async (
   method: string = "GET",
   body?: any
 ): Promise<any> => {
-    return (await fetchWithCredentials(url, method, body)).json();
+    const json_body = body ? JSON.stringify(body) : null;
+    return (await fetchWithCredentials(url, method, json_body)).json();
+};
+
+const downloadWithCredentials = async (
+  url: string,
+  destination: string
+) => {
+  const options = {
+    headers: {Authorization: await authorizationHeader()},
+  };
+  return FileSystem.downloadAsync(url, destination, options);
 };
 
 export const apiGetToken = async (username: string, password: string): Promise<loginResponse> => {
@@ -272,6 +289,21 @@ export const apiUpdateDeviceId = async (token: string) => {
         },
         () => apiSetDeviceId(token, true)
     );
+}
+
+export const apiUploadFile = async (file, id:string) => {
+  var body = new FormData();
+  body.append('file', file);
+  body.append('event', id);
+  return fetchWithCredentials(await filesEndpoint(), "POST", body, "multipart/form-data");
+}
+
+const apiGetDownloadFileUrl = async (id:number) => {
+  return await filesEndpoint() + id + "/download/"
+}
+
+export const apiDownloadFile = async (id: number, destination: string) => {
+  return downloadWithCredentials(await apiGetDownloadFileUrl(id), destination);
 }
 
 
