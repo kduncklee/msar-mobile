@@ -1,29 +1,29 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from "react-native";
-import * as DocumentPicker from "expo-document-picker";
-import * as ImagePicker from "expo-image-picker";
-import FileField from "../fields/FileField";
-import { elements } from "../../styles/elements";
-import { callout } from "../../types/callout";
-import { apiUploadFile } from "remote/api";
-import msarEventEmitter from "utility/msarEventEmitter";
+import React from 'react';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import * as DocumentPicker from 'expo-document-picker';
+import * as ImagePicker from 'expo-image-picker';
+import FileField from '@components/fields/FileField';
+import { elements } from '@styles/elements';
+import { apiUploadFile } from 'remote/api';
+import msarEventEmitter from 'utility/msarEventEmitter';
+import type { callout } from '@/types/callout';
 
-const uploadFile = async (file: object, id: number) => {
+async function uploadFile(file: object, id: number) {
   const idText: string = id?.toString();
-  console.log("file", file);
+  console.log('file', file);
   const result = await apiUploadFile(file, idText);
-  console.log("file result", result);
+  console.log('file result', result);
   console.log(await result.json());
-  msarEventEmitter.emit("refreshCallout", { id });
-};
+  msarEventEmitter.emit('refreshCallout', { id });
+}
 
-const pickUploadPhoto = async (id: number) => {
+async function pickUploadPhoto(id: number) {
   const picker = await ImagePicker.launchImageLibraryAsync({
     quality: 1,
   });
   console.log(picker);
   if (picker.canceled) {
-    console.log("No image selected.");
+    console.log('No image selected.');
     return;
   }
   console.log(picker.assets);
@@ -36,17 +36,17 @@ const pickUploadPhoto = async (id: number) => {
     type: image.mimeType,
   };
   uploadFile(file, id);
-};
+}
 
-const pickUploadFile = async (id: number) => {
+async function pickUploadFile(id: number) {
   const document = await DocumentPicker.getDocumentAsync();
   if (document.canceled) {
-    console.log("No document selected.");
+    console.log('No document selected.');
     return;
   }
   console.log(document.assets);
   const doc = document.assets[0];
-  console.log("doc", doc);
+  console.log('doc', doc);
   const file = {
     name: doc.name,
     uri: doc.uri,
@@ -55,13 +55,13 @@ const pickUploadFile = async (id: number) => {
     type: doc.mimeType,
   };
   uploadFile(file, id);
-};
+}
 
-type CalloutFileTabProps = {
+interface CalloutFileTabProps {
   callout: callout;
-};
+}
 
-const CalloutFileTab = ({ callout }: CalloutFileTabProps) => {
+function CalloutFileTab({ callout }: CalloutFileTabProps) {
   return (
     <View style={styles.contentContainer}>
       <FlatList
@@ -93,7 +93,7 @@ const CalloutFileTab = ({ callout }: CalloutFileTabProps) => {
       </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   contentContainer: {
@@ -103,12 +103,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   buttonContainer: {
-    flexDirection: "row",
-    alignItems: "stretch",
-    alignSelf: "center",
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    alignSelf: 'center',
     margin: 20,
     height: 60,
-    width: "100%",
+    width: '100%',
   },
 });
 

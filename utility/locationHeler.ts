@@ -1,22 +1,22 @@
-import { LatLng } from 'react-native-maps';
-export const coordinateFromString = (string: string): LatLng => {
+import type { LatLng } from 'react-native-maps';
 
-    const parts = string.split(',');
+export function coordinateFromString(string: string): LatLng {
+  const parts = string.split(',');
 
-    if (parts.length !== 2) {
-        return null;
-    }
+  if (parts.length !== 2) {
+    return null;
+  }
 
-    const [lat,long] = parts.map(parseFloat);
+  const [lat, long] = parts.map(Number.parseFloat);
 
-    if (isNaN(lat) || isNaN(long)) {
-        return null;
-    }
+  if (Number.isNaN(lat) || Number.isNaN(long)) {
+    return null;
+  }
 
-    const coordinate: LatLng = {
-        latitude: lat,
-        longitude: long
-    };
+  const coordinate: LatLng = {
+    latitude: lat,
+    longitude: long,
+  };
 
-    return coordinate;
+  return coordinate;
 }

@@ -1,4 +1,6 @@
-import { location } from "../types/location";
+/* eslint-disable prefer-const */
+/* eslint-disable import/no-mutable-exports */
+import type { location } from '@/types/location';
 
-export var selectedLocation: location = null;
-export var currentCredentials: {username: string, token: string} = null;
+export let selectedLocation: location = null;
+export let currentCredentials: { username: string; token: string } = null;

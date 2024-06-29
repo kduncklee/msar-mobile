@@ -1,9 +1,10 @@
-import * as Sentry from "@sentry/react-native";
+/* eslint-disable react-refresh/only-export-components */
+import * as Sentry from '@sentry/react-native';
 import { RootSiblingParent } from 'react-native-root-siblings';
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from '@tanstack/react-query';
 import { Slot, useNavigationContainerRef } from 'expo-router';
-import { SentryDsn } from "../utility/constants";
-import { usePushNotifications } from '../utility/pushNotifications';
+import { SentryDsn } from '@utility/constants';
+import { usePushNotifications } from '@utility/pushNotifications';
 import { useEffect } from 'react';
 import { queryClient, useReactQueryAppStateRefresh } from 'utility/reactQuery';
 
@@ -22,8 +23,7 @@ Sentry.init({
   ],
 });
 
-
-const Layout = () => {
+function Layout() {
   // Capture the NavigationContainer ref and register it with the instrumentation.
   const ref = useNavigationContainerRef();
 
@@ -38,7 +38,7 @@ const Layout = () => {
 
   return (
     <RootSiblingParent>
-      <QueryClientProvider client={queryClient} >
+      <QueryClientProvider client={queryClient}>
         <Slot />
       </QueryClientProvider>
     </RootSiblingParent>

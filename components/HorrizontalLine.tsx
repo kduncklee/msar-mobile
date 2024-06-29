@@ -1,17 +1,17 @@
-import React from "react";
-import { StyleSheet, View, Text } from "react-native";
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
-type HorrizontalLineProps = {
+interface HorrizontalLineProps {
   title?: string;
   color?: string;
   textColor?: string;
-};
+}
 
-const HorrizontalLine = ({
+function HorrizontalLine({
   title,
-  color = "white",
+  color = 'white',
   textColor,
-}: HorrizontalLineProps) => {
+}: HorrizontalLineProps) {
   const appliedTextColor = textColor ?? color;
 
   return (
@@ -29,12 +29,12 @@ const HorrizontalLine = ({
       )}
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: 20,
   },
   line: {
@@ -43,9 +43,9 @@ const styles = StyleSheet.create({
   },
   text: {
     paddingHorizontal: 12,
-    textAlign: "center",
+    textAlign: 'center',
     fontSize: 20,
-    fontWeight: "400",
+    fontWeight: '400',
   },
 });
 

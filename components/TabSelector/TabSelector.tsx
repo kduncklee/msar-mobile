@@ -1,86 +1,86 @@
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useState } from 'react';
-import colors from '../../styles/colors';
-import { tabItem } from '../../types/tabItem';
-import { elements } from '../../styles/elements';
+import colors from '@styles/colors';
+import { elements } from '@styles/elements';
+import type { tabItem } from '@/types/tabItem';
 
-type TabSelectorProps = {
-    tabs: tabItem[],
-    selected?: number,
-    onTabChange: (values: any) => void
-}
+interface TabSelectorProps {
+  tabs: tabItem[];
+  selected?: number;
+  onTabChange: (values: any) => void;
+};
 
-const TabSelector = ({ tabs, selected, onTabChange }: TabSelectorProps) => {
+function TabSelector({ tabs, selected, onTabChange }: TabSelectorProps) {
+  const [selectedIndex, setSelectedIndex] = useState(selected || 0);
 
-    const [selectedIndex, setSelectedIndex] = useState(selected ? selected : 0);
+  const tabSelected = (index: number) => {
+    setSelectedIndex(index);
+    onTabChange(index);
+  };
 
-    const tabSelected = (index: number) => {
-        setSelectedIndex(index);
-        onTabChange(index);
-    }
+  return (
+    <View style={styles.container}>
+      {
+        tabs.map((tab: tabItem, index: number) => {
+          let textColor: string = colors.grayText;
+          let divColor: string = colors.grayText;
+          let badgeColor: string = colors.green;
+          let badgeTextColor: string = colors.lightText;
+          if (tab.badgeColor) {
+            badgeColor = tab.badgeColor;
+          }
+          if (tab.badgeTextColor) {
+            badgeTextColor = tab.badgeTextColor;
+          }
 
-    return (
-        <View style={styles.container}>
-            {
-                tabs.map((tab: tabItem, index: number) => {
+          if (index === selectedIndex) {
+            textColor = colors.yellow;
+            divColor = colors.yellow;
+          }
 
-                    var textColor: string = colors.grayText;
-                    var divColor: string = colors.grayText;
-                    var badgeColor: string = colors.green;
-                    var badgeTextColor: string = colors.lightText;
-                    if (tab.badgeColor) {
-                        badgeColor = tab.badgeColor;
-                    }
-                    if (tab.badgeTextColor) {
-                        badgeTextColor = tab.badgeTextColor;
-                    }
-
-                    if (index === selectedIndex) {
-                        textColor = colors.yellow;
-                        divColor = colors.yellow;
-                    }
-
-                    return (
-                        <TouchableOpacity
-                            key={index}
-                            activeOpacity={0.5}
-                            style={[styles.button, { borderBottomColor: divColor, borderBottomWidth: 2 }]}
-                            onPress={() => tabSelected(index)}>
-                            <Text style={[styles.buttonLabel, { color: textColor }]}>{tab.title}</Text>
-                            {!!tab.badge &&
-                                <View style={[elements.tabBadge, {backgroundColor: badgeColor}]}>
-                                    <Text style={[elements.tabBadgeText, {color: badgeTextColor}]}>{tab.badge}</Text>
-                                </View>
-                            }
-                        </TouchableOpacity>
-                    )
-                })
-            }
-        </View>
-    )
+          return (
+            <TouchableOpacity
+              key={index}
+              activeOpacity={0.5}
+              style={[styles.button, { borderBottomColor: divColor, borderBottomWidth: 2 }]}
+              onPress={() => tabSelected(index)}
+            >
+              <Text style={[styles.buttonLabel, { color: textColor }]}>{tab.title}</Text>
+              {!!tab.badge
+              && (
+                <View style={[elements.tabBadge, { backgroundColor: badgeColor }]}>
+                  <Text style={[elements.tabBadgeText, { color: badgeTextColor }]}>{tab.badge}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          );
+        })
+      }
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flexDirection: "row",
-        height: 40,
-        marginHorizontal: 0,
-        marginTop: 10,
-        overflow: "hidden",
+  container: {
+    flexDirection: 'row',
+    height: 40,
+    marginHorizontal: 0,
+    marginTop: 10,
+    overflow: 'hidden',
 
-    },
-    button: {
-        flex: 1,
-        flexDirection: "row",
-        alignContent: "center",
-        justifyContent: "center",
-        alignItems: "center"
-    },
-    buttonLabel: {
-        fontSize: 16,
-        fontWeight: "600",
-        textAlign: "center"
-    }
+  },
+  button: {
+    flex: 1,
+    flexDirection: 'row',
+    alignContent: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
 
 });
 

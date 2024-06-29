@@ -1,23 +1,23 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 import {
-  View,
+  FlatList,
   StyleSheet,
   Text,
   TouchableOpacity,
-  FlatList,
-} from "react-native";
+  View,
+} from 'react-native';
 import Animated, {
-  useSharedValue,
   useAnimatedStyle,
-  withTiming,
+  useSharedValue,
   withSpring,
-} from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import colors from "../../styles/colors";
-import { elements } from "../../styles/elements";
-import LargeButton from "../inputs/LargeButton";
+  withTiming,
+} from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import colors from '@styles/colors';
+import { elements } from '@styles/elements';
+import LargeButton from '@components/inputs/LargeButton';
 
-type ButtonListModalProps = {
+interface ButtonListModalProps {
   buttons: {
     title: string;
     value: any;
@@ -28,18 +28,18 @@ type ButtonListModalProps = {
   modalVisible: boolean;
   onSelect: (value: any) => void;
   onCancel: () => void;
-};
+}
 
 const TRANSLATE_Y_START = 1200;
 const ANIMATION_DURATION = 500;
 
-const ButtonListModal = ({
+function ButtonListModal({
   buttons,
   title,
   modalVisible,
   onSelect,
   onCancel,
-}: ButtonListModalProps) => {
+}: ButtonListModalProps) {
   const translateY = useSharedValue(TRANSLATE_Y_START);
   const opacity = useSharedValue(0);
   const safeAreaInsets = useSafeAreaInsets();
@@ -47,13 +47,14 @@ const ButtonListModal = ({
   useEffect(() => {
     if (modalVisible) {
       showModal();
-    } else {
+    }
+    else {
       hideModal();
     }
   }, [modalVisible]);
 
   const showModal = () => {
-    console.log("showModal");
+    console.log('showModal');
     translateY.value = withSpring(0 - safeAreaInsets.bottom, {
       damping: 20,
       stiffness: 100,
@@ -62,7 +63,7 @@ const ButtonListModal = ({
   };
 
   const hideModal = () => {
-    console.log("hideModal");
+    console.log('hideModal');
     translateY.value = withTiming(TRANSLATE_Y_START, { duration: ANIMATION_DURATION });
     opacity.value = withTiming(0, { duration: ANIMATION_DURATION });
   };
@@ -84,7 +85,7 @@ const ButtonListModal = ({
       <Animated.View style={[styles.respondTray, trayAnimatedStyle]}>
         <View style={{ flex: 1 }} />
         <View style={styles.container}>
-          <Text style={[elements.mediumText, { margin: 8, fontWeight: "500" }]}>
+          <Text style={[elements.mediumText, { margin: 8, fontWeight: '500' }]}>
             {title}
           </Text>
           <FlatList
@@ -98,17 +99,17 @@ const ButtonListModal = ({
                 onPress={() => onSelect(item.value)}
               />
             )}
-            ListFooterComponent={
+            ListFooterComponent={(
               <>
                 <View style={{ height: 40 }} />
                 <LargeButton
-                  title={"Cancel"}
+                  title="Cancel"
                   backgroundColor={colors.secondaryBg}
                   textColor={colors.grayText}
                   onPress={onCancel}
                 />
               </>
-            }
+            )}
           />
         </View>
       </Animated.View>
@@ -119,19 +120,19 @@ const ButtonListModal = ({
       )}
     </>
   );
-};
+}
 
 const styles = StyleSheet.create({
   respondTray: {
     zIndex: 100,
     margin: 0,
-    position: "absolute",
+    position: 'absolute',
     left: 0,
     right: 0,
     bottom: 0,
   },
   modalBackground: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,

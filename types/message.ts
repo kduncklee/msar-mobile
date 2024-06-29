@@ -1,6 +1,6 @@
-import { personnel } from "./personnel"
+import type { personnel } from '@/types/personnel';
 
-export type message = {
-    author: personnel,
-    message: string
+export interface message {
+  author: personnel;
+  message: string;
 }

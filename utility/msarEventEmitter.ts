@@ -22,7 +22,7 @@ class MsarEventEmitter {
 
   emit(event: string, data: any): void {
     if (this.events[event]) {
-      this.events[event].forEach(callback => {
+      this.events[event].forEach((callback) => {
         callback(data);
       });
     }

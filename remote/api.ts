@@ -1,344 +1,345 @@
 import * as FileSystem from 'expo-file-system';
-import { getCredentials, getServer } from "../storage/storage";
-import { callout, calloutFromResponse } from "../types/callout";
-import { logEntry, logEntryFromRespsonse } from "../types/logEntry";
-import { calloutGetLogResponse, loginResponse, tokenValidationResponse } from "./responses";
+import { getCredentials, getServer } from '@storage/storage';
 import * as Application from 'expo-application';
-import { Platform } from "react-native";
-import { useQuery, useMutation, QueryClient, useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
-import { calloutSummary, calloutSummaryFromResponse } from "../types/calloutSummary";
-import { logStatusType, logType } from "types/enums";
+import { Platform } from 'react-native';
+import type { QueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { calloutGetLogResponse, loginResponse, tokenValidationResponse } from './responses';
+import { calloutFromResponse } from '@/types/callout';
+import type { callout } from '@/types/callout';
+import { logEntryFromRespsonse } from '@/types/logEntry';
+import type { calloutSummary } from '@/types/calloutSummary';
+import { calloutSummaryFromResponse } from '@/types/calloutSummary';
+import { logStatusType, logType } from '@/types/enums';
 
-let local_server: string = "http://192.168.1.120:8000";
-let legacy_server: string = "https://malibusarhours.org/calloutapi";
-let dev_server: string = "https://msar-dev-app.azurewebsites.net";
-let staging_server: string = "https://staging.app.malibusarhours.org";
-let prod_server: string = "https://app.malibusarhours.org";
-const server = async (): Promise<string> => {
-    const server = await getServer();
-    switch (server) {
-        case 'local':
-            return local_server;
-        case 'legacy':
-            return legacy_server;
-        case 'dev':
-            return dev_server;
-        case 'staging':
-            return staging_server;
-    }
-    return prod_server;
+const local_server: string = 'http://192.168.1.120:8000';
+const legacy_server: string = 'https://malibusarhours.org/calloutapi';
+const dev_server: string = 'https://msar-dev-app.azurewebsites.net';
+const staging_server: string = 'https://staging.app.malibusarhours.org';
+const prod_server: string = 'https://app.malibusarhours.org';
+async function server(): Promise<string> {
+  const server = await getServer();
+  switch (server) {
+    case 'local':
+      return local_server;
+    case 'legacy':
+      return legacy_server;
+    case 'dev':
+      return dev_server;
+    case 'staging':
+      return staging_server;
+  }
+  return prod_server;
 }
 
-const tokenEndpoint = async (): Promise<string> =>
-  (await server()) + "/api-token-auth/";
-const notificationsAvailableEndpoint = async (): Promise<string> =>
-  (await server()) + "/api/event_notifications/";
-const radioChannelsAvailableEndpoint = async (): Promise<string> =>
-  (await server()) + "/api/radio_channels/";
-const calloutsEndpoint = async (): Promise<string> =>
-  (await server()) + "/api/callouts/";
-const chatEndpoint = async (): Promise<string> =>
-  (await server()) + "/api/announcement/log/";
-const devicesEndpoint = async (): Promise<string> =>
-  (await server()) + "/api/devices/";
-const tokenValidationEndpoint = async (): Promise<string> =>
-  (await server()) + "/api/?format=json";
-const filesEndpoint = async (): Promise<string> =>
-  (await server()) + "/api/files/";
+async function tokenEndpoint(): Promise<string> {
+  return `${await server()}/api-token-auth/`;
+}
+async function notificationsAvailableEndpoint(): Promise<string> {
+  return `${await server()}/api/event_notifications/`;
+}
+async function radioChannelsAvailableEndpoint(): Promise<string> {
+  return `${await server()}/api/radio_channels/`;
+}
+async function calloutsEndpoint(): Promise<string> {
+  return `${await server()}/api/callouts/`;
+}
+async function chatEndpoint(): Promise<string> {
+  return `${await server()}/api/announcement/log/`;
+}
+async function devicesEndpoint(): Promise<string> {
+  return `${await server()}/api/devices/`;
+}
+async function tokenValidationEndpoint(): Promise<string> {
+  return `${await server()}/api/?format=json`;
+}
+async function filesEndpoint(): Promise<string> {
+  return `${await server()}/api/files/`;
+}
 
-const authorizationHeader = async () => {
+async function authorizationHeader() {
   const credentials = await getCredentials();
   if (!credentials.token) {
-    throw new Error("No token");
+    throw new Error('No token');
   }
-  return "Token " + credentials.token;
+  return `Token ${credentials.token}`;
 }
 
-const fetchWithCredentials = async (
-  url: string,
-  method: string = "GET",
-  body?: any,
-  contentType?: string
-): Promise<any> => {
-
-  let options = {
-    method: method,
+async function fetchWithCredentials(url: string, method: string = 'GET', body?: any, contentType?: string): Promise<any> {
+  const options = {
+    method,
     headers: {
-      Authorization: await authorizationHeader(),
-      "Content-Type": contentType ? contentType : "application/json",
+      'Authorization': await authorizationHeader(),
+      'Content-Type': contentType || 'application/json',
     },
-    body: body ? body : null,
+    body: body || null,
   };
   const response = await fetch(url, options);
   if (!response.ok) {
     const msg = await response.text();
     console.log(response.status, msg);
-    throw new Error("Network response was " + response.status + ": " + msg);
+    throw new Error(`Network response was ${response.status}: ${msg}`);
   }
   return response;
-};
+}
 
-const fetchJsonWithCredentials = async (
-  url: string,
-  method: string = "GET",
-  body?: any
-): Promise<any> => {
-    const json_body = body ? JSON.stringify(body) : null;
-    return (await fetchWithCredentials(url, method, json_body)).json();
-};
+async function fetchJsonWithCredentials(url: string, method: string = 'GET', body?: any): Promise<any> {
+  const json_body = body ? JSON.stringify(body) : null;
+  return (await fetchWithCredentials(url, method, json_body)).json();
+}
 
-const downloadWithCredentials = async (
-  url: string,
-  destination: string
-) => {
+async function downloadWithCredentials(url: string, destination: string) {
   const options = {
-    headers: {Authorization: await authorizationHeader()},
+    headers: { Authorization: await authorizationHeader() },
   };
   return FileSystem.downloadAsync(url, destination, options);
-};
+}
 
-export const apiGetToken = async (username: string, password: string): Promise<loginResponse> => {
-
-    return fetch(await tokenEndpoint(), {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            username: username,
-            password: password
-        })
-    })
+export async function apiGetToken(username: string, password: string): Promise<loginResponse> {
+  return fetch(await tokenEndpoint(), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      username,
+      password,
+    }),
+  })
     .then(response => response.json())
-    .then(data => {
-        return data;
+    .then((data) => {
+      return data;
     })
-    .catch(error => {
-        console.log(error);
-        return {
-            non_field_errors: [
-                "Server Error"
-            ]
-        };
-    })
-}
-
-export const apiValidateToken = async (): Promise<tokenValidationResponse> => {
-
-    const credentials = await getCredentials();
-    if (!credentials.token) {
-        return { valid_token: false }
-    }
-
-    return fetch(await tokenValidationEndpoint(), {
-        method: "GET",
-        headers: {
-            'Authorization': 'Token ' + credentials.token
-        }
-    })
-    .then(response => {
-        if (response.ok) {
-            return { valid_token: true }
-        } else {
-            return { valid_token: false }
-        }
-        //console.log("response status " + response.status);
-    })
-    .catch(error => {
-        console.log(error);
-        return { valid_token: false }
-    })
-}
-
-
-export const apiGetNotificationsAvailable = async (): Promise<any> => {
-    return fetchJsonWithCredentials(await notificationsAvailableEndpoint());
-}
-
-export const apiGetRadioChannelsAvailable = async (): Promise<any> => {
-    return fetchJsonWithCredentials(await radioChannelsAvailableEndpoint());
-}
-
-
-export const apiGetCallouts = async (status?: string): Promise<any> => {
-    var args = "?ordering=-id";
-    if (status) {
-        args += `&status=${status}`
-    }
-
-    return fetchJsonWithCredentials(await calloutsEndpoint() + args);
-}
-
-export const apiCreateCallout = async (callout: callout): Promise<any> => {
-    return fetchJsonWithCredentials(await calloutsEndpoint(), "POST", callout);
-}
-
-export const apiGetCallout = async (id: number): Promise<any> => {
-    return fetchJsonWithCredentials(await calloutsEndpoint() + id + '/').then(data => {
-        return calloutFromResponse(data);
+    .catch((error) => {
+      console.log(error);
+      return {
+        non_field_errors: [
+          'Server Error',
+        ],
+      };
     });
 }
 
-export const apiUpdateCallout = async (id: number, callout: callout): Promise<any> => {
-    return fetchJsonWithCredentials(
-      (await calloutsEndpoint()) + id + "/",
-      "PUT",
-      callout
-    );
+export async function apiValidateToken(): Promise<tokenValidationResponse> {
+  const credentials = await getCredentials();
+  if (!credentials.token) {
+    return { valid_token: false };
+  }
+
+  return fetch(await tokenValidationEndpoint(), {
+    method: 'GET',
+    headers: {
+      Authorization: `Token ${credentials.token}`,
+    },
+  })
+    .then((response) => {
+      if (response.ok) {
+        return { valid_token: true };
+      }
+      else {
+        return { valid_token: false };
+      }
+      // console.log("response status " + response.status);
+    })
+    .catch((error) => {
+      console.log(error);
+      return { valid_token: false };
+    });
 }
 
-export const apiRespondToCallout = async (
-  id: number,
-  response: string
-): Promise<any> => {
+export async function apiGetNotificationsAvailable(): Promise<any> {
+  return fetchJsonWithCredentials(await notificationsAvailableEndpoint());
+}
+
+export async function apiGetRadioChannelsAvailable(): Promise<any> {
+  return fetchJsonWithCredentials(await radioChannelsAvailableEndpoint());
+}
+
+export async function apiGetCallouts(status?: string): Promise<any> {
+  let args = '?ordering=-id';
+  if (status) {
+    args += `&status=${status}`;
+  }
+
+  return fetchJsonWithCredentials(await calloutsEndpoint() + args);
+}
+
+export async function apiCreateCallout(callout: callout): Promise<any> {
+  return fetchJsonWithCredentials(await calloutsEndpoint(), 'POST', callout);
+}
+
+export async function apiGetCallout(id: number): Promise<any> {
+  return fetchJsonWithCredentials(`${await calloutsEndpoint() + id}/`).then((data) => {
+    return calloutFromResponse(data);
+  });
+}
+
+export async function apiUpdateCallout(id: number, callout: callout): Promise<any> {
   return fetchJsonWithCredentials(
-    (await calloutsEndpoint()) + id + "/respond/",
-    "POST",
-    {
-      response: response,
-    }
+    `${(await calloutsEndpoint()) + id}/`,
+    'PUT',
+    callout,
   );
-};
-
-
-const apiGetLogResponseFromUrl = async (url: string, pageParam?: string): Promise<calloutGetLogResponse> => {
-    var fullUrl = pageParam ? pageParam : url + '?ordering=-id';
-    console.log('full url', fullUrl);
-
-    return fetchJsonWithCredentials(fullUrl);
 }
 
-export const apiGetCalloutLog = async (id: number, pageParam?: string): Promise<calloutGetLogResponse> => {
-    return apiGetLogResponseFromUrl(await calloutsEndpoint() + id + '/log/', pageParam);
+export async function apiRespondToCallout(id: number, response: string): Promise<any> {
+  return fetchJsonWithCredentials(
+    `${(await calloutsEndpoint()) + id}/respond/`,
+    'POST',
+    {
+      response,
+    },
+  );
 }
 
-export const apiGetChatLog = async (pageParam: string): Promise<calloutGetLogResponse> => {
-    return apiGetLogResponseFromUrl(await chatEndpoint(), pageParam);
+async function apiGetLogResponseFromUrl(url: string, pageParam?: string): Promise<calloutGetLogResponse> {
+  const fullUrl = pageParam || `${url}?ordering=-id`;
+  console.log('full url', fullUrl);
+
+  return fetchJsonWithCredentials(fullUrl);
 }
 
-
-const apiPostLogFromUrl = async (url: string, message: string): Promise<any> => {
-    return fetchJsonWithCredentials(url, "POST", {
-      type: "message",
-      message: message,
-    });
+export async function apiGetCalloutLog(id: number, pageParam?: string): Promise<calloutGetLogResponse> {
+  return apiGetLogResponseFromUrl(`${await calloutsEndpoint() + id}/log/`, pageParam);
 }
 
-export const apiPostCalloutLog = async (id: number, message: string): Promise<any> => {
-    return apiPostLogFromUrl(await calloutsEndpoint() + id + '/log/', message);
+export async function apiGetChatLog(pageParam: string): Promise<calloutGetLogResponse> {
+  return apiGetLogResponseFromUrl(await chatEndpoint(), pageParam);
 }
 
-export const apiPostChatLog = async (message: string): Promise<any> => {
-    return apiPostLogFromUrl(await chatEndpoint(), message);
+async function apiPostLogFromUrl(url: string, message: string): Promise<any> {
+  return fetchJsonWithCredentials(url, 'POST', {
+    type: 'message',
+    message,
+  });
 }
 
-export const apiSetDeviceId = async (token: string, active: boolean = true) => {
-    const tokenInfo = {
-        name: Application.nativeApplicationVersion,
-        registration_id: token,
-        device_id: active ? "msar" : "msar-disabled",
-        active: active,
-        type: Platform.OS === 'ios' ? 'ios' : 'android'
-    }
-
-    try {
-        const data = await fetchJsonWithCredentials(
-            await devicesEndpoint(), "POST", tokenInfo);
-        console.log("assigned push token: " + JSON.stringify(data));
-    } catch (error) {
-        console.log('Error saving push token: ' + error.message);
-    }
+export async function apiPostCalloutLog(id: number, message: string): Promise<any> {
+  return apiPostLogFromUrl(`${await calloutsEndpoint() + id}/log/`, message);
 }
 
-export const apiRemoveDeviceId = async (token: string) => {
-    try {
-        const data = await fetchWithCredentials(
-            await devicesEndpoint() + token + "/", "DELETE");
-        console.log("removed push token: " + JSON.stringify(data));
-    } catch (error) {
-        console.log(error);
-        alert('Error removing push token: ' + error.message);
-    }
+export async function apiPostChatLog(message: string): Promise<any> {
+  return apiPostLogFromUrl(await chatEndpoint(), message);
 }
 
-export const apiGetDeviceId = async (token: string): Promise<any> => {
-    if (!token) return Promise.reject();
-    try {
-        const data = await fetchJsonWithCredentials(
-            await devicesEndpoint() + token + "/", "GET");
-        console.log("get push token: " + JSON.stringify(data));
-        return data;
-    } catch (error) {
-        // 404 indicates it is not stored.
-        console.log(error);
-        return Promise.reject();
-    }
-}
+export async function apiSetDeviceId(token: string, active: boolean = true) {
+  const tokenInfo = {
+    name: Application.nativeApplicationVersion,
+    registration_id: token,
+    device_id: active ? 'msar' : 'msar-disabled',
+    active,
+    type: Platform.OS === 'ios' ? 'ios' : 'android',
+  };
 
-export const apiIsDeviceIdActive = async (token: string): Promise<boolean> => {
-    return (await apiGetDeviceId(token)).active;
-}
-
-export const apiUpdateDeviceId = async (token: string) => {
-    apiGetDeviceId(token).then(
-        (data) => {
-            if (data.name != Application.nativeApplicationVersion) {
-                console.log('updating stored version');
-                apiSetDeviceId(token, data.active);
-            }
-        },
-        () => apiSetDeviceId(token, true)
+  try {
+    const data = await fetchJsonWithCredentials(
+      await devicesEndpoint(),
+      'POST',
+      tokenInfo,
     );
+    console.log(`assigned push token: ${JSON.stringify(data)}`);
+  }
+  catch (error) {
+    console.log(`Error saving push token: ${error.message}`);
+  }
 }
 
-export const apiUploadFile = async (file, id:string) => {
-  var body = new FormData();
+export async function apiRemoveDeviceId(token: string) {
+  try {
+    const data = await fetchWithCredentials(
+      `${await devicesEndpoint() + token}/`,
+      'DELETE',
+    );
+    console.log(`removed push token: ${JSON.stringify(data)}`);
+  }
+  catch (error) {
+    console.log(error);
+    // eslint-disable-next-line no-alert
+    alert(`Error removing push token: ${error.message}`);
+  }
+}
+
+export async function apiGetDeviceId(token: string): Promise<any> {
+  if (!token)
+    return Promise.reject(new Error('No token'));
+  try {
+    const data = await fetchJsonWithCredentials(
+      `${await devicesEndpoint() + token}/`,
+      'GET',
+    );
+    console.log(`get push token: ${JSON.stringify(data)}`);
+    return data;
+  }
+  catch (error) {
+    // 404 indicates it is not stored.
+    console.log(error);
+    return Promise.reject(error);
+  }
+}
+
+export async function apiIsDeviceIdActive(token: string): Promise<boolean> {
+  return (await apiGetDeviceId(token)).active;
+}
+
+export async function apiUpdateDeviceId(token: string) {
+  apiGetDeviceId(token).then(
+    (data) => {
+      if (data.name !== Application.nativeApplicationVersion) {
+        console.log('updating stored version');
+        apiSetDeviceId(token, data.active);
+      }
+    },
+    () => apiSetDeviceId(token, true),
+  );
+}
+
+export async function apiUploadFile(file, id: string) {
+  const body = new FormData();
   body.append('file', file);
   body.append('event', id);
-  return fetchWithCredentials(await filesEndpoint(), "POST", body, "multipart/form-data");
+  return fetchWithCredentials(await filesEndpoint(), 'POST', body, 'multipart/form-data');
 }
 
-const apiGetDownloadFileUrl = async (id:number) => {
-  return await filesEndpoint() + id + "/download/"
+async function apiGetDownloadFileUrl(id: number) {
+  return `${await filesEndpoint() + id}/download/`;
 }
 
-export const apiDownloadFile = async (id: number, destination: string) => {
+export async function apiDownloadFile(id: number, destination: string) {
   return downloadWithCredentials(await apiGetDownloadFileUrl(id), destination);
 }
-
 
 //////////////////////////////////////////////////////////////////////////////
 // React Query
 //////////////////////////////////////////////////////////////////////////////
 
-////// Notifications Available
-const notificationsAvailabletQueryParams = () => {
+/// /// Notifications Available
+function notificationsAvailabletQueryParams() {
   return {
-    queryKey: ["notificationsAvailable"],
+    queryKey: ['notificationsAvailable'],
     queryFn: () => apiGetNotificationsAvailable(),
   };
-};
+}
 
-export const useNotificationsAvailableQuery = () => {
+export function useNotificationsAvailableQuery() {
   return useQuery(notificationsAvailabletQueryParams());
-};
+}
 
-////// RadioChannels Available
-const radioChannelsAvailabletQueryParams = () => {
+/// /// RadioChannels Available
+function radioChannelsAvailabletQueryParams() {
   return {
-    queryKey: ["radioChannelsAvailable"],
+    queryKey: ['radioChannelsAvailable'],
     queryFn: () => apiGetRadioChannelsAvailable(),
   };
-};
+}
 
-export const useRadioChannelsAvailableQuery = () => {
+export function useRadioChannelsAvailableQuery() {
   return useQuery(radioChannelsAvailabletQueryParams());
-};
+}
 
-////// Callout List
-const calloutListQueryParams = (status?: string) => {
+/// /// Callout List
+function calloutListQueryParams(status?: string) {
   return {
-    queryKey: ["callouts", status],
+    queryKey: ['callouts', status],
     queryFn: async () => {
       console.log(status);
       const response = await apiGetCallouts(status);
@@ -350,125 +351,129 @@ const calloutListQueryParams = (status?: string) => {
       return callouts;
     },
   };
-};
+}
 
-export const prefetchCalloutListQuery = async (
-  queryClient: QueryClient,
-  status?: string
-) => {
+export async function prefetchCalloutListQuery(queryClient: QueryClient, status?: string) {
   return queryClient.prefetchQuery(calloutListQueryParams(status));
-};
+}
 
-export const useCalloutListQuery = (status?: string) => {
+export function useCalloutListQuery(status?: string) {
   return useQuery(calloutListQueryParams(status));
-};
+}
 
-////// Callout
-const calloutQueryParams = (id: string) => {
-  const idInt: number = parseInt(id);
+/// /// Callout
+function calloutQueryParams(id: string) {
+  const idInt: number = Number.parseInt(id);
   return {
-    queryKey: ["calloutInfo", idInt],
+    queryKey: ['calloutInfo', idInt],
     queryFn: () => apiGetCallout(idInt),
+    enabled: !!id,
   };
-};
+}
 
-export const prefetchCalloutQuery = async (
-  queryClient: QueryClient,
-  id: string
-) => {
+export async function prefetchCalloutQuery(queryClient: QueryClient, id: string) {
   return queryClient.prefetchQuery(calloutQueryParams(id));
-};
+}
 
-export const useCalloutQuery = (id: string) => {
+export function useCalloutQuery(id: string) {
   return useQuery(calloutQueryParams(id));
-};
+}
 
-////// Callout Log
-const calloutLogQueryParams = (id: string) => {
-  const idInt: number = parseInt(id);
+/// /// Callout Log
+function calloutLogQueryParams(idInt: number) {
   return {
-    queryKey: ["calloutLog", idInt],
+    queryKey: ['calloutLog', idInt],
     queryFn: ({ pageParam }) => apiGetCalloutLog(idInt, pageParam),
-    initialPageParam: "",
-    getNextPageParam: (lastPage, pages) => lastPage?.next,
+    initialPageParam: '',
+    getNextPageParam: (lastPage, _pages) => lastPage?.next,
   };
-};
+}
 
-export const prefetchCalloutLogQuery = async (
-  queryClient: QueryClient,
-  id: string
-) => {
+export async function prefetchCalloutLogQuery(queryClient: QueryClient, id: string) {
   return queryClient.prefetchInfiniteQuery(calloutLogQueryParams(id));
-};
+}
 
-export const useCalloutLogInfiniteQuery = (id: string) => {
-  return useInfiniteQuery(calloutLogQueryParams(id));
-};
+export function useCalloutLogInfiniteQuery(idInt: number) {
+  return useInfiniteQuery(calloutLogQueryParams(idInt));
+}
 
-////// Chat 
-const chatLogQueryParams = () => {
+/// /// Chat
+function chatLogQueryParams() {
   return {
-    queryKey: ["chat"],
+    queryKey: ['chat'],
     queryFn: ({ pageParam }) => apiGetChatLog(pageParam),
-    initialPageParam: "",
-    getNextPageParam: (lastPage, pages) => lastPage?.next,
+    initialPageParam: '',
+    getNextPageParam: (lastPage, _pages) => lastPage?.next,
   };
-};
+}
 
-export const prefetchChatLogQuery = async (queryClient: QueryClient) => {
+export async function prefetchChatLogQuery(queryClient: QueryClient) {
   return queryClient.prefetchInfiniteQuery(chatLogQueryParams());
-};
+}
 
-export const useChatLogInfiniteQuery = () => {
+export function useChatLogInfiniteQuery() {
   return useInfiniteQuery(chatLogQueryParams());
-};
-
-////// Chat / Callout Log Mutations
-export const useCalloutLogMutation = (idInt: number) => {
-  return useLogMutation((message: string) => apiPostCalloutLog(idInt, message), ["calloutLog", idInt]);
 }
 
-export const useChatLogMutation = () => {
-  return useLogMutation(apiPostChatLog, ["chat"]);
+/// /// Chat / Callout Log Mutations
+// Combination hook needed for shared component.
+export function useChatOrCalloutLogMutation(idInt: number) {
+  let mutationFn;
+  let queryKey;
+  if (idInt) { // CalloutLog
+    mutationFn = (message: string) => apiPostCalloutLog(idInt, message);
+    queryKey = ['calloutLog', idInt];
+  }
+  else { // Chat
+    mutationFn = apiPostChatLog;
+    queryKey = ['chat'];
+  }
+  return useLogMutation(mutationFn, queryKey);
+}
+export function useCalloutLogMutation(idInt: number) {
+  return useChatOrCalloutLogMutation(idInt);
+}
+export function useChatLogMutation() {
+  return useChatOrCalloutLogMutation(undefined);
 }
 
-export const useLogMutation = (mutationFn, queryKey) => {
+export function useLogMutation(mutationFn, queryKey) {
   const queryClient = useQueryClient();
 
-  type LogVariables = {
-    id?: string,
-    message: string,
-  }
+  interface LogVariables {
+    id?: string;
+    message: string;
+  };
 
   const updateItem = (prev, id, replacement) => {
     return {
       ...prev,
-      pages: prev.pages.map((page) => ({
+      pages: prev.pages.map(page => ({
         ...page,
-        results: page.results.map((item) =>
+        results: page.results.map(item =>
           item.id === id
             ? replacement
-            : item
-        )
-      }))
+            : item,
+        ),
+      })),
     };
-  }
+  };
   const updateItemStatus = (prev, id, status) => {
     return {
       ...prev,
-      pages: prev.pages.map((page) => ({
+      pages: prev.pages.map(page => ({
         ...page,
-        results: page.results.map((item) =>
+        results: page.results.map(item =>
           item.id === id
             ? { ...item, status }
-            : item
-        )
-      }))
+            : item,
+        ),
+      })),
     };
-  }
+  };
 
   return useMutation({
-    mutationFn: async (variables: LogVariables) => 
+    mutationFn: async (variables: LogVariables) =>
       mutationFn(variables.message),
 
     onMutate: async (variables) => {
@@ -482,11 +487,11 @@ export const useLogMutation = (mutationFn, queryKey) => {
         return { id: variables.id };
       }
 
-      const id = "temp_" + Date.now().toString(36);
+      const id = `temp_${Date.now().toString(36)}`;
 
       // Create optimistic message
       const optimistic = {
-        id: id,
+        id,
         type: logType.MESSAGE,
         member: { username: global.currentCredentials.username },
         message: variables.message,
@@ -496,12 +501,14 @@ export const useLogMutation = (mutationFn, queryKey) => {
 
       // Add optimistic message to message list
       queryClient.setQueryData(queryKey, (prev) => {
-        if (!prev) { return prev; }
+        if (!prev) {
+          return prev;
+        }
         const working = {
           ...prev,
-          pages: prev.pages.slice()
+          pages: prev.pages.slice(),
         };
-        working.pages[0] = {...working.pages[0]};
+        working.pages[0] = { ...working.pages[0] };
         working.pages[0].results = [optimistic, ...working.pages[0].results];
         return working;
       });
@@ -510,7 +517,7 @@ export const useLogMutation = (mutationFn, queryKey) => {
       return { id };
     },
 
-    onSuccess: (result, variables, context) => {
+    onSuccess: (result, _variables, context) => {
       const entry = logEntryFromRespsonse(result);
       // Replace optimistic message in the list with the result
       queryClient.setQueryData(queryKey, (old) => {
@@ -520,14 +527,14 @@ export const useLogMutation = (mutationFn, queryKey) => {
       queryClient.invalidateQueries({ queryKey });
     },
 
-    onError: (error, variables, context) => {
+    onError: (_error, _variables, context) => {
       // Remove optimistic message from the list
       queryClient.setQueryData(queryKey, (old) => {
-        console.log("e id, old", context.id, old);
+        console.log('e id, old', context.id, old);
         return updateItemStatus(old, context.id, logStatusType.ERROR);
       });
     },
 
-    retry: 16,  // 5 minutes (6 in first minute, then 30s each)
+    retry: 16, // 5 minutes (6 in first minute, then 30s each)
   }, queryClient);
-};
+}

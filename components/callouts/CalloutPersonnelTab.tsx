@@ -1,161 +1,130 @@
-import React, { Fragment } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { calloutSummary } from '../../types/calloutSummary';
-import { calloutType, responseType } from '../../types/enums';
-import InformationTray from '../fields/InformationTray';
-import PersonnelField from '../fields/PersonnelField';
-import colors from '../../styles/colors';
-import { elements } from '../../styles/elements';
-import { textForResponseType, colorForResponseType, textForType } from '../../types/calloutSummary';
-import { opResponse } from '../../types/operationalPeriod';
-import { callout } from '../../types/callout';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import InformationTray from '@components/fields/InformationTray';
+import PersonnelField from '@components/fields/PersonnelField';
+import colors from '@styles/colors';
+import { elements } from '@styles/elements';
+import { responseType } from '@/types/enums';
+import type { opResponse } from '@/types/operationalPeriod';
+import type { callout } from '@/types/callout';
 
-type CalloutPersonnelTabProps = {
-    callout: callout
-}
+interface CalloutPersonnelTabProps {
+  callout: callout;
+};
 
+function CalloutPersonnelTab({ callout }: CalloutPersonnelTabProps) {
+  let responses: opResponse[] = [];
+  if (callout.operational_periods[0]) {
+    responses = callout.operational_periods[0].responses;
+  }
 
+  const filterByTen19: opResponse[] = responses.filter((opResponse) => {
+    return opResponse.response === responseType.TEN19;
+  });
 
-const CalloutPersonnelTab = ({ callout }: CalloutPersonnelTabProps) => {
+  const filterByTen8: opResponse[] = responses.filter((opResponse) => {
+    return opResponse.response === responseType.TEN8;
+  });
 
-    var responses: opResponse[] = [];
-    if (callout.operational_periods[0]) {
-        responses = callout.operational_periods[0].responses;
-    }
+  const filterByTen7: opResponse[] = responses.filter((opResponse) => {
+    return opResponse.response === responseType.TEN7;
+  });
 
-    const filterByTen19: opResponse[] = responses.filter((opResponse) => {
-        return opResponse.response === responseType.TEN19;
-    });
+  return (
+    <>
+      {filterByTen19.length === 0 && filterByTen8.length === 0 && filterByTen7.length === 0
+      && <Text style={[elements.mediumText, styles.noResponses]}>No Responses</Text>}
+      {filterByTen19.length > 0
+      && (
+        <InformationTray
+          title="10-19"
+          titleBarColor={colors.secondaryYellow}
+          titleTextColor={colors.black}
+          count={filterByTen19.length}
+        >
+          <View style={styles.preList} />
+          {
+            filterByTen19.map((opResponse: opResponse, index: number) => {
+              const addDiv: boolean = (index < filterByTen19.length - 1);
 
-    const filterByTen8: opResponse[] = responses.filter((opResponse) => {
-        return opResponse.response === responseType.TEN8;
-    });
+              return (
+                <React.Fragment key={opResponse.member.id}>
+                  <PersonnelField key={opResponse.member.id} opResponse={opResponse} />
+                  {addDiv
+                  && <View style={elements.informationDiv} />}
+                </React.Fragment>
+              );
+            })
+          }
+          <View style={styles.postList} />
+        </InformationTray>
+      )}
+      {filterByTen8.length > 0
+      && (
+        <InformationTray
+          title="10-8"
+          titleBarColor={colors.green}
+          titleTextColor={colors.primaryText}
+          count={filterByTen8.length}
+        >
+          <View style={styles.preList} />
+          {
+            filterByTen8.map((opResponse: opResponse, index: number) => {
+              const addDiv: boolean = (index < filterByTen8.length - 1);
 
-    const filterByTen7: opResponse[] = responses.filter((opResponse) => {
-        return opResponse.response === responseType.TEN7;
-    });
+              return (
+                <React.Fragment key={opResponse.member.id}>
+                  <PersonnelField key={opResponse.member.id} opResponse={opResponse} />
+                  {addDiv
+                  && <View style={elements.informationDiv} />}
+                </React.Fragment>
+              );
+            })
+          }
+          <View style={styles.postList} />
+        </InformationTray>
+      )}
+      {filterByTen7.length > 0
+      && (
+        <InformationTray
+          title="10-7"
+          titleBarColor={colors.red}
+          titleTextColor={colors.primaryText}
+          count={filterByTen7.length}
+        >
+          <View style={styles.preList} />
+          {
+            filterByTen7.map((opResponse: opResponse, index: number) => {
+              const addDiv: boolean = (index < filterByTen7.length - 1);
 
-    return (
-        <>
-            {filterByTen19.length == 0 && filterByTen8.length == 0 && filterByTen7.length == 0 &&
-                <Text style={[elements.mediumText, { margin: 20, textAlign: "center", color: colors.grayText }]}>No Responses</Text>
-            }
-            {filterByTen19.length > 0 &&
-                <InformationTray
-                    title={'10-19'}
-                    titleBarColor={colors.secondaryYellow}
-                    titleTextColor={colors.black}
-                    count={filterByTen19.length}>
-                    <View style={{ marginTop: 8 }} />
-                    {
-                        filterByTen19.map((opResponse: opResponse, index: number) => {
-
-                            const addDiv: boolean = (index < filterByTen19.length - 1);
-
-                            return (
-                                <React.Fragment key={opResponse.member.id}>
-                                    <PersonnelField key={opResponse.member.id} opResponse={opResponse} />
-                                    {addDiv &&
-                                        <View style={elements.informationDiv} />
-                                    }
-                                </React.Fragment>
-                            )
-                        })
-                    }
-                    <View style={{ marginBottom: 8 }} />
-                </InformationTray>
-            }
-            {filterByTen8.length > 0 &&
-                <InformationTray
-                    title={'10-8'}
-                    titleBarColor={colors.green}
-                    titleTextColor={colors.primaryText}
-                    count={filterByTen8.length}>
-                    <View style={{ marginTop: 8 }} />
-                    {
-                        filterByTen8.map((opResponse: opResponse, index: number) => {
-
-                            const addDiv: boolean = (index < filterByTen8.length - 1);
-
-                            return (
-                                <React.Fragment key={opResponse.member.id}>
-                                    <PersonnelField key={opResponse.member.id} opResponse={opResponse} />
-                                    {addDiv &&
-                                        <View style={elements.informationDiv} />
-                                    }
-                                </React.Fragment>
-                            )
-                        })
-                    }
-                    <View style={{ marginBottom: 8 }} />
-                </InformationTray>
-            }
-            {filterByTen7.length > 0 &&
-                <InformationTray
-                    title={'10-7'}
-                    titleBarColor={colors.red}
-                    titleTextColor={colors.primaryText}
-                    count={filterByTen7.length}>
-                    <View style={{ marginTop: 8 }} />
-                    {
-                        filterByTen7.map((opResponse: opResponse, index: number) => {
-
-                            const addDiv: boolean = (index < filterByTen7.length - 1);
-
-                            return (
-                                <React.Fragment key={opResponse.member.id}>
-                                    <PersonnelField key={opResponse.member.id} opResponse={opResponse} />
-                                    {addDiv &&
-                                        <View style={elements.informationDiv} />
-                                    }
-                                </React.Fragment>
-                            )
-                        })
-                    }
-                    <View style={{ marginBottom: 8 }} />
-                </InformationTray>
-            }
-        </>
-    );
+              return (
+                <React.Fragment key={opResponse.member.id}>
+                  <PersonnelField key={opResponse.member.id} opResponse={opResponse} />
+                  {addDiv
+                  && <View style={elements.informationDiv} />}
+                </React.Fragment>
+              );
+            })
+          }
+          <View style={styles.postList} />
+        </InformationTray>
+      )}
+    </>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.primaryBg
-    },
-    contentContainer: {
-        flex: 1,
-    },
-    scrollView: {
-        marginTop: 0,
-        flex: 1,
-        paddingTop: 10,
-    },
-    respondCalloutButton: {
-        margin: 20,
-        height: 60,
-        position: "absolute",
-        left: 0,
-        right: 0,
-        bottom: 0
-    },
-    respondTray: {
-        zIndex: 100,
-        margin: 0,
-        position: "absolute",
-        left: 0,
-        right: 0,
-        bottom: 0
-    },
-    modalBackground: {
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: colors.black
-    }
-})
+  noResponses: {
+    margin: 20,
+    textAlign: 'center',
+    color: colors.grayText,
+  },
+  preList: {
+    marginTop: 8,
+  },
+  postList: {
+    marginBottom: 8,
+  },
+});
 
 export default CalloutPersonnelTab;

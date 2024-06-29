@@ -1,26 +1,24 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
-import * as PushNotifications from "../utility/pushNotifications";
+import React, { useEffect, useState } from 'react';
+import * as PushNotifications from '@utility/pushNotifications';
 import {
   getCriticalForChannel,
   getSoundForChannel,
   storeCriticalForChannel,
   storeSoundForChannel,
-} from "../storage/mmkv";
-import DropdownSelector from "./inputs/DropdownSelector";
-import FormCheckbox from "./inputs/FormCheckbox";
+} from '@storage/mmkv';
+import DropdownSelector from '@components/inputs/DropdownSelector';
+import FormCheckbox from '@components/inputs/FormCheckbox';
 
-type NotificationSettingsProps = {
+interface NotificationSettingsProps {
   title: string;
   channel: string;
-};
+}
 
-const NotificationSettings = ({
+function NotificationSettings({
   title,
   channel,
-}: NotificationSettingsProps) => {
-  const [sound, setSound] = useState("");
-  const [vibration, setVibration] = useState("");
+}: NotificationSettingsProps) {
+  const [sound, setSound] = useState('');
   const [critical, setCritical] = useState(false);
 
   useEffect(() => {
@@ -29,24 +27,13 @@ const NotificationSettings = ({
       setCritical(await getCriticalForChannel(channel));
     }
     getFromStorage();
-  }, []);
-
-  const storeSetting = async () => {
-    const value = sound + "-standard";
-    console.log(`Setting ${channel} = ${value}`);
-  };
+  }, [channel]);
 
   const onSoundSelect = async (item: any) => {
     const value = item.value;
     console.log(value);
     setSound(value);
     storeSoundForChannel(channel, value);
-  };
-
-  const onVibrationSelect = async (item: any) => {
-    const value = item.value;
-    console.log(value);
-    setSound(value);
   };
 
   const onCheckToggle = (checked: boolean) => {
@@ -67,31 +54,15 @@ const NotificationSettings = ({
         selectedValue={sound}
         onSelect={onSoundSelect}
         onRightPress={onButtonPress}
-        rightButton={require("../assets/icons/frequency.png")}
+        rightButton={require('@assets/icons/frequency.png')}
       />
       <FormCheckbox
-        title={"Critical Alert"}
+        title="Critical Alert"
         checked={critical}
         onToggle={onCheckToggle}
       />
     </>
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    paddingTop: 20,
-    flexDirection: "column",
-  },
-  dropdown: {
-    flex: 1,
-    height: 40,
-    paddingHorizontal: 8,
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
-  },
-});
+}
 
 export default NotificationSettings;

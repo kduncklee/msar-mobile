@@ -1,77 +1,68 @@
-import { useState, useEffect, useRef } from 'react';
-import { SafeAreaView, StyleSheet, StatusBar, Platform, View, KeyboardAvoidingView } from 'react-native';
-import { useQueryClient } from "@tanstack/react-query";
-import Header from '../../components/Header';
-import colors from '../../styles/colors';
-import { elements } from '../../styles/elements';
-import CalloutLogTab from '../../components/callouts/CalloutLogTab';
-import LogInput from '../../components/callouts/LogInput';
-import { useChatLogInfiniteQuery, useChatLogMutation } from '../../remote/api';
+import { useEffect, useState } from 'react';
+import { KeyboardAvoidingView, Platform, SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
+import Header from '@components/Header';
+import colors from '@styles/colors';
+import CalloutLogTab from '@components/callouts/CalloutLogTab';
+import LogInput from '@components/callouts/LogInput';
+import { useChatLogInfiniteQuery, useChatLogMutation } from '@remote/api';
 
-const Page = () => {
+function Page() {
+  const [logMessageText, setLogMessageText] = useState('');
+  const chatLogMutation = useChatLogMutation();
 
-    const [logMessageText, setLogMessageText] = useState('');
-    const queryClient = useQueryClient();
-    const chatLogMutation = useChatLogMutation();
-
-    useEffect(() => {
-        if (Platform.OS === 'ios') {
-            StatusBar.setBarStyle('light-content');
-        } else if (Platform.OS === 'android') {
-            StatusBar.setBackgroundColor(colors.primaryBg);
-        }
-    }, []);
-
-    const refreshChat = () => {
-        queryClient.invalidateQueries({ queryKey: ['chat'] });
+  useEffect(() => {
+    if (Platform.OS === 'ios') {
+      StatusBar.setBarStyle('light-content');
     }
-
-    const onLogMessageTextChanged = (text: string) => {
-        setLogMessageText(text);
+    else if (Platform.OS === 'android') {
+      StatusBar.setBackgroundColor(colors.primaryBg);
     }
+  }, []);
 
-    const submitLogMessage = async () => {
-        const logMessage: string = logMessageText;
-        chatLogMutation.mutate({message: logMessage});
-        setLogMessageText('');
-    }
+  const onLogMessageTextChanged = (text: string) => {
+    setLogMessageText(text);
+  };
 
-    return (
-        <>
-            <SafeAreaView style={styles.container}>
-                <Header title={"Announcements"} backButton={true} rightButton={true} />
-                        <KeyboardAvoidingView
-                                style={styles.contentContainer}
-                                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                                keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -500} // Adjust the offset as needed
-                            >
-                        <View style={styles.contentContainer}>
-                            <CalloutLogTab id={0} useInfiniteQueryFn={() => useChatLogInfiniteQuery()} />
-                            <LogInput
-                                    onTextChange={onLogMessageTextChanged}
-                                    text={logMessageText}
-                                    onSendPress={submitLogMessage}
-                                    onPhotoPress={() => console.log('photo')} />
-                        </View>
-                        </KeyboardAvoidingView>
-            </SafeAreaView>
-        </>
-    )
+  const submitLogMessage = async () => {
+    const logMessage: string = logMessageText;
+    chatLogMutation.mutate({ message: logMessage });
+    setLogMessageText('');
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <Header title="Announcements" backButton rightButton />
+      <KeyboardAvoidingView
+        style={styles.contentContainer}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -500}
+      >
+        <View style={styles.contentContainer}>
+          <CalloutLogTab id={0} useInfiniteQueryFn={useChatLogInfiniteQuery} />
+          <LogInput
+            onTextChange={onLogMessageTextChanged}
+            text={logMessageText}
+            onSendPress={submitLogMessage}
+          />
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: colors.primaryBg
-    },
-    contentContainer: {
-        flex: 1,
-    },
-    scrollView: {
-        marginTop: 0,
-        flex: 1,
-        paddingTop: 10,
-    }
-})
+  container: {
+    flex: 1,
+    backgroundColor: colors.primaryBg,
+  },
+  contentContainer: {
+    flex: 1,
+  },
+  scrollView: {
+    marginTop: 0,
+    flex: 1,
+    paddingTop: 10,
+  },
+});
 
 export default Page;

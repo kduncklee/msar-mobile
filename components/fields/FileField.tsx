@@ -1,55 +1,57 @@
-import { StyleSheet, View, Text, Image, TouchableOpacity, Platform } from 'react-native';
-import * as FileSystem from "expo-file-system";
-import * as IntentLauncher from "expo-intent-launcher";
-import * as Sharing from "expo-sharing";
-import colors from "../../styles/colors";
-import { dataFile } from "types/dataFile";
-import { elements } from "styles/elements";
-import { getConditionalTimeString } from "utility/dateHelper";
-import { apiDownloadFile, apiGetDownloadFileUrl } from "remote/api";
-import { storage } from "storage/mmkv";
+import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import * as FileSystem from 'expo-file-system';
+import * as IntentLauncher from 'expo-intent-launcher';
+import * as Sharing from 'expo-sharing';
+import colors from '@styles/colors';
+import { elements } from '@styles/elements';
+import { getConditionalTimeString } from '@utility/dateHelper';
+import { apiDownloadFile } from '@remote/api';
+import { storage } from '@storage/mmkv';
+import type { dataFile } from '@/types/dataFile';
 
-const storageKey = (id: number) => "file_" + id;
+const storageKey = (id: number) => `file_${id}`;
 
-const downloadFile = async (id: number, name: string, mimeType: string) => {
+async function downloadFile(id: number, name: string, mimeType: string) {
   const destination = `${FileSystem.documentDirectory}${id}_${name}`;
   apiDownloadFile(id, destination)
     .then(({ uri }) => {
-      console.log(id, "finished downloading to ", uri);
+      console.log(id, 'finished downloading to ', uri);
       storage.set(storageKey(id), uri);
       openFile(uri, mimeType);
     })
     .catch((error) => {
       console.error(error);
     });
-};
+}
 
-const openFile = async (uri: string, mimeType: string) => {
+async function openFile(uri: string, mimeType: string) {
   const cUri = await FileSystem.getContentUriAsync(uri);
-  console.log("cUri", cUri);
-  if (Platform.OS === "ios") {
+  console.log('cUri', cUri);
+  if (Platform.OS === 'ios') {
     Sharing.shareAsync(cUri);
-  } else {
-    IntentLauncher.startActivityAsync("android.intent.action.VIEW", {
+  }
+  else {
+    IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
       data: cUri,
       flags: 1,
       type: mimeType,
     });
   }
-};
-type FileFieldProps = {
+}
+interface FileFieldProps {
   file: dataFile;
-};
+}
 
-const FileField = ({ file }: FileFieldProps) => {
+function FileField({ file }: FileFieldProps) {
   const size_mb = file.size / 1024 / 1024;
-  const size_text = size_mb.toFixed(3) + " MB";
+  const size_text = `${size_mb.toFixed(3)} MB`;
 
   const cellPressed = () => {
     const uri = storage.getString(storageKey(file.id));
     if (uri) {
       openFile(uri, file.content_type);
-    } else {
+    }
+    else {
       downloadFile(file.id, file.name, file.content_type);
     }
   };
@@ -59,7 +61,7 @@ const FileField = ({ file }: FileFieldProps) => {
       <View style={[elements.tray, styles.container]}>
         <View style={styles.sideBar}>
           <Image
-            source={require("assets/icons/copy.png")}
+            source={require('@assets/icons/copy.png')}
             style={styles.sideBarImage}
           />
         </View>
@@ -70,7 +72,7 @@ const FileField = ({ file }: FileFieldProps) => {
           <View style={styles.contentMiddle}>
             <Text style={styles.memberNameText}>{file.member.full_name}</Text>
             <Image
-              source={require("assets/icons/forward_narrow.png")}
+              source={require('@assets/icons/forward_narrow.png')}
               style={styles.arrowImage}
             />
           </View>
@@ -88,60 +90,60 @@ const FileField = ({ file }: FileFieldProps) => {
       </View>
     </TouchableOpacity>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: "row",
+    flexDirection: 'row',
     marginHorizontal: 20,
     marginVertical: 10,
-    overflow: "hidden",
+    overflow: 'hidden',
   },
   sideBar: {
     backgroundColor: colors.green,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
     width: 50,
   },
   sideBarImage: {
-    resizeMode: "contain",
+    resizeMode: 'contain',
     width: 30,
     height: 30,
   },
   contentBar: {
     flex: 1,
-    flexDirection: "column",
+    flexDirection: 'column',
   },
   contentTop: {
-    flexDirection: "row",
+    flexDirection: 'row',
     margin: 10,
   },
   fileNameText: {
     fontSize: 14,
-    fontWeight: "500",
+    fontWeight: '500',
     color: colors.primaryText,
     flex: 1,
   },
   contentMiddle: {
-    flexDirection: "row",
+    flexDirection: 'row',
     marginHorizontal: 10,
-    alignItems: "center",
+    alignItems: 'center',
   },
   memberNameText: {
     flex: 1,
     fontSize: 12,
-    fontWeight: "200",
+    fontWeight: '200',
     color: colors.primaryText,
   },
   arrowImage: {
-    resizeMode: "contain",
+    resizeMode: 'contain',
     width: 20,
     height: 20,
     marginLeft: 10,
   },
   contentBottom: {
-    flexDirection: "row",
+    flexDirection: 'row',
     margin: 10,
   },
 });

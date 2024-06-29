@@ -1,6 +1,6 @@
-import { responseType } from "./enums"
+import type { responseType } from '@/types/enums';
 
-export type respondedItem = {
-    response: responseType,
-    total: number
+export interface respondedItem {
+  response: responseType;
+  total: number;
 }
