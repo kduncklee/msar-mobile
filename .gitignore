@@ -11,7 +11,7 @@ web-build/
 credentials.json
 google-services.json
 GoogleService-Info.plist
-utility/constants.ts
+src/utility/constants.ts
 ios/
 android/
 build-*.aab

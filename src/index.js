@@ -7,7 +7,7 @@ import '@expo/metro-runtime';
 import { App } from 'expo-router/build/qualified-entry';
 import { renderRootComponent } from 'expo-router/build/renderRootComponent';
 
-import { setupPushNotificationsBackground } from 'utility/pushNotifications';
+import { setupPushNotificationsBackground } from '@utility/pushNotifications';
 
 // This needs to be here to register for headless background updates.
 setupPushNotificationsBackground();

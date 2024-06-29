@@ -2,12 +2,12 @@
   "expo": {
     "name": "Malibu SAR",
     "slug": "msar-mobile",
-    "version": "1.10.0",
+    "version": "1.10.1",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./src/assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./src/assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,8 +17,8 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "org.malibusar.app",
-      "buildNumber": "37",
-      "icon": "./assets/icon.png",
+      "buildNumber": "38",
+      "icon": "./src/assets/icon.png",
       "googleServicesFile": "./GoogleService-Info.plist",
       "config": {
         "usesNonExemptEncryption": false
@@ -32,22 +32,22 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon-foreground.png",
+        "foregroundImage": "./src/assets/icon-foreground.png",
         "backgroundColor": "#2B3038"
       },
       "package": "org.malibusar.app",
-      "versionCode": 47,
+      "versionCode": 48,
       "googleServicesFile": "./google-services.json"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./src/assets/favicon.png"
     },
     "plugins": [
       [
         "notification-service-expo-plugin",
         {
           "devTeam": "UJDB5NH948",
-          "iosNSEFilePath": "./assets/native/NotificationService.m"
+          "iosNSEFilePath": "./src/assets/native/NotificationService.m"
         }
       ],
       "expo-router",
@@ -70,21 +70,21 @@
         "expo-notifications",
         {
           "sounds": [
-            "assets/sounds/distortion_1_time.mp3",
-            "assets/sounds/distortion_3_times.mp3",
-            "assets/sounds/mdc_new_call.mp3",
-            "assets/sounds/radio_1_time.mp3",
-            "assets/sounds/radio_4_times.mp3",
-            "assets/sounds/serene_multi_ding.mp3",
-            "assets/sounds/ships_bells.mp3",
-            "assets/sounds/simple_ding.mp3",
-            "assets/sounds/sweet_1_time.mp3",
-            "assets/sounds/sweet_6_times.mp3",
-            "assets/sounds/trumpets_1_time.mp3",
-            "assets/sounds/trumpets_4_times.mp3",
-            "assets/sounds/wooden_drum.mp3",
-            "assets/sounds/yucatan_1_time.mp3",
-            "assets/sounds/yucatan_6_times.mp3"
+            "src/assets/sounds/distortion_1_time.mp3",
+            "src/assets/sounds/distortion_3_times.mp3",
+            "src/assets/sounds/mdc_new_call.mp3",
+            "src/assets/sounds/radio_1_time.mp3",
+            "src/assets/sounds/radio_4_times.mp3",
+            "src/assets/sounds/serene_multi_ding.mp3",
+            "src/assets/sounds/ships_bells.mp3",
+            "src/assets/sounds/simple_ding.mp3",
+            "src/assets/sounds/sweet_1_time.mp3",
+            "src/assets/sounds/sweet_6_times.mp3",
+            "src/assets/sounds/trumpets_1_time.mp3",
+            "src/assets/sounds/trumpets_4_times.mp3",
+            "src/assets/sounds/wooden_drum.mp3",
+            "src/assets/sounds/yucatan_1_time.mp3",
+            "src/assets/sounds/yucatan_6_times.mp3"
           ]
         }
       ],
