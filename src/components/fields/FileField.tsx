@@ -12,8 +12,7 @@ import * as ContextMenu from 'zeego/context-menu';
 import * as Sentry from '@sentry/react-native';
 import type { dataFile } from '@/types/dataFile';
 
-async function downloadFile(id: number, name: string) {
-  const destination = `${FileSystem.documentDirectory}${id}_${name}`;
+async function downloadFile(id: number, destination: string) {
   return apiDownloadFile(id, destination)
     .then(({ uri }) => {
       console.log(id, 'finished downloading to ', uri);
@@ -51,18 +50,23 @@ interface FileFieldProps {
 function FileField({ file }: FileFieldProps) {
   const size_mb = file.size / 1024 / 1024;
   const size_text = `${size_mb.toFixed(3)} MB`;
-  const [localUri, setLocalUri] = useLocalDataFilePath(file.id);
+  const localFilename = `${file.id}_${file.name}`;
+  const localFullUri = `${FileSystem.documentDirectory}${localFilename}`;
+
+  const [storedUri, setStoredUri] = useLocalDataFilePath(file.id);
 
   const download = async () => {
-    return downloadFile(file.id, file.name).then((uri) => {
-      setLocalUri(uri);
+    return downloadFile(file.id, localFullUri).then((uri) => {
+      setStoredUri(localFilename);
       return uri;
     });
   };
 
   const localOrDownload = async () => {
-    if (localUri) {
-      return localUri;
+    if (storedUri) {
+      // iOS moves the document dir between versions, so re-create the full path.
+      // Early versions stored the absolute path to the old document directory.
+      return localFullUri;
     }
     return download();
   };
