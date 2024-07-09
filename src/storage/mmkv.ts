@@ -1,5 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
-import { MMKV, useMMKVNumber } from 'react-native-mmkv';
+import { MMKV, useMMKVNumber, useMMKVString } from 'react-native-mmkv';
 import { getData, removeData } from '@storage/storage';
 
 const key_name = 'mmkv_encryption_key';
@@ -50,6 +50,10 @@ export const clientStorage = {
     storage.delete(key);
   },
 };
+
+export function useLocalDataFilePath(id: number) {
+  return useMMKVString(`file_${id}`, storage);
+}
 
 export function useLastRead(id: number) {
   return useMMKVNumber(`last-read-${id.toString()}`, storage);

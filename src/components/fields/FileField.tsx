@@ -6,29 +6,34 @@ import colors from '@styles/colors';
 import { elements } from '@styles/elements';
 import { getConditionalTimeString } from '@utility/dateHelper';
 import { apiDownloadFile } from '@remote/api';
-import { storage } from '@storage/mmkv';
+import { useLocalDataFilePath } from '@storage/mmkv';
+import FileViewer from 'react-native-file-viewer';
+import * as ContextMenu from 'zeego/context-menu';
+import * as Sentry from '@sentry/react-native';
 import type { dataFile } from '@/types/dataFile';
 
-const storageKey = (id: number) => `file_${id}`;
-
-async function downloadFile(id: number, name: string, mimeType: string) {
+async function downloadFile(id: number, name: string) {
   const destination = `${FileSystem.documentDirectory}${id}_${name}`;
-  apiDownloadFile(id, destination)
+  return apiDownloadFile(id, destination)
     .then(({ uri }) => {
       console.log(id, 'finished downloading to ', uri);
-      storage.set(storageKey(id), uri);
-      openFile(uri, mimeType);
+      return uri;
     })
     .catch((error) => {
-      console.error(error);
+      console.error('downloadFile Error', error);
+      throw error;
     });
+}
+
+async function shareFile(uri: string) {
+  Sharing.shareAsync(uri);
 }
 
 async function openFile(uri: string, mimeType: string) {
   const cUri = await FileSystem.getContentUriAsync(uri);
   console.log('cUri', cUri);
   if (Platform.OS === 'ios') {
-    Sharing.shareAsync(cUri);
+    await FileViewer.open(cUri, { showOpenWithDialog: true });
   }
   else {
     IntentLauncher.startActivityAsync('android.intent.action.VIEW', {
@@ -38,6 +43,7 @@ async function openFile(uri: string, mimeType: string) {
     });
   }
 }
+
 interface FileFieldProps {
   file: dataFile;
 }
@@ -45,50 +51,105 @@ interface FileFieldProps {
 function FileField({ file }: FileFieldProps) {
   const size_mb = file.size / 1024 / 1024;
   const size_text = `${size_mb.toFixed(3)} MB`;
+  const [localUri, setLocalUri] = useLocalDataFilePath(file.id);
+
+  const download = async () => {
+    return downloadFile(file.id, file.name).then((uri) => {
+      setLocalUri(uri);
+      return uri;
+    });
+  };
+
+  const localOrDownload = async () => {
+    if (localUri) {
+      return localUri;
+    }
+    return download();
+  };
+
+  const downloadPressed = () => {
+    download().catch((error) => {
+      console.error('Share error', file.id, error);
+      Sentry.captureException(error);
+    });
+  };
+
+  const sharePressed = () => {
+    localOrDownload().then(shareFile).catch((error) => {
+      console.error('Share error', file.id, error);
+      Sentry.captureException(error);
+    });
+  };
+
+  const openPressed = () => {
+    localOrDownload().then(uri => openFile(uri, file.content_type)).catch((error) => {
+      console.error('Open error', file.id, error);
+      Sentry.captureException(error);
+    }); ;
+  };
 
   const cellPressed = () => {
-    const uri = storage.getString(storageKey(file.id));
-    if (uri) {
-      openFile(uri, file.content_type);
-    }
-    else {
-      downloadFile(file.id, file.name, file.content_type);
-    }
+    openPressed();
+  };
+
+  const cellLongPressed = () => {
+    // Having a onLongPressed ensures that onPressed does not fire on a long press.
   };
 
   return (
-    <TouchableOpacity activeOpacity={0.5} onPress={cellPressed}>
-      <View style={[elements.tray, styles.container]}>
-        <View style={styles.sideBar}>
-          <Image
-            source={require('@assets/icons/copy.png')}
-            style={styles.sideBarImage}
-          />
-        </View>
-        <View style={styles.contentBar}>
-          <View style={styles.contentTop}>
-            <Text style={styles.fileNameText}>{file.name}</Text>
-          </View>
-          <View style={styles.contentMiddle}>
-            <Text style={styles.memberNameText}>{file.member.full_name}</Text>
-            <Image
-              source={require('@assets/icons/forward_narrow.png')}
-              style={styles.arrowImage}
-            />
-          </View>
-          <View style={styles.contentBottom}>
-            <View style={[elements.capsule]}>
-              <Text style={elements.smallYellowText}>
-                {getConditionalTimeString(file.created_at)}
-              </Text>
+    <ContextMenu.Root>
+      <ContextMenu.Trigger>
+        <TouchableOpacity
+          activeOpacity={0.5}
+          onPress={cellPressed}
+          onLongPress={cellLongPressed}
+        >
+          <View style={[elements.tray, styles.container]}>
+            <View style={styles.sideBar}>
+              <Image
+                source={require('@assets/icons/copy.png')}
+                style={styles.sideBarImage}
+              />
             </View>
-            <View style={[elements.capsule]}>
-              <Text style={elements.smallYellowText}>{size_text}</Text>
+            <View style={styles.contentBar}>
+              <View style={styles.contentTop}>
+                <Text style={styles.fileNameText}>{file.name}</Text>
+              </View>
+              <View style={styles.contentMiddle}>
+                <Text style={styles.memberNameText}>{file.member.full_name}</Text>
+                <Image
+                  source={require('@assets/icons/forward_narrow.png')}
+                  style={styles.arrowImage}
+                />
+              </View>
+              <View style={styles.contentBottom}>
+                <View style={[elements.capsule]}>
+                  <Text style={elements.smallYellowText}>
+                    {getConditionalTimeString(file.created_at)}
+                  </Text>
+                </View>
+                <View style={[elements.capsule]}>
+                  <Text style={elements.smallYellowText}>{size_text}</Text>
+                </View>
+              </View>
             </View>
           </View>
-        </View>
-      </View>
-    </TouchableOpacity>
+        </TouchableOpacity>
+      </ContextMenu.Trigger>
+
+      <ContextMenu.Content>
+        <ContextMenu.Item key="download" onSelect={downloadPressed}>
+          <ContextMenu.ItemTitle>Download</ContextMenu.ItemTitle>
+        </ContextMenu.Item>
+        <ContextMenu.Item key="open" onSelect={openPressed}>
+          <ContextMenu.ItemTitle>Open</ContextMenu.ItemTitle>
+        </ContextMenu.Item>
+        <ContextMenu.Item key="share" onSelect={sharePressed}>
+          <ContextMenu.ItemTitle>Share</ContextMenu.ItemTitle>
+        </ContextMenu.Item>
+      </ContextMenu.Content>
+
+    </ContextMenu.Root>
   );
 }
 
