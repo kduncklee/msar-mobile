@@ -10,6 +10,7 @@ interface FormTextInputProps {
   placeholder: string;
   value?: string;
   rightButton?: ImageRequireSource;
+  editable?: boolean;
   secure?: boolean;
   returnKey?: ReturnKeyType;
   autoCorrect?: boolean;
@@ -19,7 +20,7 @@ interface FormTextInputProps {
   onChange: (text: string) => void;
 };
 
-function FormTextInput({ title, placeholder, value, icon, rightButton, onRightPress, onChange, secure = false, returnKey, onSubmit, autoCorrect = true, autoCapitalize = 'sentences' }: FormTextInputProps) {
+function FormTextInput({ title, placeholder, value, icon, rightButton, onRightPress, onChange, editable = true, secure = false, returnKey, onSubmit, autoCorrect = true, autoCapitalize = 'sentences' }: FormTextInputProps) {
   const textChanged = (text: string) => {
     onChange(text);
   };
@@ -51,6 +52,7 @@ function FormTextInput({ title, placeholder, value, icon, rightButton, onRightPr
           onSubmitEditing={handleDoneButtonPress}
           placeholder={placeholder}
           placeholderTextColor={colors.grayText}
+          editable={editable}
           secureTextEntry={secure}
           autoCorrect={autoCorrect}
           autoCapitalize={autoCapitalize}

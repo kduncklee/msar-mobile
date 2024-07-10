@@ -13,7 +13,7 @@ export interface location {
 };
 
 export function locationToString(location: location): string {
-  if (location.address?.street) {
+  if (location?.address?.street) {
     let address = `${location.address.street}`;
     if (location.address?.city) {
       address += `, ${location.address.city}`;
@@ -27,7 +27,7 @@ export function locationToString(location: location): string {
     return address;
   }
 
-  if (location.coordinates?.lat && location.coordinates?.long) {
+  if (location?.coordinates?.lat && location.coordinates?.long) {
     return `${location.coordinates.lat}, ${location.coordinates.long}`;
   }
 
@@ -35,15 +35,15 @@ export function locationToString(location: location): string {
 }
 
 export function locationToShortString(location: location): string {
-  if (location.address?.street) {
+  if (location?.address?.street) {
     return `${location.address.street}`;
   }
 
-  if (location.coordinates?.lat && location.coordinates?.long) {
+  if (location?.coordinates?.lat && location.coordinates?.long) {
     return `${location.coordinates.lat}, ${location.coordinates.long}`;
   }
 
-  if (location.text) {
+  if (location?.text) {
     return `${location.text}`;
   }
 

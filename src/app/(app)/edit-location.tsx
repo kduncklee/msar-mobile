@@ -14,12 +14,14 @@ import type { geocodeAddressResponse } from '@remote/responses';
 import LocationSelectionModal from '@components/modals/LocationSelectModal';
 import type { location } from '@/types/location';
 import { locationToShortString, locationToString } from '@/types/location';
-import '@storage/global';
+import { useEditingLocation } from '@/storage/mmkv';
+import { handleBackPressed, useBackHandler } from '@/utility/backHandler';
 
 function Page() {
   const markerRef = useRef<MapMarker>();
   const [showSpinner, setShowSpinner] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [editingLocation, setEditingLocation] = useEditingLocation();
   const [currentLocation, setCurrentLocation] = useState<location>(null);
   const [defaultRegion, setDefaultRegion] = useState<Region>({
     latitude: 34.050783236893395,
@@ -28,8 +30,13 @@ function Page() {
     longitudeDelta: 0.5355799588636216,
   });
   const [addressText, setAddressText] = useState('');
-  let initialLocation: location = null;
   const [searchResults, setSearchResults] = useState<location[]>([]);
+  const locationChanged = (currentLocation?.coordinates != null) && (
+    (editingLocation == null) || (editingLocation.coordinates == null)
+    || (editingLocation.coordinates.lat !== currentLocation.coordinates.lat)
+    || (editingLocation.coordinates.long !== currentLocation.coordinates.long)
+  );
+  useBackHandler(locationChanged);
 
   useEffect(() => {
     if (Platform.OS === 'ios') {
@@ -38,13 +45,12 @@ function Page() {
     else if (Platform.OS === 'android') {
       StatusBar.setBackgroundColor(colors.primaryBg);
     }
-
-    if (global.selectedLocation != null) {
-      console.log(locationToString(global.selectedLocation));
-      initialLocation = global.selectedLocation;
-      setLocation(initialLocation);
-    }
   }, []);
+
+  useEffect(() => {
+    console.log('editing location', locationToString(editingLocation));
+    setLocation(editingLocation);
+  }, [editingLocation]);
 
   useEffect(() => {
     if (currentLocation?.coordinates != null
@@ -61,35 +67,7 @@ function Page() {
   }, [currentLocation]);
 
   const backPressed = () => {
-    if (initialLocation?.coordinates !== null && currentLocation.coordinates !== null) {
-      if (initialLocation.coordinates.lat !== currentLocation.coordinates.lat
-        || initialLocation.coordinates.long !== currentLocation.coordinates.long) {
-        showChangeAlert();
-        return;
-      }
-    }
-
-    router.back();
-  };
-
-  const showChangeAlert = () => {
-    Alert.alert(
-      'Location Changed',
-      'Going back without setting the location will lose this change. Do you want to proceed?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Yes',
-          onPress: () => {
-            router.back();
-          },
-        },
-      ],
-      { cancelable: false },
-    );
+    handleBackPressed(locationChanged);
   };
 
   const onMapLongPress = (event: LongPressEvent) => {
@@ -99,8 +77,8 @@ function Page() {
 
     setLocation({
       coordinates: {
-        lat: event.nativeEvent.coordinate.latitude.toString(),
-        long: event.nativeEvent.coordinate.longitude.toString(),
+        lat: event.nativeEvent.coordinate.latitude.toFixed(6),
+        long: event.nativeEvent.coordinate.longitude.toFixed(6),
       },
     });
   };
@@ -109,11 +87,12 @@ function Page() {
     console.log(region);
   };
 
+  // Save the location and return.
   const onLocationSelect = () => {
-    global.selectedLocation = currentLocation;
+    setEditingLocation(currentLocation);
 
     if (currentLocation?.coordinates != null) {
-      router.setParams({ location: `${locationToString(currentLocation)}` });
+      router.back();
     }
   };
 

@@ -1,6 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
-import { MMKV, useMMKVNumber, useMMKVString } from 'react-native-mmkv';
+import { MMKV, useMMKVNumber, useMMKVObject, useMMKVString } from 'react-native-mmkv';
 import { getData, removeData } from '@storage/storage';
+import type { location } from '@/types/location';
 
 const key_name = 'mmkv_encryption_key';
 const keychainOptions: SecureStore.SecureStoreOptions = {
@@ -50,6 +51,10 @@ export const clientStorage = {
     storage.delete(key);
   },
 };
+
+export function useEditingLocation() {
+  return useMMKVObject<location>('edit_location', storage);
+}
 
 export function useLocalDataFilePath(id: number) {
   return useMMKVString(`file_${id}`, storage);

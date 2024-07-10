@@ -6,20 +6,21 @@ import { useMutation } from '@tanstack/react-query';
 import Header from '@components/Header';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
-import { router, useGlobalSearchParams, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import DropdownSelector from '@components/inputs/DropdownSelector';
 import FormTextInput from '@components/inputs/FormTextInput';
 import FormTextArea from '@components/inputs/FormTextArea';
 import FormCheckbox from '@components/inputs/FormCheckbox';
 import DropdownMultiselect from '@components/inputs/DropdownMultiselect';
 import ActivityModal from '@components/modals/ActivityModal';
-import '@storage/global';
 import { apiCreateCallout, apiUpdateCallout, useCalloutQuery, useNotificationsAvailableQuery, useRadioChannelsAvailableQuery } from '@remote/api';
 import msarEventEmitter from '@utility/msarEventEmitter';
 import type { callout } from '@/types/callout';
 import type { location } from '@/types/location';
 import { locationToString } from '@/types/location';
 import { calloutStatus, calloutType, stringToCalloutType } from '@/types/enums';
+import { useEditingLocation } from '@/storage/mmkv';
+import { handleBackPressed, useBackHandler } from '@/utility/backHandler';
 
 function Page() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -41,7 +42,10 @@ function Page() {
   const [locationText, setLocationText] = useState('');
   const [locationDescText, setLocationDescText] = useState('');
   const [handlingUnit, setHandlingUnit] = useState<string>(null);
-  const { location } = useGlobalSearchParams();
+  const [editingLocation, setEditingLocation] = useEditingLocation();
+  const [calloutChanged, setCalloutChanged] = useState(false);
+  useBackHandler(calloutChanged);
+
   const calloutQuery = useCalloutQuery(id);
   let existingData;
   if (id) {
@@ -113,21 +117,30 @@ function Page() {
     else if (Platform.OS === 'android') {
       StatusBar.setBackgroundColor(colors.primaryBg);
     }
-
-    global.selectedLocation = null;
   }, []);
 
   useEffect(() => {
-    if (location) {
-      router.back();
-      setLocationText(`${location}`);
+    if (editingLocation) {
+      console.log('editingLocation useEffect', editingLocation);
+      setLocationText(locationToString(editingLocation));
+      if (editingLocation && (JSON.stringify(existingData?.location) !== JSON.stringify(editingLocation))) {
+        console.log('setCalloutChanged because of location');
+        setCalloutChanged(true);
+      }
     }
-  }, [location]);
+  }, [editingLocation, existingData?.location]);
 
   useEffect(() => {
     if (existingData) {
       populateFields();
     }
+    else {
+      setEditingLocation(undefined);
+      setLocationText('');
+    }
+    console.log('setCalloutChanged false');
+    setCalloutChanged(false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [existingData]);
 
   const populateFields = () => {
@@ -135,7 +148,7 @@ function Page() {
     setOperationType(stringToCalloutType(existingData.operation_type));
     setLocationText(locationToString(existingData.location));
     setLocationDescText(existingData.location.text);
-    global.selectedLocation = existingData.location;
+    setEditingLocation(existingData.location);
     setSubject(existingData.subject);
     setSubjectContact(existingData.subject_contact);
     setInformant(existingData.informant);
@@ -149,6 +162,10 @@ function Page() {
       setTen22(true);
     }
     setResolutionNotes(existingData.resolution);
+  };
+
+  const backPressed = () => {
+    handleBackPressed(calloutChanged);
   };
 
   const createCalloutPressed = () => {
@@ -201,16 +218,15 @@ function Page() {
     let locationObject: location = {
       text: locationText,
     };
-    if (global.selectedLocation) {
-      locationObject = global.selectedLocation;
+    if (editingLocation) {
+      locationObject = editingLocation;
     }
 
     if (locationDescText) {
       locationObject.text = locationDescText;
     }
 
-    // console.log("Location: " + JSON.stringify(locationObject));
-
+    // console.log(`Location: ${JSON.stringify(locationObject)}`);
     const callout: callout = {
       title,
       operation_type: operationType,
@@ -233,7 +249,6 @@ function Page() {
     }
 
     // console.log("generated Callout: " + JSON.stringify(callout));
-
     return callout;
   };
 
@@ -299,60 +314,80 @@ function Page() {
 
   const validateFields = (): boolean => {
     // TODO: add validation
-    return true;
+    let error = '';
+
+    if (!title) {
+      error += 'Title is a required field\n';
+    }
+    if (error) {
+      Alert.alert('Validation failure', error);
+    }
+    return !error;
   };
 
   const titleChanged = (text: string) => {
     setTitle(text);
+    setCalloutChanged(true);
   };
 
   const calloutTypeSelected = (item: any) => {
     const opType = item.enum as calloutType;
     setOperationType(opType);
+    setCalloutChanged(true);
   };
 
   const locationChanged = (text: string) => {
     setLocationText(text);
+    setCalloutChanged(true);
   };
 
   const locationDescChanged = (text: string) => {
     setLocationDescText(text);
+    setCalloutChanged(true);
   };
 
   const locationButtonPressed = () => {
-    router.push({ pathname: 'edit-location', params: { locationDescription: locationText, location: '' } });
+    router.push({ pathname: 'edit-location' });
   };
 
   const subjectChanged = (text: string) => {
     setSubject(text);
+    setCalloutChanged(true);
   };
 
   const subjectContactChanged = (text: string) => {
     setSubjectContact(text);
+    setCalloutChanged(true);
   };
 
   const informantChanged = (text: string) => {
     setInformant(text);
+    setCalloutChanged(true);
   };
 
   const informantContactChanged = (text: string) => {
     setInformantContact(text);
+    setCalloutChanged(true);
   };
 
   const circumstancesChanged = (text: string) => {
     setCircumstances(text);
+    setCalloutChanged(true);
   };
 
   const radioFreqSelected = (item: any) => {
     setRadioFrequency(item.label);
+    setCalloutChanged(true);
   };
 
   const additionalRadioFrequenciesSelected = (items: string[]) => {
     setAdditionalRadioFrequencies(items);
+    setCalloutChanged(true);
   };
 
   const notificationsSelected = (items: string[]) => {
     setNotificationsMade(items);
+    setCalloutChanged(true);
   };
 
   const on1022Toggle = (checked: boolean) => {
@@ -360,20 +395,23 @@ function Page() {
     if (!checked) {
       setResolutionNotes('');
     }
+    setCalloutChanged(true);
   };
 
   const resolutionChanged = (text: string) => {
     setResolutionNotes(text);
+    setCalloutChanged(true);
   };
 
   const handlingUnitChanged = (text: string) => {
     setHandlingUnit(text);
+    setCalloutChanged(true);
   };
 
   return (
     <>
       <SafeAreaView style={styles.container}>
-        <Header title={headerTitle} backButton timestamp={new Date()} />
+        <Header title={headerTitle} backButton onBackPressed={backPressed} timestamp={new Date()} />
         <KeyboardAvoidingView
           style={styles.contentContainer}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -400,6 +438,7 @@ function Page() {
               onChange={locationChanged}
               placeholder="Location"
               value={locationText}
+              editable={false}
             />
             <FormTextInput
               onChange={locationDescChanged}
