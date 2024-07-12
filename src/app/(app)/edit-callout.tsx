@@ -418,18 +418,25 @@ function Page() {
           keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -500} // Adjust the offset as needed
         >
           <ScrollView style={styles.scrollView}>
-            <FormTextInput
-              title="Title"
-              onChange={titleChanged}
-              placeholder="Title"
-              value={title}
-            />
             <DropdownSelector
               title="Callout Type"
               options={callOutTypeSelect}
               placeholder="Select type"
               selectedValue={`${callOutTypeSelect.findIndex(item => item.enum === operationType)}`}
               onSelect={calloutTypeSelected}
+            />
+            <FormTextInput
+              title="Title"
+              onChange={titleChanged}
+              placeholder="Title - Few Word Summary"
+              value={title}
+            />
+            <FormTextArea
+              title="Circumstances / Call Details"
+              height={100}
+              onChange={circumstancesChanged}
+              placeholder="Call Details - Full Description"
+              value={circumstances}
             />
             <FormTextInput
               title="Location"
@@ -468,13 +475,6 @@ function Page() {
               onChange={informantContactChanged}
               placeholder="Informant Contact"
               value={informantContact}
-            />
-            <FormTextArea
-              title="Circumstances"
-              height={100}
-              onChange={circumstancesChanged}
-              placeholder="Circumstances"
-              value={circumstances}
             />
             <DropdownSelector
               title="Tactical Talkgroup"
