@@ -11,6 +11,7 @@ import { router } from 'expo-router';
 import type { callout } from '@/types/callout';
 import { colorForResponseType, textForCalloutStatus, textForResponseType, textForType } from '@/types/calloutSummary';
 import { calloutStatus } from '@/types/enums';
+import { locationIsSet } from '@/types/location';
 
 interface CalloutInformationTabProps {
   callout: callout;
@@ -34,7 +35,7 @@ function CalloutInformationTab({ callout }: CalloutInformationTabProps) {
       >
         <View style={{ marginTop: 8 }} />
         {!!callout.title
-        && <TextAreaField value={callout.title} />}
+        && <TextAreaField value={callout.title} valueColor={colors.secondaryYellow} />}
         {!!callout.created_at
         && (
           <InformationField
@@ -116,12 +117,13 @@ function CalloutInformationTab({ callout }: CalloutInformationTabProps) {
             <TextAreaField
               title="Circumstances"
               value={callout.description}
+              valueColor={colors.secondaryYellow}
             />
           </>
         )}
         <View style={{ height: 10 }} />
       </InformationTray>
-      {!!callout.location
+      {(locationIsSet(callout.location) || callout.location?.text)
       && (
         <InformationTray
           title="Location"

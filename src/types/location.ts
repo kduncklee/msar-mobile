@@ -12,6 +12,11 @@ export interface location {
   };
 };
 
+export function locationIsSet(location: location): boolean {
+  return (!!location?.address?.street
+    || !!(location?.coordinates?.lat && location.coordinates?.long));
+}
+
 export function locationToString(location: location): string {
   if (location?.address?.street) {
     let address = `${location.address.street}`;

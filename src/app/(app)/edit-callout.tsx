@@ -215,16 +215,11 @@ function Page() {
   };
 
   const generateCallout = (): callout => {
-    let locationObject: location = {
-      text: locationText,
-    };
+    let locationObject: location = {};
     if (editingLocation) {
       locationObject = editingLocation;
     }
-
-    if (locationDescText) {
-      locationObject.text = locationDescText;
-    }
+    locationObject.text = locationDescText;
 
     // console.log(`Location: ${JSON.stringify(locationObject)}`);
     const callout: callout = {
@@ -453,7 +448,7 @@ function Page() {
               value={locationDescText}
             />
             <FormTextInput
-              title="Subject"
+              title="Subject / Victim / Missing Person"
               onChange={subjectChanged}
               placeholder="Subject"
               value={subject}
@@ -465,7 +460,7 @@ function Page() {
               value={subjectContact}
             />
             <FormTextInput
-              title="Informant"
+              title="Informant / Reporting Party"
               onChange={informantChanged}
               placeholder="Informant"
               value={informant}

@@ -40,59 +40,41 @@ function LocationField({ location }: LocationFieldProps) {
     Linking.openURL(mapUrl).catch(err => console.error('An error occurred', err));
   };
 
-  if (location.text && (location.address == null || location.coordinates == null)) {
-    locType = locationType.DESCRIPTION;
-  }
-  else if (location.address) {
-    locType = locationType.ADDRESS;
-    if (location.coordinates) {
-      if (location.coordinates.lat != null && location.coordinates.long != null) {
-        coordinates = coordinateFromString(`${location.coordinates.lat}, ${location.coordinates.long}`);
-      }
-      defaultRegion.latitude = coordinates.latitude;
-      defaultRegion.longitude = coordinates.longitude;
-    }
-  }
-  else if (location.coordinates) {
-    locType = locationType.COORDINATES;
-    if (location.coordinates.lat != null && location.coordinates.long != null) {
-      coordinates = coordinateFromString(`${location.coordinates.lat}, ${location.coordinates.long}`);
-    }
+  if (location?.coordinates?.lat != null && location?.coordinates?.long != null) {
+    coordinates = coordinateFromString(`${location.coordinates.lat}, ${location.coordinates.long}`);
     defaultRegion.latitude = coordinates.latitude;
     defaultRegion.longitude = coordinates.longitude;
+  }
+
+  if (location.address?.street) {
+    locType = locationType.ADDRESS;
+  }
+  else if (coordinates.latitude) {
+    locType = locationType.COORDINATES;
+  }
+  else if (location.text) {
+    locType = locationType.DESCRIPTION;
   }
 
   return (
     <View style={styles.container}>
       {locType === locationType.DESCRIPTION
       && <Text style={[elements.mediumText, { padding: 8 }]}>{location.text}</Text>}
-      {locType === locationType.ADDRESS
-      && (
-        <MapView style={styles.mapContainer} region={defaultRegion}>
-          {coordinates
-          && (
-            <Marker
-              coordinate={coordinates}
-              title={locationToShortString(location)}
-            />
-          )}
-        </MapView>
-      )}
-      {locType === locationType.COORDINATES
-      && (
-        <MapView style={styles.mapContainer} region={defaultRegion}>
-          {coordinates
-          && (
-            <Marker
-              coordinate={coordinates}
-              title="Location"
-            />
-          )}
-        </MapView>
-      )}
+
       {(locType === locationType.COORDINATES || locType === locationType.ADDRESS)
       && (
         <>
+          <MapView style={styles.mapContainer} region={defaultRegion}>
+            {coordinates
+            && (
+              <Marker
+                coordinate={coordinates}
+                title={(locType === locationType.ADDRESS)
+                  ? locationToShortString(location)
+                  : 'Location'}
+              />
+            )}
+          </MapView>
           <Text style={[elements.smallText, { margin: 16 }]} selectable>
             {locationToString(location)}
           </Text>
