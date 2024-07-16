@@ -1,0 +1,16 @@
+appId: org.malibusar.app
+---
+- launchApp
+- tapOn:
+    text: Announcements
+    index: 1
+- tapOn: Message...
+- evalScript: ${output.title = (Math.random() + 1).toString(36).substring(7)}
+- inputText: ${output.title}
+- tapOn:
+    id: sendButton
+- assertVisible: ${output.title}
+- assertNotVisible: Sending
+- assertNotVisible: Error
+- tapOn:
+    id: backButton

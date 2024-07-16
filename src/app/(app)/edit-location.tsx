@@ -219,7 +219,7 @@ function Page() {
                   autoCorrect={false}
                 />
                 <TouchableOpacity activeOpacity={0.5} style={[styles.button, { backgroundColor: colors.blue }]} onPress={searchPressed}>
-                  <Image source={require('@assets/icons/location_search.png')} style={styles.buttonImage} />
+                  <Image source={require('@assets/icons/location_search.png')} style={styles.buttonImage} testID="search-button" />
                 </TouchableOpacity>
               </View>
               {!currentCoordinate

@@ -28,11 +28,12 @@ function FormCheckbox({ title, checked, disabled, onToggle }: FormCheckboxProps)
         activeOpacity={0.5}
         style={[elements.inputContainer, { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' }]}
         onPress={onCheckToggle}
+        testID={`${title}-checkbox`}
       >
         {checked
-        && <Image source={require('@assets/icons/check.png')} style={elements.fieldImage} />}
+        && <Image source={require('@assets/icons/check.png')} style={elements.fieldImage} testID={`${title}-checked`} />}
       </TouchableOpacity>
-      <Text style={[elements.mediumText, { marginLeft: 10, fontWeight: '600' }]}>{title}</Text>
+      <Text style={[elements.mediumText, { marginLeft: 10, fontWeight: '600' }]} testID={title}>{title}</Text>
     </View>
   );
 }

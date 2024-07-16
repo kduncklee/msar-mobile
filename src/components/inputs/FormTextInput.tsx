@@ -64,7 +64,7 @@ function FormTextInput({ title, placeholder, value, icon, rightButton, onRightPr
             onPress={onRightPress}
           >
             {rightButton
-            && <Image source={rightButton} style={elements.fieldImage} />}
+            && <Image source={rightButton} style={elements.fieldImage} testID={`${title}-button`} />}
           </TouchableOpacity>
         )}
       </View>

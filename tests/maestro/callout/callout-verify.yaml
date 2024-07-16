@@ -1,0 +1,36 @@
+appId: org.malibusar.app
+---
+- assertVisible:
+    id: header-title
+    text: ${TITLE}
+
+- assertVisible:
+    text: ${TITLE}
+    index: 1
+- assertVisible: John Doe
+- assertVisible: 555-555-5555
+- assertVisible: Jane Doe
+- assertVisible: 555-555-1234
+- assertVisible: MAL SAR
+- assertVisible: tag 100
+- assertVisible: Details of the callout.
+
+- scrollUntilVisible:
+    centerElement: true
+    element:
+      text: Location
+
+- assertVisible: Google Map
+- assertVisible: '1925 Las Virgenes Road, Calabasas, CA 91302'
+- assertVisible: Description of the specific location.
+
+- assertVisible: Active
+
+- tapOn: Log
+- assertVisible: "Callout updated.\nRadio channels added: ['C41', 'C42']"
+- assertVisible: "Callout updated.\nNotifications added: ['SP']"
+- assertVisible: Message...
+- tapOn: Info
+
+- assertVisible: 'C41, C42'
+- assertVisible: SP

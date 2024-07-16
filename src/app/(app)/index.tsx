@@ -95,6 +95,7 @@ function Page() {
           <TouchableOpacity
             activeOpacity={0.5}
             onPress={() => router.push('/callout-list')}
+            testID="Callouts"
           >
             <View style={[elements.tray, styles.contentTray]}>
               <Text style={styles.buttonText}>Callouts</Text>

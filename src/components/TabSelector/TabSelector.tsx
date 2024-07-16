@@ -49,7 +49,7 @@ function TabSelector({ tabs, selected, onTabChange }: TabSelectorProps) {
               {!!tab.badge
               && (
                 <View style={[elements.tabBadge, { backgroundColor: badgeColor }]}>
-                  <Text style={[elements.tabBadgeText, { color: badgeTextColor }]}>{tab.badge}</Text>
+                  <Text style={[elements.tabBadgeText, { color: badgeTextColor }]} testID={`${tab.title}-badge`}>{tab.badge}</Text>
                 </View>
               )}
             </TouchableOpacity>

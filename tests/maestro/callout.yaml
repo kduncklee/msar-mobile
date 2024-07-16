@@ -1,0 +1,46 @@
+appId: org.malibusar.app
+---
+- launchApp
+- evalScript: '${output.title = (Math.random() + 1).toString(36).substring(7)}'
+
+- runFlow:
+    when:
+      visible:
+        id: backButton
+    commands:
+      - tapOn:
+          id: backButton
+
+- runFlow:
+    when:
+      visible:
+        id: backButton
+    commands:
+      - tapOn:
+          id: backButton
+
+- runFlow:
+    file: callout/callout-create.yaml
+    env:
+      TITLE: ${output.title}
+
+- runFlow:
+    file: callout/callout-verify.yaml
+    env:
+      TITLE: ${output.title}
+
+- runFlow:
+    file: callout/callout-log.yaml
+    env:
+      INITIAL_LOG_COUNT: 2
+
+- runFlow:
+    file: callout/callout-respond.yaml
+
+- tapOn:
+    id: backButton
+- assertVisible: ${output.title}
+- assertVisible: 1925 Las Virgenes Road
+
+- tapOn:
+    id: backButton

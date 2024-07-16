@@ -60,12 +60,13 @@ function Header({ title, backButton = false, onBackPressed, rightButton = false,
       {backButton
       && (
         <TouchableOpacity activeOpacity={0.2} style={styles.backContainer} onPress={() => backPressed()}>
-          <Image source={require('@assets/icons/back.png')} style={styles.backImage} />
+          <Image source={require('@assets/icons/back.png')} style={styles.backImage} testID="backButton" />
         </TouchableOpacity>
       )}
       <Text
         style={[styles.title, { paddingHorizontal: backButton ? 10 : 20 }]}
         numberOfLines={1}
+        testID="header-title"
       >
         {title}
       </Text>

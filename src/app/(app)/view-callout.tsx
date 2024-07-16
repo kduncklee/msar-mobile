@@ -12,7 +12,7 @@ import CalloutInformationTab from '@components/callouts/CalloutInformationTab';
 import CalloutLogTab from '@components/callouts/CalloutLogTab';
 import CalloutPersonnelTab from '@components/callouts/CalloutPersonnelTab';
 import LogInput from '@components/callouts/LogInput';
-import { apiRespondToCallout, useCalloutLogInfiniteQuery, useCalloutLogMutation, useCalloutQuery } from '@remote/api';
+import { apiRespondToCallout, calloutLogQueryKey, calloutQueryKey, useCalloutLogInfiniteQuery, useCalloutLogMutation, useCalloutQuery } from '@remote/api';
 import msarEventEmitter from '@utility/msarEventEmitter';
 import CalloutRespondModal from '@components/modals/CalloutRespondModal';
 import CalloutFileTab from 'components/callouts/CalloutFileTab';
@@ -135,8 +135,8 @@ function Page() {
 
   const refreshCallout = () => {
     console.log('refreshCallout');
-    queryClient.invalidateQueries({ queryKey: ['calloutInfo'] });
-    queryClient.invalidateQueries({ queryKey: ['calloutLog'] });
+    queryClient.invalidateQueries({ queryKey: calloutQueryKey(idInt) });
+    queryClient.invalidateQueries({ queryKey: calloutLogQueryKey(idInt) });
   };
 
   const refreshReceived = (_data) => {
@@ -169,7 +169,13 @@ function Page() {
   };
 
   const submitLogMessage = async () => {
-    calloutLogMutation.mutate({ message: logMessageText });
+    calloutLogMutation.mutate({ message: logMessageText }, {
+      onSuccess: () => {
+        // Additionally refresh the callout data to update badge.
+        queryClient.invalidateQueries({ queryKey: calloutQueryKey(idInt) });
+      },
+
+    });
     setLogMessageText('');
   };
 

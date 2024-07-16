@@ -1,0 +1,28 @@
+appId: org.malibusar.app
+---
+- launchApp
+- tapOn:
+    text: Settings
+    index: 1
+- assertVisible: Username
+- runFlow:
+    when:
+      visible:
+        id: Notifications-checked
+    commands:
+      - tapOn:
+          id: Notifications-checked
+- tapOn:
+    id: Notifications-checkbox
+    retryTapIfNoChange: false
+- assertVisible: Restore default notification sounds
+- tapOn: Restore default notification sounds
+- assertVisible:
+    text: Snooze
+    index: 1
+- tapOn:
+    text: Settings
+    index: 1
+- assertVisible: Yucatan - Long
+- tapOn:
+    id: backButton

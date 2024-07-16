@@ -20,7 +20,7 @@ function LogInput({ text, onSendPress, onTextChange }: LogInputProps) {
         placeholderTextColor={colors.grayText}
       />
       <TouchableOpacity activeOpacity={0.5} style={[styles.button, { backgroundColor: colors.blue }]} onPress={onSendPress}>
-        <Image source={require('@assets/icons/send_white.png')} style={styles.buttonImage} />
+        <Image source={require('@assets/icons/send_white.png')} style={styles.buttonImage} testID="sendButton" />
       </TouchableOpacity>
     </View>
   );

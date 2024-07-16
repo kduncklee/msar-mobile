@@ -362,10 +362,13 @@ export function useCalloutListQuery(status?: string) {
 }
 
 /// /// Callout
+export function calloutQueryKey(idInt: number) {
+  return ['calloutInfo', idInt];
+}
 function calloutQueryParams(id: string) {
   const idInt: number = Number.parseInt(id);
   return {
-    queryKey: ['calloutInfo', idInt],
+    queryKey: calloutQueryKey(idInt),
     queryFn: () => apiGetCallout(idInt),
     enabled: !!id,
   };
@@ -380,9 +383,12 @@ export function useCalloutQuery(id: string) {
 }
 
 /// /// Callout Log
+export function calloutLogQueryKey(idInt: number) {
+  return ['calloutLog', idInt];
+}
 function calloutLogQueryParams(idInt: number) {
   return {
-    queryKey: ['calloutLog', idInt],
+    queryKey: calloutLogQueryKey(idInt),
     queryFn: ({ pageParam }) => apiGetCalloutLog(idInt, pageParam),
     initialPageParam: '',
     getNextPageParam: (lastPage, _pages) => lastPage?.next,

@@ -39,6 +39,7 @@ function DropdownSelector({ title, options, placeholder, selectedValue, rightBut
           onChange={(item) => {
             onSelect(item);
           }}
+          testID={title}
         />
         {onRightPress
         && (
