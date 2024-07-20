@@ -11,6 +11,7 @@ import { logEntryFromRespsonse } from '@/types/logEntry';
 import type { calloutSummary } from '@/types/calloutSummary';
 import { calloutSummaryFromResponse } from '@/types/calloutSummary';
 import { logStatusType, logType } from '@/types/enums';
+import { userDetailsFromResponse } from '@/types/user';
 
 const local_server: string = 'http://192.168.1.120:8000';
 const legacy_server: string = 'https://malibusarhours.org/calloutapi';
@@ -46,6 +47,9 @@ async function calloutsEndpoint(): Promise<string> {
 }
 async function chatEndpoint(): Promise<string> {
   return `${await server()}/api/announcement/log/`;
+}
+async function membersEndpoint(): Promise<string> {
+  return `${await server()}/api/members/`;
 }
 async function devicesEndpoint(): Promise<string> {
   return `${await server()}/api/devices/`;
@@ -222,6 +226,10 @@ export async function apiPostChatLog(message: string): Promise<any> {
   return apiPostLogFromUrl(await chatEndpoint(), message);
 }
 
+export async function apiGetMembers(): Promise<any> {
+  return fetchJsonWithCredentials(await membersEndpoint());
+}
+
 export async function apiSetDeviceId(token: string, active: boolean = true) {
   const tokenInfo = {
     name: Application.nativeApplicationVersion,
@@ -334,6 +342,26 @@ function radioChannelsAvailabletQueryParams() {
 
 export function useRadioChannelsAvailableQuery() {
   return useQuery(radioChannelsAvailabletQueryParams());
+}
+
+/// /// Members List
+export const memberListQueryKey = ['members'];
+function memberListQueryParams() {
+  return {
+    queryKey: memberListQueryKey,
+    queryFn: async () => {
+      const response = await apiGetMembers();
+      return response.results.map((result: any) => userDetailsFromResponse(result));
+    },
+  };
+}
+
+export async function prefetchMemberListQuery(queryClient: QueryClient) {
+  return queryClient.prefetchQuery(memberListQueryParams());
+}
+
+export function useMemberListQuery() {
+  return useQuery(memberListQueryParams());
 }
 
 /// /// Callout List

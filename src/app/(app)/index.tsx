@@ -113,6 +113,14 @@ function Page() {
           </TouchableOpacity>
           <TouchableOpacity
             activeOpacity={0.5}
+            onPress={() => router.push('/roster')}
+          >
+            <View style={[elements.tray, styles.contentTray]}>
+              <Text style={styles.buttonText}>Roster</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.5}
             onPress={() => router.push('/settings')}
           >
             <View style={[elements.tray, styles.contentTray]}>

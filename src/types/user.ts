@@ -9,6 +9,12 @@ export interface user {
   mobile_phone?: string;
 };
 
+export interface user_detail extends user {
+  status: string;
+  status_order: number;
+  is_current: boolean;
+}
+
 export function userToString(user: user): string {
   if (!user)
     return 'System';
@@ -31,4 +37,12 @@ export function isUserSelf(user: user): boolean {
   }
 
   return false;
+}
+
+export function userDetailsFromResponse(memberResonse: any): user_detail {
+  return {
+    mobile_phone: memberResonse.display_phone,
+    first_name: memberResonse.short_name,
+    ...memberResonse,
+  };
 }
