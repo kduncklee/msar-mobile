@@ -29,6 +29,14 @@ function useChatUnread(): boolean {
   return hasUnread;
 }
 
+interface Items {
+  key?: string;
+  text: string;
+  url?: string;
+  onPress?: () => unknown;
+  badge?: string | number;
+}
+
 function Page() {
   const [topMargin, setTopMargin] = useState(0);
   const [snoozeModalVisible, setSnoozeModalVisible] = useState(false);
@@ -36,6 +44,14 @@ function Page() {
   const [snoozeTitle, setSnoozeTitle] = useState('Snooze');
   const chatHasUnread = useChatUnread();
   const numberActiveCallouts = useNumberActiveCallouts();
+
+  const items: Items[] = [
+    { text: 'Callouts', url: '/callout-list', badge: numberActiveCallouts },
+    { text: 'Announcements', url: '/chat', badge: chatHasUnread && '!' },
+    { text: 'Roster', url: '/roster' },
+    { text: 'Settings', url: '/settings' },
+    { key: 'snooze', text: snoozeTitle, onPress: () => setSnoozeModalVisible(true) },
+  ];
 
   useEffect(() => {
     if (Platform.OS === 'ios') {
@@ -53,17 +69,17 @@ function Page() {
     setSnoozeExpireTime(getSnoozeExpires());
   }, []);
 
-  const updateSnooze = () => {
-    const snoozeRemaining = snoozeExpireTime - new Date().getTime();
-    const snoozing = snoozeRemaining > 0;
-    const title = snoozing
-      ? (`Snoozing until ${new Date(snoozeExpireTime).toLocaleTimeString()}`)
-      : 'Snooze';
-    setSnoozeTitle(title);
-    return snoozeRemaining;
-  };
-
   useEffect(() => {
+    const updateSnooze = () => {
+      const snoozeRemaining = snoozeExpireTime - new Date().getTime();
+      const snoozing = snoozeRemaining > 0;
+      const title = snoozing
+        ? (`Snoozing until ${new Date(snoozeExpireTime).toLocaleTimeString()}`)
+        : 'Snooze';
+      setSnoozeTitle(title);
+      return snoozeRemaining;
+    };
+
     const snoozeRemaining = updateSnooze();
     const interval = setInterval(updateSnooze, snoozeRemaining);
     return () => clearInterval(interval);
@@ -92,49 +108,19 @@ function Page() {
       <SafeAreaView style={styles.container}>
         <ScrollView style={styles.scrollView}>
           <Image source={require('@assets/msar_logo.png')} style={[styles.logoImage, { marginTop: topMargin }]} />
-          <TouchableOpacity
-            activeOpacity={0.5}
-            onPress={() => router.push('/callout-list')}
-            testID="Callouts"
-          >
-            <View style={[elements.tray, styles.contentTray]}>
-              <Text style={styles.buttonText}>Callouts</Text>
-              {!!numberActiveCallouts && <Badge style={styles.badge}>{numberActiveCallouts}</Badge>}
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            activeOpacity={0.5}
-            onPress={() => router.push('/chat')}
-          >
-            <View style={[elements.tray, styles.contentTray]}>
-              <Text style={styles.buttonText}>Announcements</Text>
-              {chatHasUnread && <Badge style={styles.badge}>!</Badge>}
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            activeOpacity={0.5}
-            onPress={() => router.push('/roster')}
-          >
-            <View style={[elements.tray, styles.contentTray]}>
-              <Text style={styles.buttonText}>Roster</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            activeOpacity={0.5}
-            onPress={() => router.push('/settings')}
-          >
-            <View style={[elements.tray, styles.contentTray]}>
-              <Text style={styles.buttonText}>Settings</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            activeOpacity={0.5}
-            onPress={() => setSnoozeModalVisible(true)}
-          >
-            <View style={[elements.tray, styles.contentTray]}>
-              <Text style={styles.buttonText}>{snoozeTitle}</Text>
-            </View>
-          </TouchableOpacity>
+          {items.map(item => (
+            <TouchableOpacity
+              activeOpacity={0.5}
+              onPress={item.onPress ? item.onPress : () => router.push(item.url)}
+              testID={item.text}
+              key={item.text}
+            >
+              <View style={[elements.tray, styles.contentTray]}>
+                <Text style={styles.buttonText}>{item.text}</Text>
+                {!!item.badge && <Badge style={styles.badge}>{item.badge}</Badge>}
+              </View>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
       </SafeAreaView>
 
