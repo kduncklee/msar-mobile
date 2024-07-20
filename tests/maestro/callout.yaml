@@ -35,12 +35,15 @@ appId: org.malibusar.app
       INITIAL_LOG_COUNT: 2
 
 - runFlow:
+    when:
+      platform: Android
     file: callout/callout-respond.yaml
 
 - tapOn:
     id: backButton
-- assertVisible: ${output.title}
-- assertVisible: 1925 Las Virgenes Road
+
+- assertVisible: .*${output.title}.*
+- assertVisible: .*1925 Las Virgenes Road.*
 
 - tapOn:
     id: backButton

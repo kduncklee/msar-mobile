@@ -87,6 +87,8 @@ export function imageForType(type: calloutType): ImageRequireSource {
     case calloutType.INFORMATION:
       return require('@assets/icons/information.png'); ;
   }
+  // Avoid null image error.
+  return require('@assets/icons/pencil.png');
 }
 
 export function textForType(type?: calloutType): string {

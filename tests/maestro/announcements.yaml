@@ -2,8 +2,7 @@ appId: org.malibusar.app
 ---
 - launchApp
 - tapOn:
-    text: Announcements
-    index: 1
+    text: Announcements.*
 - tapOn: Message...
 - evalScript: ${output.title = (Math.random() + 1).toString(36).substring(7)}
 - inputText: ${output.title}

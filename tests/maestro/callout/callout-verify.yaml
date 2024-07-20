@@ -11,7 +11,11 @@ appId: org.malibusar.app
 - assertVisible: 555-555-5555
 - assertVisible: Jane Doe
 - assertVisible: 555-555-1234
-- assertVisible: MAL SAR
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible: MAL SAR
 - assertVisible: tag 100
 - assertVisible: Details of the callout.
 
@@ -20,17 +24,37 @@ appId: org.malibusar.app
     element:
       text: Location
 
-- assertVisible: Google Map
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible: Google Map
+
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - assertVisible:
+          id: AnnotationContainer
+
 - assertVisible: '1925 Las Virgenes Road, Calabasas, CA 91302'
 - assertVisible: Description of the specific location.
 
 - assertVisible: Active
 
-- tapOn: Log
-- assertVisible: "Callout updated.\nRadio channels added: ['C41', 'C42']"
-- assertVisible: "Callout updated.\nNotifications added: ['SP']"
+- tapOn: Log.*
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible: "Callout updated.\nRadio channels added: ['C41', 'C42']"
+      - assertVisible: "Callout updated.\nNotifications added: ['SP']"
 - assertVisible: Message...
-- tapOn: Info
 
-- assertVisible: 'C41, C42'
-- assertVisible: SP
+- tapOn: Info
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible: 'C41, C42'
+      - assertVisible: SP

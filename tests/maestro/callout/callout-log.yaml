@@ -2,28 +2,36 @@ appId: org.malibusar.app
 ---
 - evalScript: '${output.new_log_count = (Number.parseInt(INITIAL_LOG_COUNT)+1).toFixed(0)}'
 
-- tapOn: Log
+- tapOn: Log.*
 - assertVisible: Message...
-- assertVisible:
-    id: Log-badge
-    text: ${INITIAL_LOG_COUNT}
-- assertNotVisible:
-    id: Log-badge
-    text: ${output.new_log_count}
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          id: Log-badge
+          text: ${INITIAL_LOG_COUNT}
+      - assertNotVisible:
+          id: Log-badge
+          text: ${output.new_log_count}
 - tapOn: Message...
 - inputText: test message
 - tapOn:
     id: sendButton
 - assertVisible: test message
 - assertVisible: Message...
-- assertVisible:
-    id: Log-badge
-    text: ${output.new_log_count}
-- tapOn: Personnel
-- assertVisible:
-    id: Log-badge
-    text: ${output.new_log_count}
-- tapOn: Log
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          id: Log-badge
+          text: ${output.new_log_count}
+      - tapOn: Personnel.*
+      - assertVisible:
+          id: Log-badge
+          text: ${output.new_log_count}
+- tapOn: Log.*
 - assertVisible: test message
 - assertVisible: Message...
 - tapOn: Info

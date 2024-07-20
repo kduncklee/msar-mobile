@@ -40,7 +40,7 @@ function FormTextInput({ title, placeholder, value, icon, rightButton, onRightPr
   return (
     <View style={styles.container}>
       {!!title
-      && <Text style={elements.fieldTitle}>{title}</Text>}
+      && <Text style={elements.fieldTitle} testID={`${title}-label`}>{title}</Text>}
       <View style={[elements.inputContainer, { height: 50 }]}>
         {!!icon
         && <Image source={icon} style={elements.fieldImage} />}

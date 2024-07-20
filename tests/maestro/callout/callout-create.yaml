@@ -1,27 +1,38 @@
 appId: org.malibusar.app
+TEST_VALIDATION: true
 ---
-- tapOn: Callouts
+- tapOn:
+    id: Callouts
 - tapOn: Create Callout
-- scrollUntilVisible:
-    centerElement: true
-    element:
-      text: 10-22
-- tapOn:
-    text: Create Callout
-    index: 1
-- assertVisible: .*Title is a required field.*
-- tapOn: OK
-- scrollUntilVisible:
-    direction: UP
-    element:
-      text: Select type
-- tapOn: Select type
-- assertVisible:
-    text: Search
-    index: 1
-- tapOn:
-    text: Rescue
-    index: 1
+
+- runFlow:
+    when:
+      true: ${TEST_VALIDATION}
+    commands:
+      - scrollUntilVisible:
+          centerElement: true
+          element:
+            text: 'Handling Unit / Tag #'
+      - tapOn:
+          text: Create Callout
+          index: 1
+      - assertVisible: .*Title is a required field.*
+      - tapOn: OK
+      - scrollUntilVisible:
+          direction: UP
+          element:
+            text: Select type
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - tapOn: Select type
+      - assertVisible:
+          text: Search
+          index: 1
+      - tapOn:
+          text: Rescue
+          index: 1
 - tapOn: Title - Few Word Summary
 - inputText: '${TITLE}'
 - tapOn: Call Details - Full Description
@@ -29,6 +40,7 @@ appId: org.malibusar.app
 - tapOn:
     text: Circumstances / Call Details
     label: Click on 'Circumstances / Call Details' to hide keyboard.
+
 - tapOn:
     id: Location-button
 - tapOn: Search...
@@ -42,44 +54,53 @@ appId: org.malibusar.app
 - assertVisible: '1925 Las Virgenes Road, Calabasas, CA 91302'
 - tapOn: Location Description
 - inputText: Description of the specific location.
+
+- pressKey: Enter
 - scrollUntilVisible:
-    centerElement: true
     element:
-      text: Subject
+      text: Subject Contact
+
 - tapOn: Subject
 - inputText: John Doe
+- pressKey: Enter
 - tapOn: Subject Contact
 - inputText: 555-555-5555
+- pressKey: Enter
+
 - scrollUntilVisible:
     centerElement: true
     element:
       text: Informant
 - tapOn: Informant
 - inputText: Jane Doe
+- pressKey: Enter
 - tapOn: Informant Contact
 - inputText: 555-555-1234
-- tapOn:
-    id: Tactical Talkgroup
-- tapOn:
-    id: Tactical Talkgroup
-- tapOn:
-    text: MAL SAR
-    index: 1
-- tapOn: Select Frequencies
-- tapOn:
-    text: C41
-    index: 1
-- tapOn:
-    text: C42
-    index: 1
-- tapOn:
-    id: 'android:id/content'
-- tapOn: Select Notifications
-- tapOn:
-    text: SP
-    index: 1
-- tapOn:
-    id: 'android:id/content'
+- pressKey: Enter
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - tapOn:
+          id: Tactical Talkgroup
+      - tapOn:
+          text: MAL SAR
+          index: 1
+      - tapOn: Select Frequencies
+      - tapOn:
+          text: C41
+          index: 1
+      - tapOn:
+          text: C42
+          index: 1
+      - tapOn:
+          id: 'android:id/content'
+      - tapOn: Select Notifications
+      - tapOn:
+          text: SP
+          index: 1
+      - tapOn:
+          id: 'android:id/content'
 - scrollUntilVisible:
     centerElement: true
     element:

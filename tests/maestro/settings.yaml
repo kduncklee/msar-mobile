@@ -3,7 +3,6 @@ appId: org.malibusar.app
 - launchApp
 - tapOn:
     text: Settings
-    index: 1
 - assertVisible: Username
 - runFlow:
     when:
@@ -19,10 +18,8 @@ appId: org.malibusar.app
 - tapOn: Restore default notification sounds
 - assertVisible:
     text: Snooze
-    index: 1
 - tapOn:
     text: Settings
-    index: 1
 - assertVisible: Yucatan - Long
 - tapOn:
     id: backButton

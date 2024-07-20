@@ -72,7 +72,7 @@ function Header({ title, backButton = false, onBackPressed, rightButton = false,
       </Text>
       {timestamp != null && (
         <View style={[elements.capsule, { marginRight: 20 }]}>
-          <Text style={elements.smallYellowText}>{getConditionalTimeString(timestamp)}</Text>
+          <Text style={elements.smallYellowText} testID="header-timestamp">{getConditionalTimeString(timestamp)}</Text>
         </View>
       )}
       {rightButton
