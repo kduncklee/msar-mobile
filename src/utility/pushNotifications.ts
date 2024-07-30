@@ -20,6 +20,8 @@ const availableChannels = [
   { label: 'Distortion - Short', value: 'distortion_1_time' },
   { label: 'Distortion - Long', value: 'distortion_3_times' },
   { label: 'MDC new call', value: 'mdc_new_call' },
+  { label: 'Rising 1 beep', value: 'beeprising' },
+  { label: 'Rising 4 beeps', value: 'uprising' },
   { label: 'Radio - Short', value: 'radio_1_time' },
   { label: 'Radio - Long', value: 'radio_4_times' },
   { label: 'Serene multi-ding', value: 'serene_multi_ding' },
@@ -209,6 +211,31 @@ export async function testDisplayNotification(channel: string = 'callout') {
   displayNotification(remoteMessage);
 }
 
+async function mutationSuccessNotification(title: string, body: string) {
+  const remoteMessage = {
+    data: {
+      title,
+      body,
+      channel: 'sent',
+    },
+  };
+  return displayNotification(remoteMessage);
+}
+
+export async function calloutResponseSuccessNotification(response: string) {
+  return mutationSuccessNotification(
+    'Responded to callout',
+    `Responded ${response}`,
+  );
+}
+
+export async function messageSuccessNotification(message: string) {
+  return mutationSuccessNotification(
+    'Successfully sent message',
+    `Sent: ${message}`,
+  );
+}
+
 export function restoreNotificationDefaults() {
   storeSoundForChannel('callout', 'yucatan_6_times');
   storeCriticalForChannel('callout', true);
@@ -222,6 +249,8 @@ export function restoreNotificationDefaults() {
   storeCriticalForChannel('callout-response-yes', true);
   storeSoundForChannel('announcement', 'sweet_1_time');
   storeCriticalForChannel('announcement', true);
+  storeSoundForChannel('sent', 'uprising');
+  storeCriticalForChannel('sent', false);
   storeCriticalAlertsVolume(1.0);
 }
 
@@ -246,6 +275,11 @@ export function checkNotificationDefaults() {
     storeCriticalForChannel('callout-response-no', critical);
     storeSoundForChannel('callout-response-yes', sound);
     storeCriticalForChannel('callout-response-yes', critical);
+  }
+  // These were added even later, check separately:
+  if (getSoundForChannel('sent') === undefined) {
+    storeSoundForChannel('sent', 'uprising');
+    storeCriticalForChannel('sent', false);
   }
 }
 

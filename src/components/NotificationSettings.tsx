@@ -12,11 +12,13 @@ import FormCheckbox from '@components/inputs/FormCheckbox';
 interface NotificationSettingsProps {
   title: string;
   channel: string;
+  allowCritical?: boolean;
 }
 
 function NotificationSettings({
   title,
   channel,
+  allowCritical = true,
 }: NotificationSettingsProps) {
   const [sound, setSound] = useState('');
   const [critical, setCritical] = useState(false);
@@ -56,11 +58,13 @@ function NotificationSettings({
         onRightPress={onButtonPress}
         rightButton={require('@assets/icons/frequency.png')}
       />
-      <FormCheckbox
-        title="Critical Alert"
-        checked={critical}
-        onToggle={onCheckToggle}
-      />
+      {allowCritical && (
+        <FormCheckbox
+          title="Critical Alert"
+          checked={critical}
+          onToggle={onCheckToggle}
+        />
+      )}
     </>
   );
 }

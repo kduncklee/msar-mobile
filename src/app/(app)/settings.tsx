@@ -124,6 +124,11 @@ function Page() {
             title="Announcements"
             channel="announcement"
           />
+          <NotificationSettings
+            title="Message sent successfully"
+            channel="sent"
+            allowCritical={false}
+          />
         </>
       )}
     </>

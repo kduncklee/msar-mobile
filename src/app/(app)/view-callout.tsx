@@ -21,6 +21,8 @@ import type { tabItem } from '@/types/tabItem';
 import { calloutStatus } from '@/types/enums';
 import type { responseType } from '@/types/enums';
 import { textForResponseType } from '@/types/calloutSummary';
+import { calloutResponseSuccessNotification } from '@/utility/pushNotifications';
+import type { calloutResponse } from '@/types/calloutResponse';
 
 enum CalloutTabs { INFO, LOG, FILES, PERSONNEL };
 
@@ -51,10 +53,11 @@ function Page() {
 
   const calloutResponseKey = ['calloutResponse', idInt];
   const calloutResponseMutation = useMutation({
-    mutationFn: ({ idInt, text }) => apiRespondToCallout(idInt, text),
+    mutationFn: (variables: calloutResponse) => apiRespondToCallout(variables.idInt, variables.text),
     mutationKey: calloutResponseKey,
-    onSuccess: (_result, _variables, _context) => {
+    onSuccess: (_result, variables, _context) => {
       msarEventEmitter.emit('refreshCallout', { id: idInt });
+      calloutResponseSuccessNotification(variables.text);
     },
     onError: (error, _variables, _context) => {
       Sentry.captureException(error);

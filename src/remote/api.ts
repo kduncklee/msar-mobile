@@ -12,6 +12,7 @@ import type { calloutSummary } from '@/types/calloutSummary';
 import { calloutSummaryFromResponse } from '@/types/calloutSummary';
 import { logStatusType, logType } from '@/types/enums';
 import { userDetailsFromResponse } from '@/types/user';
+import { messageSuccessNotification } from '@/utility/pushNotifications';
 
 const local_server: string = 'http://192.168.1.120:8000';
 const legacy_server: string = 'https://malibusarhours.org/calloutapi';
@@ -559,6 +560,8 @@ export function useLogMutation(mutationFn, queryKey) {
       });
       // Invalidate the cache to get the actual data on server.
       queryClient.invalidateQueries({ queryKey });
+
+      messageSuccessNotification(result.message);
     },
 
     onError: (_error, _variables, context) => {
