@@ -40,7 +40,7 @@ function TabSelector({ tabs, selected, onTabChange }: TabSelectorProps) {
 
           return (
             <TouchableOpacity
-              key={index}
+              key={tab.title}
               activeOpacity={0.5}
               style={[styles.button, { borderBottomColor: divColor, borderBottomWidth: 2 }]}
               onPress={() => tabSelected(index)}

@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-root-toast';
 import * as Sentry from '@sentry/react-native';
-import { useMutation } from '@tanstack/react-query';
 import Header from '@components/Header';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
@@ -13,14 +12,15 @@ import FormTextArea from '@components/inputs/FormTextArea';
 import FormCheckbox from '@components/inputs/FormCheckbox';
 import DropdownMultiselect from '@components/inputs/DropdownMultiselect';
 import ActivityModal from '@components/modals/ActivityModal';
-import { apiCreateCallout, apiUpdateCallout, useCalloutQuery, useNotificationsAvailableQuery, useRadioChannelsAvailableQuery } from '@remote/api';
 import msarEventEmitter from '@utility/msarEventEmitter';
+import { useCalloutQuery, useNotificationsAvailableQuery, useRadioChannelsAvailableQuery } from '@/remote/query';
 import type { callout } from '@/types/callout';
 import type { location } from '@/types/location';
 import { locationToString } from '@/types/location';
 import { calloutStatus, calloutType, stringToCalloutType } from '@/types/enums';
 import { useEditingLocation } from '@/storage/mmkv';
 import { handleBackPressed, useBackHandler } from '@/utility/backHandler';
+import { useCalloutCreateMutation, useCalloutUpdateMutation } from '@/remote/mutation';
 
 function Page() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -54,12 +54,8 @@ function Page() {
   const notificationsAvailableQuery = useNotificationsAvailableQuery();
   const radioChanelsAvailableQuery = useRadioChannelsAvailableQuery();
 
-  const calloutCreateMutation = useMutation({
-    mutationFn: callout => apiCreateCallout(callout),
-  });
-  const calloutUpdateMutation = useMutation({
-    mutationFn: ({ idInt, callout }) => apiUpdateCallout(idInt, callout),
-  });
+  const calloutCreateMutation = useCalloutCreateMutation();
+  const calloutUpdateMutation = useCalloutUpdateMutation();
 
   let headerTitle: string = 'Create Callout';
 
@@ -256,7 +252,7 @@ function Page() {
     setShowSpinner(true);
 
     calloutCreateMutation.mutate(generateCallout(), {
-      onSuccess: (data, _error, _variables, _context) => {
+      onSuccess: (data, _variables, _context) => {
         console.log(data);
         msarEventEmitter.emit('refreshCallout', {});
         router.replace({ pathname: 'view-callout', params: { id: data.id.toString(), title: data.title } });
@@ -286,7 +282,7 @@ function Page() {
     calloutUpdateMutation.mutate(
       { idInt, callout: generateCallout() },
       {
-        onSuccess: (data, _error, _variables, _context) => {
+        onSuccess: (data, _variables, _context) => {
           console.log(data);
           msarEventEmitter.emit('refreshCallout', {});
           router.replace({

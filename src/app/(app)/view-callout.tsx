@@ -12,10 +12,11 @@ import CalloutInformationTab from '@components/callouts/CalloutInformationTab';
 import CalloutLogTab from '@components/callouts/CalloutLogTab';
 import CalloutPersonnelTab from '@components/callouts/CalloutPersonnelTab';
 import LogInput from '@components/callouts/LogInput';
-import { apiRespondToCallout, calloutLogQueryKey, calloutQueryKey, useCalloutLogInfiniteQuery, useCalloutLogMutation, useCalloutQuery } from '@remote/api';
 import msarEventEmitter from '@utility/msarEventEmitter';
 import CalloutRespondModal from '@components/modals/CalloutRespondModal';
 import CalloutFileTab from 'components/callouts/CalloutFileTab';
+import { calloutLogQueryKey, calloutQueryKey, useCalloutLogInfiniteQuery, useCalloutQuery } from '@/remote/query';
+import { useCalloutLogMutation } from '@/remote/mutation';
 import { calloutResponseBadge } from '@/types/callout';
 import type { tabItem } from '@/types/tabItem';
 import { calloutStatus } from '@/types/enums';
@@ -23,11 +24,13 @@ import type { responseType } from '@/types/enums';
 import { textForResponseType } from '@/types/calloutSummary';
 import { calloutResponseSuccessNotification } from '@/utility/pushNotifications';
 import type { calloutResponse } from '@/types/calloutResponse';
+import useAuth from '@/hooks/useAuth';
 
 enum CalloutTabs { INFO, LOG, FILES, PERSONNEL };
 
 function Page() {
   const { id, title, type } = useLocalSearchParams<{ id: string; title: string; type?: string }>();
+  const { api } = useAuth();
   const [headerTitle, setHeaderTitle] = useState(title);
   const scrollViewRef = useRef(null);
 
@@ -53,7 +56,7 @@ function Page() {
 
   const calloutResponseKey = ['calloutResponse', idInt];
   const calloutResponseMutation = useMutation({
-    mutationFn: (variables: calloutResponse) => apiRespondToCallout(variables.idInt, variables.text),
+    mutationFn: (variables: calloutResponse) => api.apiRespondToCallout(variables.idInt, variables.text),
     mutationKey: calloutResponseKey,
     onSuccess: (_result, variables, _context) => {
       msarEventEmitter.emit('refreshCallout', { id: idInt });
@@ -70,7 +73,7 @@ function Page() {
   const calloutResponseMutationState = useMutationState({
     // this mutation key needs to match the mutation key of the given mutation (see above)
     filters: { mutationKey: calloutResponseKey, status: 'pending' },
-    select: mutation => mutation.state.variables,
+    select: mutation => mutation.state.variables as calloutResponse,
   });
 
   const calloutLogMutation = useCalloutLogMutation(idInt);
@@ -110,12 +113,15 @@ function Page() {
     else if (Platform.OS === 'android') {
       StatusBar.setBackgroundColor(colors.primaryBg);
     }
+  }, []);
 
+  useEffect(() => {
     msarEventEmitter.on('refreshCallout', refreshReceived);
 
     return () => {
       msarEventEmitter.off('refreshCallout', refreshReceived);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

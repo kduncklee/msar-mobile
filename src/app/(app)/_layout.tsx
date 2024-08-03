@@ -1,35 +1,23 @@
 import { Redirect, Stack } from 'expo-router';
 import { useEffect } from 'react';
 import * as Sentry from '@sentry/react-native';
-import '@storage/global';
 import { migrateSharedStorage } from 'storage/mmkv';
-import { getServer } from 'storage/storage';
-import { checkNotificationDefaults, doInitialRedirect, registerForPushNotificationsAsync } from '@utility/pushNotifications';
+import { usePushNotificationsInner } from '@utility/pushNotifications';
+import useAuth from '@/hooks/useAuth';
 
 export default function AppLayout() {
-  const signedIn = global.currentCredentials?.token;
+  const { username, token, server } = useAuth();
+  const signedIn = !!token;
+  usePushNotificationsInner();
 
   useEffect(() => {
-    console.log('inner layout useEffect', signedIn);
-    if (signedIn) {
-      registerForPushNotificationsAsync();
-      checkNotificationDefaults();
-      migrateSharedStorage();
-    }
-  }, [signedIn]);
-
-  useEffect(() => {
-    Sentry.setUser({ username: global.currentCredentials?.username });
-    getServer().then((server: string) => {
-      Sentry.setTag('server', server);
-    });
+    migrateSharedStorage();
   }, []);
 
   useEffect(() => {
-    if (signedIn) {
-      doInitialRedirect();
-    }
-  }, [signedIn]);
+    Sentry.setUser({ username });
+    Sentry.setTag('server', server);
+  }, [server, username]);
 
   if (!signedIn) {
     return <Redirect href="/login" />;

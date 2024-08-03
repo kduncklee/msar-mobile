@@ -30,7 +30,10 @@ function CalloutLogTab({ id, useInfiniteQueryFn }: CalloutLogTabProps) {
   useEffect(() => {
     if (!isLoading && logList) {
       if (logList?.length) {
-        storeLastRead(id, logList[0].id);
+        const lastId = Number.parseInt(logList[0].id);
+        if (!Number.isNaN(lastId)) {
+          storeLastRead(id, lastId);
+        }
       }
       else {
         storeLastRead(id, 0); // User looked at the empty log.

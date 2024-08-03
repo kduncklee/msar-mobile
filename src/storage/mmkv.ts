@@ -122,7 +122,7 @@ export function clearSnoozeExpires() {
   return storeSnoozeExpires(0);
 }
 
-export function storeBadggeCount(value: number) {
+export function storeBadgeCount(value: number) {
   sharedStorage.set('badgeCount', value);
 }
 

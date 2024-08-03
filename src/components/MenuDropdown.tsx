@@ -16,17 +16,21 @@ function MenuDropdown({ children, items }: MenuDropdownProps) {
       <DropdownMenu.Trigger>
         {children}
       </DropdownMenu.Trigger>
+
+      {/* @ts-expect-error Library uses Pick, should probably be Partial<Pick> */}
       <DropdownMenu.Content>
-        {items.map(item => (
-          <DropdownMenu.Item
-            key={item.name}
-            onSelect={item.onSelect}
-          >
-            <DropdownMenu.ItemTitle>
-              {item.name}
-            </DropdownMenu.ItemTitle>
-          </DropdownMenu.Item>
-        ))}
+        <>
+          {items.map(item => (
+            <DropdownMenu.Item
+              key={item.name}
+              onSelect={item.onSelect}
+            >
+              <DropdownMenu.ItemTitle>
+                {item.name}
+              </DropdownMenu.ItemTitle>
+            </DropdownMenu.Item>
+          ))}
+        </>
       </DropdownMenu.Content>
     </DropdownMenu.Root>
   );

@@ -5,11 +5,8 @@ import { elements } from '@styles/elements';
 import { router } from 'expo-router';
 import FormTextInput from '@components/inputs/FormTextInput';
 import SmallButton from '@components/inputs/SmallButton';
-import { apiGetToken } from '@remote/api';
-import type { loginResponse } from '@remote/responses';
-import { clearServer, getCredentials, getServer, storeCredentials, storeServer } from '@storage/storage';
 import ActivityModal from '@components/modals/ActivityModal';
-import '@storage/global';
+import useAuth from '@/hooks/useAuth';
 
 function Page() {
   const [topMargin, setTopMargin] = useState(0);
@@ -17,6 +14,7 @@ function Page() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showSpinner, setShowSpinner] = useState(false);
+  const { login } = useAuth();
 
   useEffect(() => {
     if (Platform.OS === 'ios') {
@@ -37,44 +35,7 @@ function Page() {
         }
       },
     );
-
-    tokenCheck();
   }, []);
-
-  const tokenCheck = async () => {
-    const creds = await getCredentials();
-    if (!creds.token || !creds.username) {
-      return;
-    }
-    const server = await getServer();
-
-    if (server) {
-      setUsername(`_${server}_${creds.username}`);
-    }
-    else {
-      setUsername(creds.username);
-    }
-    setPassword('');
-    setShowSpinner(true);
-
-    // Skipping api call to enable offline mode
-    /*
-        console.log("apiValidateToken");
-        const response = await apiValidateToken();
-        if (response.valid_token == true) {
-            global.currentCredentials = await getCredentials();
-            router.push('/');
-        } else {
-            await clearCredentials();
-            setUsername('');
-            setPassword('');
-        }
-        */
-    global.currentCredentials = await getCredentials();
-    router.push('/');
-
-    setShowSpinner(false);
-  };
 
   const usernameChanged = (text: string) => {
     setUsername(text);
@@ -84,37 +45,17 @@ function Page() {
     setPassword(text);
   };
 
-  const login = async () => {
+  const loginPressed = async () => {
     setShowSpinner(true);
-
-    let server;
-    let server_username = username;
-    const match = username.match(/_([^_]+)_(.+)/);
-    if (match) {
-      server = match[1];
-      server_username = match[2];
-      console.log(server, server_username);
-      await storeServer(server);
-    }
-    else {
-      console.log('clear server', server_username);
-      await clearServer();
-    }
-    console.log('apiGetToken');
-    const response: loginResponse = await apiGetToken(server_username, password);
+    const errorString = await login(username, password);
     setShowSpinner(false);
-    if (response.non_field_errors) {
-      const errorString: string = response.non_field_errors.join('\n');
+    if (errorString) {
       Alert.alert('Problem logging in', errorString, [
         { text: 'OK' },
       ]);
-      return;
     }
-
-    if (response.token) {
-      await storeCredentials(server_username, response.token);
-      global.currentCredentials = await getCredentials();
-      router.push('/');
+    else {
+      router.replace('/');
     }
   };
 
@@ -155,7 +96,7 @@ function Page() {
                   title="Login"
                   backgroundColor={colors.yellow}
                   textColor={colors.black}
-                  onPress={() => login()}
+                  onPress={() => loginPressed()}
                 />
               </View>
             </View>

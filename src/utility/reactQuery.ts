@@ -25,6 +25,7 @@ export const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error) => {
       Sentry.captureException(error);
+      console.log('QueryCache onError:', error);
       Toast.show(`Something went wrong: ${error.message}`);
     },
   }),

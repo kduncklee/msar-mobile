@@ -4,7 +4,8 @@ import Header from '@components/Header';
 import colors from '@styles/colors';
 import CalloutLogTab from '@components/callouts/CalloutLogTab';
 import LogInput from '@components/callouts/LogInput';
-import { useChatLogInfiniteQuery, useChatLogMutation } from '@remote/api';
+import { useChatLogInfiniteQuery } from '@/remote/query';
+import { useChatLogMutation } from '@/remote/mutation';
 
 function Page() {
   const [logMessageText, setLogMessageText] = useState('');

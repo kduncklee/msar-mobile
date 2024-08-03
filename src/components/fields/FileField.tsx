@@ -5,15 +5,16 @@ import * as Sharing from 'expo-sharing';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
 import { getConditionalTimeString } from '@utility/dateHelper';
-import { apiDownloadFile } from '@remote/api';
 import { useLocalDataFilePath } from '@storage/mmkv';
 import FileViewer from 'react-native-file-viewer';
 import * as ContextMenu from 'zeego/context-menu';
 import * as Sentry from '@sentry/react-native';
 import type { dataFile } from '@/types/dataFile';
+import useAuth from '@/hooks/useAuth';
+import type { Api } from '@/remote/api';
 
-async function downloadFile(id: number, destination: string) {
-  return apiDownloadFile(id, destination)
+async function downloadFile(api: Api, id: number, destination: string) {
+  return api.apiDownloadFile(id, destination)
     .then(({ uri }) => {
       console.log(id, 'finished downloading to ', uri);
       return uri;
@@ -48,6 +49,8 @@ interface FileFieldProps {
 }
 
 function FileField({ file }: FileFieldProps) {
+  const { api } = useAuth();
+
   const size_mb = file.size / 1024 / 1024;
   const size_text = `${size_mb.toFixed(3)} MB`;
   const localFilename = `${file.id}_${file.name}`;
@@ -56,7 +59,7 @@ function FileField({ file }: FileFieldProps) {
   const [storedUri, setStoredUri] = useLocalDataFilePath(file.id);
 
   const download = async () => {
-    return downloadFile(file.id, localFullUri).then((uri) => {
+    return downloadFile(api, file.id, localFullUri).then((uri) => {
       setStoredUri(localFilename);
       return uri;
     });
@@ -141,6 +144,7 @@ function FileField({ file }: FileFieldProps) {
         </TouchableOpacity>
       </ContextMenu.Trigger>
 
+      {/* @ts-expect-error Library uses Pick, should probably be Partial<Pick> */}
       <ContextMenu.Content>
         <ContextMenu.Item key="download" onSelect={downloadPressed}>
           <ContextMenu.ItemTitle>Download</ContextMenu.ItemTitle>

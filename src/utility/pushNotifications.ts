@@ -6,11 +6,15 @@ import messaging from '@react-native-firebase/messaging';
 import notifee, { EventType } from '@notifee/react-native';
 import * as Sentry from '@sentry/react-native';
 import * as Notifications from 'expo-notifications';
-import { apiIsDeviceIdActive, apiRemoveDeviceId, apiSetDeviceId, apiUpdateDeviceId, prefetchCalloutListQuery, prefetchCalloutLogQuery, prefetchCalloutQuery, prefetchChatLogQuery } from '@remote/api';
-import { getCriticalAlertsVolume, getCriticalForChannel, getIsSnoozing, getSoundForChannel, storeBadggeCount, storeCriticalAlertsVolume, storeCriticalForChannel, storeSoundForChannel } from '@storage/mmkv';
+import { getCriticalAlertsVolume, getCriticalForChannel, getIsSnoozing, getSoundForChannel, storeBadgeCount, storeCriticalAlertsVolume, storeCriticalForChannel, storeSoundForChannel } from '@storage/mmkv';
 import msarEventEmitter from '@utility/msarEventEmitter';
 import { queryClient } from '@utility/reactQuery';
+import { getToken } from './pushNotificationToken';
+import { prefetchCalloutListQuery, prefetchCalloutLogQuery, prefetchCalloutQuery, prefetchChatLogQuery } from '@/remote/query';
 import { activeTabStatusQuery } from '@/types/calloutSummary';
+import { Api } from '@/remote/api';
+import useAuth from '@/hooks/useAuth';
+import { getCredentials, getServer } from '@/storage/storage';
 
 const NO_NOTIFICATION = 'none';
 const SILENT = 'silent2'; // 'silent' was already used with default sound.
@@ -67,27 +71,7 @@ async function checkApplicationPermission() {
   }
 }
 
-export async function getToken() {
-  return messaging().getToken();
-}
-
-export async function sendPushToken(active: boolean = true) {
-  const token = await getToken();
-  await apiSetDeviceId(token, active);
-}
-
-export async function checkPushToken(): Promise<boolean> {
-  return getToken().then(apiIsDeviceIdActive);
-}
-
-export async function removePushToken() {
-  const token = await getToken();
-  if (token != null) {
-    return apiRemoveDeviceId(token);
-  }
-}
-
-export async function registerForPushNotificationsAsync() {
+async function registerForPushNotificationsAsync(api: Api) {
   checkApplicationPermission();
 
   // While this sometimes generates a warning that it is not required, leave
@@ -100,7 +84,7 @@ export async function registerForPushNotificationsAsync() {
   const token = await getToken();
   if (token) {
     console.log('registered', token);
-    apiUpdateDeviceId(token);
+    api.apiUpdateDeviceId(token);
   }
   else {
     // eslint-disable-next-line no-alert
@@ -254,7 +238,7 @@ export function restoreNotificationDefaults() {
   storeCriticalAlertsVolume(1.0);
 }
 
-export function checkNotificationDefaults() {
+function checkNotificationDefaults() {
   if (
     (getSoundForChannel('callout') === undefined)
     || (getSoundForChannel('callout-resolved') === undefined)
@@ -283,17 +267,18 @@ export function checkNotificationDefaults() {
   }
 }
 
-function prefetch(notification) {
+function prefetch(api: Api, notification) {
   const url = notification.data?.url;
   const id = notification.data?.id;
+  console.log('prefetch', api, api?.server());
   if (url) {
     if (url === 'view-callout') {
-      prefetchCalloutQuery(queryClient, id);
-      prefetchCalloutLogQuery(queryClient, id);
-      prefetchCalloutListQuery(queryClient, activeTabStatusQuery);
+      prefetchCalloutQuery(queryClient, api, id);
+      prefetchCalloutLogQuery(queryClient, api, id);
+      prefetchCalloutListQuery(queryClient, api, activeTabStatusQuery);
     }
     else if (url === 'chat') {
-      prefetchChatLogQuery(queryClient);
+      prefetchChatLogQuery(queryClient, api);
     }
   }
 }
@@ -323,11 +308,17 @@ export function setupPushNotificationsBackground() {
     if (Platform.OS !== 'ios') { // iOS handled in Notification Service Extenstion
       displayNotification(remoteMessage);
     }
-    prefetch(remoteMessage);
+
+    const creds = await getCredentials();
+    const server = await getServer();
+    if (creds.token && server) {
+      const api = new Api(server, creds.token);
+      prefetch(api, remoteMessage);
+    }
   });
 }
 
-export async function doInitialRedirect() {
+async function doInitialRedirect() {
   const initialNotification = await notifee.getInitialNotification();
 
   if (initialNotification) {
@@ -337,7 +328,7 @@ export async function doInitialRedirect() {
   }
 }
 
-export function usePushNotifications() {
+export function usePushNotificationsOuter() {
   const notifeeOnEvent = async ({ type, detail }) => {
     const { notification } = detail;
     switch (type) {
@@ -352,10 +343,11 @@ export function usePushNotifications() {
   };
 
   useEffect(() => {
+    console.log('usePushNotifications useEffect');
     function clearBadgeCount() {
       if (Platform.OS === 'ios') {
         notifee.setBadgeCount(0).then(() => console.log('Badge count removed'));
-        storeBadggeCount(0); // Shared state with NSE.
+        storeBadgeCount(0); // Shared state with NSE.
       }
     }
 
@@ -365,15 +357,6 @@ export function usePushNotifications() {
         clearBadgeCount();
       }
     }
-
-    const onMessageUnsubscribe = messaging().onMessage(
-      async (remoteMessage) => {
-        console.log('onMessage', remoteMessage);
-        // Display for iOS too: NSE does not run for foreground notifications.
-        displayNotification(remoteMessage);
-        prefetch(remoteMessage);
-      },
-    );
 
     const onNotificationOpenedAppUnsubscribe
       = messaging().onNotificationOpenedApp(async (remoteMessage) => {
@@ -392,10 +375,43 @@ export function usePushNotifications() {
     }
 
     return () => {
-      onMessageUnsubscribe();
       onNotificationOpenedAppUnsubscribe();
       notifeeOnForegroundUnsubscribe();
       appStateSubscription.remove();
     };
   }, []);
+}
+
+export function usePushNotificationsInner() {
+  const { token, api } = useAuth();
+  const signedIn = !!token;
+
+  useEffect(() => {
+    if (signedIn) {
+      doInitialRedirect();
+    }
+  }, [signedIn]);
+
+  useEffect(() => {
+    console.log('inner layout useEffect', signedIn);
+    if (signedIn) {
+      registerForPushNotificationsAsync(api);
+      checkNotificationDefaults();
+    }
+  }, [signedIn, api]);
+
+  useEffect(() => {
+    const onMessageUnsubscribe = messaging().onMessage(
+      async (remoteMessage) => {
+        console.log('onMessage', remoteMessage);
+        // Display for iOS too: NSE does not run for foreground notifications.
+        displayNotification(remoteMessage);
+        prefetch(api, remoteMessage);
+      },
+    );
+
+    return () => {
+      onMessageUnsubscribe();
+    };
+  }, [api]);
 }

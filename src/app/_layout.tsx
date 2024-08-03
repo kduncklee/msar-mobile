@@ -4,9 +4,10 @@ import { RootSiblingParent } from 'react-native-root-siblings';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { Slot, useNavigationContainerRef } from 'expo-router';
 import { SentryDsn } from '@utility/constants';
-import { usePushNotifications } from '@utility/pushNotifications';
+import { usePushNotificationsOuter } from '@utility/pushNotifications';
 import { useEffect } from 'react';
 import { queryClient, useReactQueryAppStateRefresh } from 'utility/reactQuery';
+import { AuthProvider } from '@/components/AuthProvider';
 
 const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
 
@@ -34,14 +35,16 @@ function Layout() {
   }, [ref]);
 
   useReactQueryAppStateRefresh();
-  usePushNotifications();
+  usePushNotificationsOuter();
 
   return (
-    <RootSiblingParent>
-      <QueryClientProvider client={queryClient}>
-        <Slot />
-      </QueryClientProvider>
-    </RootSiblingParent>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <RootSiblingParent>
+          <Slot />
+        </RootSiblingParent>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 

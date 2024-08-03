@@ -2,55 +2,38 @@ import { useEffect, useState } from 'react';
 import * as Application from 'expo-application';
 import { router } from 'expo-router';
 import { Platform, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useQueryClient } from '@tanstack/react-query';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
-import { clearCredentials, clearServer, getCredentials, getServer } from '@storage/storage';
-import { getCriticalAlertsVolume, storage, storeCriticalAlertsVolume } from '@storage/mmkv';
-import '@storage/global';
+import { getCriticalAlertsVolume, storeCriticalAlertsVolume } from '@storage/mmkv';
 import FormCheckbox from '@components/inputs/FormCheckbox';
 import * as PushNotifications from '@utility/pushNotifications';
 import NotificationSettings from '@components/NotificationSettings';
 import FormSlider from '@components/inputs/FormSlider';
 import HorrizontalLine from '@components/HorrizontalLine';
 import Header from '@components/Header';
+import useAuth from '@/hooks/useAuth';
+import { checkPushToken, sendPushToken } from '@/utility/pushNotificationToken';
 
 function Page() {
-  const [username, setUsername] = useState('Loading...');
-  const [server, setServer] = useState('Loading...');
   const [notificationLoading, setNotificationLoading] = useState('Loading...');
   const [pushEnabled, setPushEnabled] = useState(null);
   const [criticalAlertsVolume, setCriticalAlertsVolume] = useState(null);
-  const queryClient = useQueryClient();
+  const { username, server, api, logout } = useAuth();
+  const serverName = server || 'Production';
 
   useEffect(() => {
-    loadCredentials();
-    PushNotifications.checkPushToken().then(
+    checkPushToken(api).then(
       setPushEnabled,
       () => setNotificationLoading('Unable to connect'),
     );
     setCriticalAlertsVolume(getCriticalAlertsVolume());
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const loadCredentials = async () => {
-    const credentials = await getCredentials();
-    if (credentials.username != null) {
-      setUsername(credentials.username);
-    }
-    console.log(credentials);
-    const s = await getServer();
-    if (s) {
-      setServer(s);
-    }
-    else {
-      setServer('Production');
-    }
-  };
 
   const onPushToggle = async () => {
     const pushStatus = !pushEnabled;
 
-    await PushNotifications.sendPushToken(pushStatus);
+    await sendPushToken(api, pushStatus);
 
     setPushEnabled(pushStatus);
   };
@@ -67,13 +50,7 @@ function Page() {
   };
 
   const onSignOutPress = async () => {
-    await PushNotifications.removePushToken();
-    await clearCredentials();
-    await clearServer();
-    global.currentCredentials = null;
-    queryClient.invalidateQueries();
-    queryClient.clear();
-    storage.clearAll();
+    logout();
     router.replace('/');
   };
 
@@ -146,7 +123,7 @@ function Page() {
         </View>
         <View style={styles.userContainer}>
           <Text style={elements.mediumText}>Server</Text>
-          <Text style={[elements.mediumText, styles.userText]}>{server}</Text>
+          <Text style={[elements.mediumText, styles.userText]}>{serverName}</Text>
         </View>
         <View style={styles.userContainer}>
           <Text style={elements.mediumText}>Version</Text>

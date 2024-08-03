@@ -1,3 +1,6 @@
+/* eslint-disable react/no-children-map */
+// eslint-disable-next-line ts/ban-ts-comment
+// @ts-nocheck
 /*
  * A smart badge for react-native apps
  * https://github.com/react-native-component/react-native-smart-badge/
@@ -8,6 +11,7 @@
 import React, {
   Component,
 } from 'react';
+
 import {
   StyleSheet,
   Text,
@@ -54,7 +58,6 @@ export default class Badge extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
 
     this._width = 0;
   }

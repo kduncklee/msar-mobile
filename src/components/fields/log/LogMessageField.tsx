@@ -4,13 +4,14 @@ import { Autolink, LatLngMatcher } from 'react-native-autolink';
 import { elements } from '@styles/elements';
 import colors from '@styles/colors';
 import { getConditionalTimeString } from '@utility/dateHelper';
-import { useChatOrCalloutLogMutation } from '@remote/api';
+import { useChatOrCalloutLogMutation } from '@/remote/mutation';
 import { logStatusType } from '@/types/enums';
 import type { user } from '@/types/user';
 import { isUserSelf, userToString } from '@/types/user';
+import useAuth from '@/hooks/useAuth';
 
 interface LogMessageFieldProps {
-  id: number;
+  id: string;
   callout_id: number;
   member: user;
   message: string;
@@ -20,8 +21,9 @@ interface LogMessageFieldProps {
 
 function LogMessageField({ id, callout_id, member, message, status, timestamp }: LogMessageFieldProps) {
   const logMutation = useChatOrCalloutLogMutation(callout_id);
+  const { username } = useAuth();
 
-  const isSelf: boolean = isUserSelf(member);
+  const isSelf: boolean = isUserSelf(member, username);
   const isError = status === logStatusType.ERROR;
   const isPublished = !status;
 

@@ -31,9 +31,8 @@ function LocationSelectionModal({ locations, onSelect, onClose }: LocationSelect
           {
             locations.map((location: location, index: number) => {
               return (
-                <React.Fragment key={index}>
+                <React.Fragment key={location.coordinates.lat + location.coordinates.long}>
                   <TouchableOpacity
-                    key={index}
                     activeOpacity={0.5}
                     style={styles.resultContainer}
                     onPress={() => selectedResult(index)}

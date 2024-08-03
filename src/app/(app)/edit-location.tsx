@@ -142,7 +142,6 @@ function Page() {
       else {
         const tmpResults: location[] = [];
         response.results.forEach((location: location) => {
-          console.log(locationToString(location));
           tmpResults.push(location);
         });
 

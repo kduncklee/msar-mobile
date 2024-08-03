@@ -7,11 +7,10 @@ import colors from '@styles/colors';
 import TabSelector from '@components/TabSelector/TabSelector';
 import { elements } from '@styles/elements';
 import { router } from 'expo-router';
-import { useCalloutListQuery } from '@remote/api';
 import ActivityModal from '@components/modals/ActivityModal';
 import msarEventEmitter from '@utility/msarEventEmitter';
+import { useCalloutListQuery } from '@/remote/query';
 import type { tabItem } from '@/types/tabItem';
-import '@storage/global';
 import { activeTabStatusQuery, archivedTabStatusQuery } from '@/types/calloutSummary';
 import type { calloutSummary } from '@/types/calloutSummary';
 
@@ -40,12 +39,15 @@ function Page() {
     else if (Platform.OS === 'android') {
       StatusBar.setBackgroundColor(colors.primaryBg);
     }
+  }, []);
 
+  useEffect(() => {
     msarEventEmitter.on('refreshCallout', refreshReceived);
 
     return () => {
       msarEventEmitter.off('refreshCallout', refreshReceived);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const refreshReceived = (_data) => {
@@ -81,7 +83,7 @@ function Page() {
         <Header title="Callouts" backButton rightButton />
         <TabSelector tabs={tabs} onTabChange={tabChanged} />
         <View style={styles.contentContainer}>
-          {query.isLoading ? (<Text>Loading...</Text>) : (<></>)}
+          {query.isLoading ? (<Text>Loading...</Text>) : (null)}
           {query.isSuccess
             ? (
                 <ScrollView style={styles.scrollView}>
@@ -93,7 +95,7 @@ function Page() {
                   <View style={{ height: 100 }} />
                 </ScrollView>
               )
-            : (<></>)}
+            : (null)}
           <TouchableOpacity
             activeOpacity={0.8}
             style={[elements.capsuleButton, styles.createCalloutButton]}

@@ -5,10 +5,10 @@ import colors from '@styles/colors';
 import { elements } from '@styles/elements';
 import SnoozeModal from 'components/modals/SnoozeModal';
 import { getSnoozeExpires, storeSnoozeExpires, useLastRead } from 'storage/mmkv';
-import { useCalloutListQuery, useChatLogInfiniteQuery } from 'remote/api';
 import { logEntriesFromInfiniteQueryData } from 'types/logEntry';
 import { activeTabStatusQuery } from 'types/calloutSummary';
 import Badge from 'components/Badge';
+import { useCalloutListQuery, useChatLogInfiniteQuery } from '@/remote/query';
 
 // Warning: this limits at PAGE_SIZE. We should never have that many active.
 function useNumberActiveCallouts(): number {
@@ -23,7 +23,7 @@ function useNumberActiveCallouts(): number {
 function useChatUnread(): boolean {
   const { data } = useChatLogInfiniteQuery();
   const logList = logEntriesFromInfiniteQueryData(data);
-  const lastId = logList ? logList[0]?.id : 0;
+  const lastId = logList ? Number.parseInt(logList[0]?.id) : 0;
   const [lastLogRead, _setLastLogRead] = useLastRead(0);
   const hasUnread = (lastLogRead === undefined) || (lastLogRead < lastId);
   return hasUnread;
@@ -117,6 +117,7 @@ function Page() {
             >
               <View style={[elements.tray, styles.contentTray]}>
                 <Text style={styles.buttonText}>{item.text}</Text>
+                {/* @ts-expect-error Badge has typescript errors. */}
                 {!!item.badge && <Badge style={styles.badge}>{item.badge}</Badge>}
               </View>
             </TouchableOpacity>

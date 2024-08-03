@@ -66,7 +66,7 @@ export function getConditionalTimeString(date: Date): string {
     return 'unknown';
   }
   const day = 24 * 60 * 60 * 1000;
-  if (Date.now() - date < day) {
+  if (Date.now() - date.valueOf() < day) {
     return getTimeString(date);
   }
   else {

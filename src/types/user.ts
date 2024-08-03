@@ -1,5 +1,3 @@
-import '@storage/global';
-
 export interface user {
   id: number;
   first_name: string;
@@ -25,15 +23,12 @@ function stringEqualsIgnoreCase(a: string, b: string): boolean {
   return a.localeCompare(b, 'en', { sensitivity: 'accent' }) === 0;
 }
 
-export function isUserSelf(user: user): boolean {
+export function isUserSelf(user: user, self_username: string): boolean {
   if (!user)
     return false;
 
-  if (global.currentCredentials) {
-    // console.log(global.currentCredentials, user);
-    if (global.currentCredentials.username) {
-      return stringEqualsIgnoreCase(global.currentCredentials.username, user.username);
-    }
+  if (self_username) {
+    return stringEqualsIgnoreCase(self_username, user.username);
   }
 
   return false;

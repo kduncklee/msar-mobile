@@ -4,7 +4,7 @@ import type { location } from '@/types/location';
 import type { user } from '@/types/user';
 
 export interface logEntry {
-  id: number;
+  id: string; // numeric if from server, otherwise 'temp_*'
   type: logType;
   event: number;
   member: user;
@@ -17,7 +17,7 @@ export interface logEntry {
 
 export function logEntryFromRespsonse(data: any): logEntry {
   return {
-    id: data.id,
+    id: data.id?.toString(),
     type: stringToLogType(data.type),
     event: data.event,
     member: data.member,
