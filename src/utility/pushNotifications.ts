@@ -9,7 +9,7 @@ import * as Notifications from 'expo-notifications';
 import { getCriticalAlertsVolume, getCriticalForChannel, getIsSnoozing, getSoundForChannel, storeBadgeCount, storeCriticalAlertsVolume, storeCriticalForChannel, storeSoundForChannel } from '@storage/mmkv';
 import msarEventEmitter from '@utility/msarEventEmitter';
 import { queryClient } from '@utility/reactQuery';
-import { getToken } from './pushNotificationToken';
+import { updatePushToken } from './pushNotificationToken';
 import { prefetchCalloutListQuery, prefetchCalloutLogQuery, prefetchCalloutQuery, prefetchChatLogQuery } from '@/remote/query';
 import { activeTabStatusQuery } from '@/types/calloutSummary';
 import { Api } from '@/remote/api';
@@ -81,15 +81,7 @@ async function registerForPushNotificationsAsync(api: Api) {
     await messaging().registerDeviceForRemoteMessages();
   }
 
-  const token = await getToken();
-  if (token) {
-    console.log('registered', token);
-    api.apiUpdateDeviceId(token);
-  }
-  else {
-    // eslint-disable-next-line no-alert
-    alert('Failed to get push token');
-  }
+  updatePushToken();
 }
 
 async function setupChannels() {
