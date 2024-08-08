@@ -10,7 +10,6 @@ interface MenuDropdownProps {
 };
 
 function MenuDropdown({ children, items }: MenuDropdownProps) {
-  console.log(children);
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger>

@@ -1,10 +1,8 @@
 import React, { useEffect } from 'react';
 import {
-  FlatList,
+  BackHandler,
   StyleSheet,
-  Text,
   TouchableOpacity,
-  View,
 } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -14,35 +12,39 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import colors from '@styles/colors';
-import { elements } from '@styles/elements';
-import LargeButton from '@components/inputs/LargeButton';
 
-interface ButtonListModalProps {
-  buttons: {
-    title: string;
-    value: any;
-    backgroundColor: string;
-    textColor: string;
-  }[];
-  title: string;
+interface ModalAnimationProps {
+  children: React.ReactElement;
   modalVisible: boolean;
-  onSelect: (value: any) => void;
+  tray?: boolean;
   onCancel: () => void;
 }
 
 const TRANSLATE_Y_START = 1200;
 const ANIMATION_DURATION = 500;
 
-function ButtonListModal({
-  buttons,
-  title,
+function ModalAnimation({
+  children,
   modalVisible,
-  onSelect,
+  tray = false,
   onCancel,
-}: ButtonListModalProps) {
+}: ModalAnimationProps) {
   const translateY = useSharedValue(TRANSLATE_Y_START);
   const opacity = useSharedValue(0);
   const safeAreaInsets = useSafeAreaInsets();
+
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => {
+        if (modalVisible) {
+          onCancel();
+        }
+        return modalVisible;
+      },
+    );
+    return () => backHandler.remove();
+  }, [modalVisible, onCancel]);
 
   useEffect(() => {
     if (modalVisible) {
@@ -83,37 +85,13 @@ function ButtonListModal({
 
   return (
     <>
-      <Animated.View style={[styles.respondTray, trayAnimatedStyle]}>
-        <View style={{ flex: 1 }} />
-        <View style={styles.container}>
-          <Text style={[elements.mediumText, { margin: 8, fontWeight: '500' }]}>
-            {title}
-          </Text>
-          <FlatList
-            style={{ borderRadius: 20 }}
-            data={buttons}
-            renderItem={({ item }) => (
-              <LargeButton
-                title={item.title}
-                backgroundColor={item.backgroundColor}
-                textColor={item.textColor}
-                onPress={() => onSelect(item.value)}
-              />
-            )}
-            ListFooterComponent={(
-              <>
-                <View style={{ height: 40 }} />
-                <LargeButton
-                  title="Cancel"
-                  backgroundColor={colors.secondaryBg}
-                  textColor={colors.grayText}
-                  onPress={onCancel}
-                />
-              </>
-            )}
-          />
-        </View>
-      </Animated.View>
+      {tray
+        ? (
+            <Animated.View style={[styles.tray, trayAnimatedStyle]}>
+              {children}
+            </Animated.View>
+          )
+        : children}
       {!!modalVisible && (
         <Animated.View style={[styles.modalBackground, modalAnimatedStyle]}>
           <TouchableOpacity onPress={onCancel} style={{ flex: 1 }} />
@@ -124,7 +102,7 @@ function ButtonListModal({
 }
 
 const styles = StyleSheet.create({
-  respondTray: {
+  tray: {
     zIndex: 100,
     margin: 0,
     position: 'absolute',
@@ -140,14 +118,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: colors.black,
   },
-  container: {
-    borderRadius: 20,
-    borderColor: colors.grayText,
-    borderWidth: 2,
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    backgroundColor: colors.primaryBg,
-  },
 });
 
-export default ButtonListModal;
+export default ModalAnimation;

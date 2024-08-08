@@ -7,6 +7,7 @@ import { getConditionalTimeString } from '@utility/dateHelper';
 
 interface HeaderProps {
   title: string;
+  zeroTopMargin?: boolean;
   backButton?: boolean;
   onBackPressed?: () => void;
   rightButton?: boolean;
@@ -14,17 +15,17 @@ interface HeaderProps {
   timestamp?: Date;
 };
 
-function Header({ title, backButton = false, onBackPressed, rightButton = false, timestamp = null }: HeaderProps) {
+function Header({ title, zeroTopMargin, backButton = false, onBackPressed, rightButton = false, timestamp = null }: HeaderProps) {
   const [headerMargin, setHeaderMargin] = useState(0);
 
   useEffect(() => {
-    if (Platform.OS === 'ios') {
+    if (zeroTopMargin || (Platform.OS === 'ios')) {
       setHeaderMargin(0);
     }
     else if (Platform.OS === 'android') {
       setHeaderMargin(StatusBar.currentHeight);
     }
-  }, []);
+  }, [zeroTopMargin]);
 
   useFocusEffect(() => {
     // console.log('added back handler: ' + pathname)

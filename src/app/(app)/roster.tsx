@@ -7,11 +7,14 @@ import { memberListQueryKey, useMemberListQuery } from '@/remote/query';
 import UserCell from '@/components/UserCell';
 import type { MenuDropdownItem } from '@/components/MenuDropdown';
 import MenuDropdown from '@/components/MenuDropdown';
+import type { user_detail } from '@/types/user';
+import UserModal from '@/components/modals/UserModal';
 
 function Page() {
   const [sortName, setSortName] = useState('Name');
   const [sortKey, setSortKey] = useState('last_name');
   const [reversed, setReversed] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<user_detail>(null);
   const queryClient = useQueryClient();
   const query = useMemberListQuery();
   const sorted = query.data
@@ -56,6 +59,10 @@ function Page() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const onClose = () => {
+    setSelectedUser(null);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Header title="Roster" backButton />
@@ -75,7 +82,7 @@ function Page() {
               <ScrollView style={styles.scrollView}>
                 {
                   sorted.map((user, _index) => {
-                    return (<UserCell key={user.id} user={user} />);
+                    return (<UserCell key={user.id} user={user} onPress={setSelectedUser} />);
                   })
                 }
                 <View style={{ height: 100 }} />
@@ -83,6 +90,7 @@ function Page() {
             )
           : null}
       </View>
+      {!!selectedUser && (<UserModal user={selectedUser} onCancel={onClose} />)}
     </SafeAreaView>
   );
 }

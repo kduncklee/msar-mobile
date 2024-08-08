@@ -9,9 +9,11 @@ interface InformationFieldProps {
   valueColor?: string;
   icon?: ImageRequireSource;
   onIconPress?: () => void;
+  secondaryIcon?: ImageRequireSource;
+  onSecondaryIconPress?: () => void;
 };
 
-function InformationField({ title, value, valueColor, icon, onIconPress }: InformationFieldProps) {
+function InformationField({ title, value, valueColor, icon, onIconPress, secondaryIcon, onSecondaryIconPress }: InformationFieldProps) {
   const textColor = valueColor || colors.secondaryYellow;
 
   return (
@@ -19,6 +21,13 @@ function InformationField({ title, value, valueColor, icon, onIconPress }: Infor
       {!!title
       && <Text style={styles.titleText}>{title}</Text>}
       <View style={styles.valueContainer}>
+        {onSecondaryIconPress
+        && (
+          <TouchableOpacity activeOpacity={0.5} onPress={onSecondaryIconPress} style={styles.button}>
+            {secondaryIcon
+            && <Image source={secondaryIcon} style={styles.iconImage} />}
+          </TouchableOpacity>
+        )}
         {onIconPress
         && (
           <TouchableOpacity activeOpacity={0.5} onPress={onIconPress} style={styles.button}>

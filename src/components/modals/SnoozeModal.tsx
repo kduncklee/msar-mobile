@@ -1,4 +1,4 @@
-import ButtonListModal from '@components/modals/ButtonListModal';
+import ButtonListModal from '@components/modals/common/ButtonListModal';
 import colors from '@styles/colors';
 
 interface SnoozeModalProps {

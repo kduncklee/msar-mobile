@@ -6,9 +6,10 @@ import { makePhoneCall } from '@/utility/phone';
 
 interface UserCellProps {
   user: user_detail;
+  onPress: (user) => void;
 };
 
-function UserCell({ user }: UserCellProps) {
+function UserCell({ user, onPress }: UserCellProps) {
   return (
     <View style={[elements.tray, styles.container]}>
       <TouchableOpacity
@@ -18,7 +19,11 @@ function UserCell({ user }: UserCellProps) {
       >
         <Image source={require('@assets/icons/phone.png')} style={styles.sideBarImage} />
       </TouchableOpacity>
-      <View style={styles.contentBar}>
+      <TouchableOpacity
+        style={styles.contentBar}
+        activeOpacity={0.5}
+        onPress={() => onPress(user)}
+      >
         <View style={styles.contentRow}>
           <Text style={styles.headerText}>{user.full_name}</Text>
           <Text style={styles.usernameText}>{user.username}</Text>
@@ -27,7 +32,7 @@ function UserCell({ user }: UserCellProps) {
           <Text style={styles.phoneText}>{user.mobile_phone}</Text>
           <Text style={styles.statusText}>{user.status}</Text>
         </View>
-      </View>
+      </TouchableOpacity>
     </View>
   );
 }

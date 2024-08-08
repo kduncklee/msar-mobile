@@ -6,12 +6,12 @@ import LocationField from '@components/fields/LocationField';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
 import { getFullTimeString } from '@utility/dateHelper';
-import { makePhoneCall } from '@utility/phone';
 import { router } from 'expo-router';
 import type { callout } from '@/types/callout';
 import { colorForResponseType, textForCalloutStatus, textForResponseType, textForType } from '@/types/calloutSummary';
 import { calloutStatus } from '@/types/enums';
 import { locationIsSet } from '@/types/location';
+import InformationPhoneField from '@/components/fields/InformationPhoneField';
 
 interface CalloutInformationTabProps {
   callout: callout;
@@ -58,10 +58,8 @@ function CalloutInformationTab({ callout }: CalloutInformationTabProps) {
         )}
         {!!callout.subject_contact
         && (
-          <InformationField
+          <InformationPhoneField
             value={callout.subject_contact}
-            icon={require('@assets/icons/phone_yellow.png')}
-            onIconPress={() => makePhoneCall(callout.subject_contact)}
           />
         )}
         {(!!callout.subject || !!callout.subject_contact)
@@ -75,10 +73,8 @@ function CalloutInformationTab({ callout }: CalloutInformationTabProps) {
         )}
         {!!callout.informant_contact
         && (
-          <InformationField
+          <InformationPhoneField
             value={callout.informant_contact}
-            icon={require('@assets/icons/phone_yellow.png')}
-            onIconPress={() => makePhoneCall(callout.informant_contact)}
           />
         )}
         {(!!callout.informant || !!callout.informant_contact)

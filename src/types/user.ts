@@ -1,3 +1,10 @@
+export interface phone {
+  id: number;
+  number: string;
+  type: string;
+  position: number;
+}
+
 export interface user {
   id: number;
   first_name: string;
@@ -11,6 +18,7 @@ export interface user_detail extends user {
   status: string;
   status_order: number;
   is_current: boolean;
+  phone_numbers: phone[];
 }
 
 export function userToString(user: user): string {
@@ -34,10 +42,18 @@ export function isUserSelf(user: user, self_username: string): boolean {
   return false;
 }
 
-export function userDetailsFromResponse(memberResonse: any): user_detail {
+function phoneFromResponse(response) {
   return {
-    mobile_phone: memberResonse.display_phone,
-    first_name: memberResonse.short_name,
-    ...memberResonse,
+    ...response,
+    number: response.display_number,
+  };
+}
+
+export function userDetailsFromResponse(memberResponse: any): user_detail {
+  return {
+    ...memberResponse,
+    mobile_phone: memberResponse.display_phone,
+    first_name: memberResponse.short_name,
+    phone_numbers: memberResponse.phone_set?.map(phoneFromResponse),
   };
 }
