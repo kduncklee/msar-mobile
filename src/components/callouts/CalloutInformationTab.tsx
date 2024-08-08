@@ -121,6 +121,16 @@ function CalloutInformationTab({ callout }: CalloutInformationTabProps) {
             />
           </>
         )}
+        {!!callout.resolution && (
+          <>
+            <View style={elements.informationDiv} />
+            <TextAreaField
+              title="Resolution"
+              value={callout.resolution}
+              valueColor={colors.secondaryYellow}
+            />
+          </>
+        )}
         <View style={{ height: 10 }} />
       </InformationTray>
       {(locationIsSet(callout.location) || callout.location?.text)

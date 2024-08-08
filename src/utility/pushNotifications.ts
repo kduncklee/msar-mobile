@@ -81,7 +81,7 @@ async function registerForPushNotificationsAsync(api: Api) {
     await messaging().registerDeviceForRemoteMessages();
   }
 
-  updatePushToken();
+  updatePushToken(api);
 }
 
 async function setupChannels() {

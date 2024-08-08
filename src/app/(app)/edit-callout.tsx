@@ -62,7 +62,6 @@ function Page() {
   const callOutTypeSelect = [
     { label: 'Search', enum: calloutType.SEARCH, value: '0' },
     { label: 'Rescue', enum: calloutType.RESCUE, value: '1' },
-    { label: 'Information Only', enum: calloutType.INFORMATION, value: '2' },
   ];
 
   if (id && typeof id === 'string') {
