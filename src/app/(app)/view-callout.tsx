@@ -48,6 +48,8 @@ function Page() {
   const [calloutTimestamp, setCalloutTimestamp] = useState<Date>(null);
   const [logMessageText, setLogMessageText] = useState('');
   const [isActive, setIsActive] = useState(false);
+  const [isResolved, setIsResolved] = useState(false);
+  const headerBackground = isResolved ? colors.green : colors.primaryBg;
 
   const idInt: number = Number.parseInt(id);
 
@@ -111,9 +113,14 @@ function Page() {
       StatusBar.setBarStyle('light-content');
     }
     else if (Platform.OS === 'android') {
-      StatusBar.setBackgroundColor(colors.primaryBg);
+      StatusBar.setBackgroundColor(headerBackground);
     }
-  }, []);
+    return () => {
+      if (Platform.OS === 'android') {
+        StatusBar.setBackgroundColor(colors.primaryBg);
+      }
+    };
+  }, [headerBackground]);
 
   useEffect(() => {
     msarEventEmitter.on('refreshCallout', refreshReceived);
@@ -138,6 +145,12 @@ function Page() {
       }
       else {
         setIsActive(false);
+      }
+      if (callout.status === calloutStatus.RESOLVED) {
+        setIsResolved(true);
+      }
+      else {
+        setIsResolved(false);
       }
     }
   }, [callout]);
@@ -191,7 +204,7 @@ function Page() {
   return (
     <>
       <SafeAreaView style={styles.container}>
-        <Header title={headerTitle} backButton timestamp={calloutTimestamp} />
+        <Header title={headerTitle} background={headerBackground} backButton timestamp={calloutTimestamp} />
         {!!callout
         && (
           <>

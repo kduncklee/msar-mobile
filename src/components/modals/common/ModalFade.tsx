@@ -30,10 +30,7 @@ function ModalFade({ children, header, modalVisible, onCancel }: ModalFadeProps)
 
 const styles = StyleSheet.create({
   modalContent: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
+    flex: 1,
   },
   modalOverlay: {
     position: 'absolute',

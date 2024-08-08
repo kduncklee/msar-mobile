@@ -13,6 +13,7 @@ import { useCalloutListQuery } from '@/remote/query';
 import type { tabItem } from '@/types/tabItem';
 import { activeTabStatusQuery, archivedTabStatusQuery } from '@/types/calloutSummary';
 import type { calloutSummary } from '@/types/calloutSummary';
+import useStatusBarColor from '@/hooks/useStatusBarColor';
 
 function Page() {
   const [showSpinner, _setShowSpinner] = useState(false);
@@ -20,6 +21,7 @@ function Page() {
   const [status, setStatus] = useState(activeTabStatusQuery);
   const queryClient = useQueryClient();
   const query = useCalloutListQuery(status);
+  useStatusBarColor();
 
   const tabs: tabItem[] = [
     {

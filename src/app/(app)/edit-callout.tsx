@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-root-toast';
 import * as Sentry from '@sentry/react-native';
 import Header from '@components/Header';
@@ -21,6 +21,7 @@ import { calloutStatus, calloutType, stringToCalloutType } from '@/types/enums';
 import { useEditingLocation } from '@/storage/mmkv';
 import { handleBackPressed, useBackHandler } from '@/utility/backHandler';
 import { useCalloutCreateMutation, useCalloutUpdateMutation } from '@/remote/mutation';
+import useStatusBarColor from '@/hooks/useStatusBarColor';
 
 function Page() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -45,6 +46,7 @@ function Page() {
   const [editingLocation, setEditingLocation] = useEditingLocation();
   const [calloutChanged, setCalloutChanged] = useState(false);
   useBackHandler(calloutChanged);
+  useStatusBarColor();
 
   const calloutQuery = useCalloutQuery(id);
   let existingData;
@@ -104,15 +106,6 @@ function Page() {
       additionalRadioChannelsAvailable.push(labelValueItem(name));
     }
   });
-
-  useEffect(() => {
-    if (Platform.OS === 'ios') {
-      StatusBar.setBarStyle('light-content');
-    }
-    else if (Platform.OS === 'android') {
-      StatusBar.setBackgroundColor(colors.primaryBg);
-    }
-  }, []);
 
   useEffect(() => {
     if (editingLocation) {

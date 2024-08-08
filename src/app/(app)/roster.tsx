@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Header from '@components/Header';
 import colors from '@styles/colors';
 import { useQueryClient } from '@tanstack/react-query';
@@ -9,12 +9,14 @@ import type { MenuDropdownItem } from '@/components/MenuDropdown';
 import MenuDropdown from '@/components/MenuDropdown';
 import type { user_detail } from '@/types/user';
 import UserModal from '@/components/modals/UserModal';
+import useStatusBarColor from '@/hooks/useStatusBarColor';
 
 function Page() {
   const [sortName, setSortName] = useState('Name');
   const [sortKey, setSortKey] = useState('last_name');
   const [reversed, setReversed] = useState(false);
   const [selectedUser, setSelectedUser] = useState<user_detail>(null);
+  useStatusBarColor();
   const queryClient = useQueryClient();
   const query = useMemberListQuery();
   const sorted = query.data
@@ -44,15 +46,6 @@ function Page() {
     { name: 'Ascending', onSelect: () => { setReversed(false); } },
     { name: 'Descending', onSelect: () => { setReversed(true); } },
   ];
-
-  useEffect(() => {
-    if (Platform.OS === 'ios') {
-      StatusBar.setBarStyle('light-content');
-    }
-    else if (Platform.OS === 'android') {
-      StatusBar.setBackgroundColor(colors.primaryBg);
-    }
-  }, []);
 
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: memberListQueryKey });

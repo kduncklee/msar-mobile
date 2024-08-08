@@ -8,6 +8,7 @@ import { getConditionalTimeString } from '@utility/dateHelper';
 interface HeaderProps {
   title: string;
   zeroTopMargin?: boolean;
+  background?: any;
   backButton?: boolean;
   onBackPressed?: () => void;
   rightButton?: boolean;
@@ -15,7 +16,7 @@ interface HeaderProps {
   timestamp?: Date;
 };
 
-function Header({ title, zeroTopMargin, backButton = false, onBackPressed, rightButton = false, timestamp = null }: HeaderProps) {
+function Header({ title, zeroTopMargin, background, backButton = false, onBackPressed, rightButton = false, timestamp = null }: HeaderProps) {
   const [headerMargin, setHeaderMargin] = useState(0);
 
   useEffect(() => {
@@ -56,8 +57,10 @@ function Header({ title, zeroTopMargin, backButton = false, onBackPressed, right
     console.log('settings');
   };
 
+  const viewStyle = background ? { backgroundColor: background } : {};
+
   return (
-    <View style={[styles.container, { marginTop: headerMargin }]}>
+    <View style={[styles.container, { marginTop: headerMargin }, viewStyle]}>
       {backButton
       && (
         <TouchableOpacity activeOpacity={0.2} style={styles.backContainer} onPress={() => backPressed()}>

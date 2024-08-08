@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Image, Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Header from '@components/Header';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
@@ -16,6 +16,7 @@ import type { location } from '@/types/location';
 import { locationToShortString, locationToString } from '@/types/location';
 import { useEditingLocation } from '@/storage/mmkv';
 import { handleBackPressed, useBackHandler } from '@/utility/backHandler';
+import useStatusBarColor from '@/hooks/useStatusBarColor';
 
 function Page() {
   const markerRef = useRef<MapMarker>();
@@ -37,15 +38,7 @@ function Page() {
     || (editingLocation.coordinates.long !== currentLocation.coordinates.long)
   );
   useBackHandler(locationChanged);
-
-  useEffect(() => {
-    if (Platform.OS === 'ios') {
-      StatusBar.setBarStyle('light-content');
-    }
-    else if (Platform.OS === 'android') {
-      StatusBar.setBackgroundColor(colors.primaryBg);
-    }
-  }, []);
+  useStatusBarColor();
 
   useEffect(() => {
     console.log('editing location', locationToString(editingLocation));
