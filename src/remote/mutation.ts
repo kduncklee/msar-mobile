@@ -35,7 +35,7 @@ export function useChatOrCalloutLogMutation(idInt: number) {
     queryKey = ['calloutLog', idInt];
   }
   else { // Chat
-    mutationFn = api.apiPostChatLog;
+    mutationFn = (message: string) => api.apiPostChatLog(message);
     queryKey = ['chat'];
   }
   return useLogMutation(mutationFn, queryKey);
