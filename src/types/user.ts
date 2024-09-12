@@ -24,7 +24,7 @@ export interface user_detail extends user {
 export function userToString(user: user): string {
   if (!user)
     return 'System';
-  return user.full_name;
+  return `${user.username} - ${user.full_name}`;
 }
 
 function stringEqualsIgnoreCase(a: string, b: string): boolean {
