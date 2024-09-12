@@ -5,7 +5,7 @@ import { getConditionalTimeString } from '@utility/dateHelper';
 import { useLastRead } from 'storage/mmkv';
 import type { calloutSummary } from '@/types/calloutSummary';
 import { colorForResponseType, colorForTypeAndStatus, imageForType, textForResponseType } from '@/types/calloutSummary';
-import { responseType } from '@/types/enums';
+import { calloutStatus, responseType } from '@/types/enums';
 import { locationToShortString } from '@/types/location';
 import type { respondedItem } from '@/types/respondedItem';
 
@@ -17,6 +17,7 @@ interface CalloutCellProps {
 function CalloutCell({ summary, onPress }: CalloutCellProps) {
   const [lastLogRead, _setLastLogRead] = useLastRead(summary?.id);
   const hasUnread = (lastLogRead === undefined) || (lastLogRead < summary.log_last_id);
+  const isResolved = summary.status === calloutStatus.RESOLVED;
   // console.log(summary.id, lastLogRead, summary.log_last_id, hasUnread);
 
   const cellPressed = () => {
@@ -64,6 +65,11 @@ function CalloutCell({ summary, onPress }: CalloutCellProps) {
               <Image source={require('@assets/icons/log_yellow.png')} style={styles.logImage} />
               <Text style={elements.smallYellowText}>{summary.log_count}</Text>
             </View>
+            {isResolved && (
+              <View style={[elements.capsule]}>
+                <Text style={elements.smallYellowText}>10-22</Text>
+              </View>
+            )}
           </View>
         </View>
       </View>
