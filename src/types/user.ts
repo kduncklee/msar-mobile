@@ -19,6 +19,7 @@ export interface user_detail extends user {
   status_order: number;
   is_current: boolean;
   phone_numbers: phone[];
+  employee_id: string;
 }
 
 export function userToString(user: user): string {
@@ -55,5 +56,6 @@ export function userDetailsFromResponse(memberResponse: any): user_detail {
     mobile_phone: memberResponse.display_phone,
     first_name: memberResponse.short_name,
     phone_numbers: memberResponse.phone_set?.map(phoneFromResponse),
+    employee_id: memberResponse.emp,
   };
 }

@@ -30,6 +30,7 @@ function UserModal({ user, onCancel }: UserModalProps) {
           <InformationField title="Name" value={user.full_name} />
           <InformationField title="Username" value={user.username} />
           <InformationField title="Status" value={user.status} />
+          <InformationField title="Employee ID" value={user.employee_id} />
         </InformationTray>
 
         <InformationTray
