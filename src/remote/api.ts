@@ -192,7 +192,7 @@ export class Api {
     return this.#fetchJsonWithCredentials(this.#calloutsEndpoint(), 'POST', callout);
   }
 
-  async apiGetCallout(id: number): Promise<any> {
+  async apiGetCallout(id: number): Promise<callout> {
     return this.#fetchJsonWithCredentials(`${this.#calloutsEndpoint() + id}/`).then((data) => {
       return calloutFromResponse(data);
     });

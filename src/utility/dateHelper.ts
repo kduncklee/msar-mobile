@@ -39,7 +39,7 @@ export function getTimeString(date: Date, padHours: boolean = false): string {
 
 /** Format the date as "M/d" and time as "H:mm AM/PM" */
 export function getLongDateTimeString(date: Date): string {
-  return `${getDateString(date)}  ${getTimeString(date)}`;
+  return `${getDateString(date)} ${getTimeString(date)}`;
 }
 
 /** Format the date as "MM/DD/yyyy" and time as "hh:mm a" */

@@ -49,7 +49,7 @@ function Page() {
   useStatusBarColor();
 
   const calloutQuery = useCalloutQuery(id);
-  let existingData;
+  let existingData: callout;
   if (id) {
     existingData = calloutQuery.data;
   }
