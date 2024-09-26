@@ -262,7 +262,7 @@ function checkNotificationDefaults() {
 function prefetch(api: Api, notification) {
   const url = notification.data?.url;
   const id = notification.data?.id;
-  console.log('prefetch', api, api?.server());
+  console.log('prefetch', api);
   if (url) {
     if (url === 'view-callout') {
       prefetchCalloutQuery(queryClient, api, id);

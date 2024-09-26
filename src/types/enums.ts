@@ -1,3 +1,10 @@
+export enum eventType {
+  MEETING = 'meeting',
+  TRAINING = 'training',
+  OPERATION = 'operation',
+  COMMUNITY = 'community',
+}
+
 export enum calloutType {
   SEARCH = 'search',
   RESCUE = 'rescue',

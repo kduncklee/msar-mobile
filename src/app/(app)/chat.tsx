@@ -1,24 +1,17 @@
-import { useEffect, useState } from 'react';
-import { KeyboardAvoidingView, Platform, SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
+import { useState } from 'react';
+import { KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, View } from 'react-native';
 import Header from '@components/Header';
 import colors from '@styles/colors';
 import CalloutLogTab from '@components/callouts/CalloutLogTab';
 import LogInput from '@components/callouts/LogInput';
 import { useChatLogInfiniteQuery } from '@/remote/query';
 import { useChatLogMutation } from '@/remote/mutation';
+import useStatusBarColor from '@/hooks/useStatusBarColor';
 
 function Page() {
   const [logMessageText, setLogMessageText] = useState('');
   const chatLogMutation = useChatLogMutation();
-
-  useEffect(() => {
-    if (Platform.OS === 'ios') {
-      StatusBar.setBarStyle('light-content');
-    }
-    else if (Platform.OS === 'android') {
-      StatusBar.setBackgroundColor(colors.primaryBg);
-    }
-  }, []);
+  useStatusBarColor();
 
   const onLogMessageTextChanged = (text: string) => {
     setLogMessageText(text);

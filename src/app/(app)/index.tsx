@@ -49,6 +49,7 @@ function Page() {
     { text: 'Callouts', url: '/callout-list', badge: numberActiveCallouts },
     { text: 'Announcements', url: '/chat', badge: chatHasUnread && '!' },
     { text: 'Roster', url: '/roster' },
+    { text: 'Calendar', url: '/calendar' },
     { text: 'Settings', url: '/settings' },
     { key: 'snooze', text: snoozeTitle, onPress: () => setSnoozeModalVisible(true) },
   ];

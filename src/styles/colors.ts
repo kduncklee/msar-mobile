@@ -4,6 +4,7 @@ const colors = {
   secondaryBg: '#2B3038',
   selectionBg: '#67ACED',
   primaryText: '#ffffff',
+  white: '#ffffff',
   black: '#000000',
   grayText: '#60646A',
   secondaryYellow: '#EDC767',

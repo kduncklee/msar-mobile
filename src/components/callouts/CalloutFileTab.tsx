@@ -74,10 +74,10 @@ function CalloutFileTab({ callout }: CalloutFileTabProps) {
           return <FileField file={item} />;
         }}
       />
-      <View style={styles.buttonContainer}>
+      <View style={elements.buttonContainer}>
         <TouchableOpacity
           activeOpacity={0.8}
-          style={[elements.capsuleButton, styles.uploadButton, {}]}
+          style={[elements.capsuleButton, elements.splitButton]}
           onPress={() => pickUploadPhoto(api, callout.id)}
         >
           <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>
@@ -86,7 +86,7 @@ function CalloutFileTab({ callout }: CalloutFileTabProps) {
         </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={0.8}
-          style={[elements.capsuleButton, styles.uploadButton, {}]}
+          style={[elements.capsuleButton, elements.splitButton]}
           onPress={() => pickUploadFile(api, callout.id)}
         >
           <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>
@@ -101,17 +101,6 @@ function CalloutFileTab({ callout }: CalloutFileTabProps) {
 const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
-  },
-  uploadButton: {
-    flex: 1,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    alignItems: 'stretch',
-    alignSelf: 'center',
-    margin: 20,
-    height: 60,
-    width: '100%',
   },
 });
 

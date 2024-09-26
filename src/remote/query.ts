@@ -5,6 +5,9 @@ import type { calloutSummary } from '@/types/calloutSummary';
 import { calloutSummaryFromResponse } from '@/types/calloutSummary';
 import { userDetailsFromResponse } from '@/types/user';
 import useAuth from '@/hooks/useAuth';
+import type { event } from '@/types/event';
+import { eventFromResponse } from '@/types/event';
+import { type patrol, patrolFromResponse } from '@/types/patrol';
 
 //////////////////////////////////////////////////////////////////////////////
 // React Query
@@ -34,6 +37,51 @@ export function useRadioChannelsAvailableQuery() {
   const { api } = useAuth();
   return useQuery(radioChannelsAvailabletQueryParams(api));
 }
+
+/// /// Events List
+
+const eventListQueryKey = ['events'];
+function eventListQueryParams(api: Api) {
+  return {
+    queryKey: eventListQueryKey,
+    queryFn: async (): Promise<event[]> => {
+      const response = await api.apiGetEvents();
+      return response.results.map((result: any) => eventFromResponse(result));
+    },
+  };
+}
+
+export async function prefetchEventListQuery(queryClient: QueryClient, api: Api) {
+  return queryClient.prefetchQuery(eventListQueryParams(api));
+}
+
+export function useEventListQuery() {
+  const { api } = useAuth();
+  return useQuery(eventListQueryParams(api));
+}
+
+/// /// Patrols List
+
+const patrolListQueryKey = ['patrols'];
+function patrolListQueryParams(api: Api) {
+  return {
+    queryKey: patrolListQueryKey,
+    queryFn: async (): Promise<patrol[]> => {
+      const response = await api.apiGetPatrols();
+      return response.results.map((result: any) => patrolFromResponse(result));
+    },
+  };
+}
+
+export async function prefetchPatrolListQuery(queryClient: QueryClient, api: Api) {
+  return queryClient.prefetchQuery(patrolListQueryParams(api));
+}
+
+export function usePatrolListQuery() {
+  const { api } = useAuth();
+  return useQuery(patrolListQueryParams(api));
+}
+
 /// /// Members List
 
 export const memberListQueryKey = ['members'];

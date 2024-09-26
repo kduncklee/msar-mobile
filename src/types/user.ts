@@ -17,6 +17,7 @@ export interface user {
 export interface user_detail extends user {
   status: string;
   status_order: number;
+  color: string;
   is_current: boolean;
   phone_numbers: phone[];
   employee_id: string;
@@ -28,8 +29,12 @@ export function userToString(user: user): string {
   return `${user.username} - ${user.full_name}`;
 }
 
-function stringEqualsIgnoreCase(a: string, b: string): boolean {
-  return a.localeCompare(b, 'en', { sensitivity: 'accent' }) === 0;
+function stringCompareIgnoreCase(a: string, b: string): number {
+  return a.localeCompare(b, 'en', { sensitivity: 'accent' });
+}
+
+export function compareUsername(a: user, b: user) {
+  return stringCompareIgnoreCase(a.username, b.username);
 }
 
 export function isUserSelf(user: user, self_username: string): boolean {
@@ -37,7 +42,7 @@ export function isUserSelf(user: user, self_username: string): boolean {
     return false;
 
   if (self_username) {
-    return stringEqualsIgnoreCase(self_username, user.username);
+    return stringCompareIgnoreCase(self_username, user.username) === 0;
   }
 
   return false;

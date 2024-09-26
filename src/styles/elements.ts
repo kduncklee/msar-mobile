@@ -21,6 +21,14 @@ export const elements = StyleSheet.create({
     fontWeight: '400',
     color: colors.secondaryYellow,
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    alignSelf: 'center',
+    margin: 20,
+    height: 60,
+    width: '100%',
+  },
   capsuleButton: {
     flexDirection: 'row',
     backgroundColor: colors.yellow,
@@ -30,6 +38,9 @@ export const elements = StyleSheet.create({
     alignContent: 'center',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  splitButton: {
+    flex: 1,
   },
   whiteButtonText: {
     fontWeight: '500',

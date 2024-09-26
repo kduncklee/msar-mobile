@@ -4,11 +4,13 @@ import { logStatusType, logType } from '@/types/enums';
 import { logEntryFromRespsonse } from '@/types/logEntry';
 import { messageSuccessNotification } from '@/utility/pushNotifications';
 import type { callout } from '@/types/callout';
+import type { patrol } from '@/types/patrol';
 
 //////////////////////////////////////////////////////////////////////////////
 // React Query Mutations
 //////////////////////////////////////////////////////////////////////////////
 
+/// /// Callout Mutations
 export function useCalloutCreateMutation() {
   const { api } = useAuth();
   return useMutation({
@@ -21,6 +23,22 @@ export function useCalloutUpdateMutation() {
   return useMutation({
     mutationFn: ({ idInt, callout }: { idInt: number; callout: callout }) =>
       api.apiUpdateCallout(idInt, callout),
+  });
+}
+
+/// /// Patrol Mutations
+export function usePatrolCreateMutation() {
+  const { api } = useAuth();
+  return useMutation({
+    mutationFn: (patrol: patrol) => api.apiCreatePatrol(patrol),
+  });
+}
+
+export function usePatrolUpdateMutation() {
+  const { api } = useAuth();
+  return useMutation({
+    mutationFn: ({ idInt, patrol }: { idInt: number; patrol: patrol }) =>
+      api.apiUpdatePatrol(idInt, patrol),
   });
 }
 

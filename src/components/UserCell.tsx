@@ -10,14 +10,15 @@ interface UserCellProps {
 };
 
 function UserCell({ user, onPress }: UserCellProps) {
+  const tintColor = user.color?.toLocaleLowerCase() === '#ffffff' ? '#000000' : null;
   return (
     <View style={[elements.tray, styles.container]}>
       <TouchableOpacity
         activeOpacity={0.5}
         onPress={() => makePhoneCall(user.mobile_phone)}
-        style={[styles.sideBar, { backgroundColor: colors.green }]}
+        style={[styles.sideBar, { backgroundColor: user.color || colors.green }]}
       >
-        <Image source={require('@assets/icons/phone.png')} style={styles.sideBarImage} />
+        <Image source={require('@assets/icons/phone.png')} tintColor={tintColor} style={styles.sideBarImage} />
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.contentBar}

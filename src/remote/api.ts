@@ -4,6 +4,7 @@ import { Platform } from 'react-native';
 import type { calloutGetLogResponse, loginResponse, tokenValidationResponse } from './responses';
 import { calloutFromResponse } from '@/types/callout';
 import type { callout } from '@/types/callout';
+import type { patrol } from '@/types/patrol';
 
 const local_server: string = 'http://192.168.1.120:8000';
 const legacy_server: string = 'https://malibusarhours.org/calloutapi';
@@ -18,8 +19,6 @@ export class Api {
     this.#_server = server;
     this.#token = token;
   }
-
-  server() { return this.#_server; }
 
   #server(): string {
     switch (this.#_server) {
@@ -53,6 +52,14 @@ export class Api {
 
   #chatEndpoint(): string {
     return `${this.#server()}/api/announcement/log/`;
+  }
+
+  #eventsEndpoint(): string {
+    return `${this.#server()}/api/events/?is_operation=false`;
+  }
+
+  #patrolsEndpoint(): string {
+    return `${this.#server()}/api/patrols/`;
   }
 
   #membersEndpoint(): string {
@@ -237,6 +244,28 @@ export class Api {
 
   async apiPostChatLog(message: string): Promise<any> {
     return this.#apiPostLogFromUrl(this.#chatEndpoint(), message);
+  }
+
+  async apiGetEvents(): Promise<any> {
+    return this.#fetchJsonWithCredentials(this.#eventsEndpoint());
+  }
+
+  async apiGetPatrols(): Promise<any> {
+    return this.#fetchJsonWithCredentials(this.#patrolsEndpoint());
+  }
+
+  async apiCreatePatrol(patrol: patrol): Promise<any> {
+    const modified_patrol = { ...patrol, member: patrol.member?.id };
+    return this.#fetchJsonWithCredentials(this.#patrolsEndpoint(), 'POST', modified_patrol);
+  }
+
+  async apiUpdatePatrol(id: number, patrol: patrol): Promise<any> {
+    const modified_patrol = { ...patrol, member: patrol.member?.id };
+    return this.#fetchJsonWithCredentials(
+    `${(this.#patrolsEndpoint()) + id}/`,
+    'PUT',
+    modified_patrol,
+    );
   }
 
   async apiGetMembers(): Promise<any> {

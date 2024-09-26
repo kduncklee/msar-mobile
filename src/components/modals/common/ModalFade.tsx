@@ -2,7 +2,7 @@ import { Modal, SafeAreaView, StyleSheet, TouchableWithoutFeedback, View } from 
 import Header from '@/components/Header';
 
 interface ModalFadeProps {
-  children: React.ReactElement;
+  children: React.ReactNode;
   header?: string;
   modalVisible: boolean;
   onCancel: () => void;
