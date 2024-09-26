@@ -5,7 +5,7 @@ import TextAreaField from '@components/fields/TextAreaField';
 import LocationField from '@components/fields/LocationField';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
-import { getFullTimeString } from '@utility/dateHelper';
+import { getFullDateTimeString } from '@utility/dateHelper';
 import { router } from 'expo-router';
 import type { callout } from '@/types/callout';
 import { colorForResponseType, textForCalloutStatus, textForResponseType, textForType } from '@/types/calloutSummary';
@@ -40,7 +40,7 @@ function CalloutInformationTab({ callout }: CalloutInformationTabProps) {
         && (
           <InformationField
             title="Time of Dispatch"
-            value={getFullTimeString(callout.created_at)}
+            value={getFullDateTimeString(callout.created_at)}
           />
         )}
         <View style={elements.informationDiv} />

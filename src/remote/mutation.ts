@@ -1,10 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import Toast from 'react-native-root-toast';
+import * as Sentry from '@sentry/react-native';
 import useAuth from '@/hooks/useAuth';
 import { logStatusType, logType } from '@/types/enums';
 import { logEntryFromRespsonse } from '@/types/logEntry';
 import { messageSuccessNotification } from '@/utility/pushNotifications';
 import type { callout } from '@/types/callout';
 import type { patrol } from '@/types/patrol';
+import { usePatrolListQuery } from '@/remote/query';
 
 //////////////////////////////////////////////////////////////////////////////
 // React Query Mutations
@@ -29,8 +32,19 @@ export function useCalloutUpdateMutation() {
 /// /// Patrol Mutations
 export function usePatrolCreateMutation() {
   const { api } = useAuth();
+  const patrolQuery = usePatrolListQuery();
   return useMutation({
     mutationFn: (patrol: patrol) => api.apiCreatePatrol(patrol),
+    onSuccess: (data, _variables, _context) => {
+      console.log('patrol created', data);
+      patrolQuery.refetch();
+    },
+    onError: (error, _variables, _context) => {
+      Sentry.captureException(error);
+      Toast.show(`Unable to create patrol: ${error.message}`, {
+        duration: Toast.durations.LONG,
+      });
+    },
   });
 }
 
@@ -39,6 +53,24 @@ export function usePatrolUpdateMutation() {
   return useMutation({
     mutationFn: ({ idInt, patrol }: { idInt: number; patrol: patrol }) =>
       api.apiUpdatePatrol(idInt, patrol),
+  });
+}
+
+export function usePatrolRemoveMutation() {
+  const { api } = useAuth();
+  const patrolQuery = usePatrolListQuery();
+  return useMutation({
+    mutationFn: (idInt: number) => api.apiRemovePatrol(idInt),
+    onSuccess: (data, _variables, _context) => {
+      console.log('patrol deleted', data);
+      patrolQuery.refetch();
+    },
+    onError: (error, _variables, _context) => {
+      Sentry.captureException(error);
+      Toast.show(`Unable to delete patrol: ${error.message}`, {
+        duration: Toast.durations.LONG,
+      });
+    },
   });
 }
 

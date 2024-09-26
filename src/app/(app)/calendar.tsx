@@ -48,6 +48,7 @@ const linearTheme: CalendarTheme = {
       container: {
         borderColor: 'rgba(255, 255, 255, 0.5)',
         borderRadius: isPressed ? 4 : 30,
+        borderWidth: 1,
         backgroundColor: isPressed ? linearAccent : 'transparent',
       },
       content: {

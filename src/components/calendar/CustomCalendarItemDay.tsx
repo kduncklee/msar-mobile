@@ -1,8 +1,10 @@
 import type { CalendarItemDayWithContainerProps } from '@marceloterreiro/flash-calendar';
 import { Calendar, useOptimizedDayMetadata } from '@marceloterreiro/flash-calendar';
-import { StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet, Text } from 'react-native';
+import { useCallback } from 'react';
 import type { patrol } from '@/types/patrol';
 import type { event } from '@/types/event';
+import { CalendarItemDayContent } from '@/components/calendar/CalendarItemDayContent';
 
 interface CustomCalendarItemDayWithContainerProps extends CalendarItemDayWithContainerProps {
   events: event[];
@@ -22,6 +24,10 @@ export const CustomCalendarItemDay = ({
 }: CustomCalendarItemDayWithContainerProps) => {
   const metadata = useOptimizedDayMetadata(baseMetadata);
 
+  const handlePress = useCallback(() => {
+    onPress(metadata.id);
+  }, [metadata.id, onPress]);
+
   return (
     <Calendar.Item.Day.Container
       dayHeight={dayHeight}
@@ -35,56 +41,49 @@ export const CustomCalendarItemDay = ({
       theme={containerTheme}
     >
 
-      <Calendar.Item.Day
-        height={dayHeight}
-        metadata={metadata}
-        onPress={onPress}
-        theme={theme}
+      <Pressable
+        disabled={metadata.state === 'disabled'}
+        onPress={handlePress}
+        style={({ pressed: isPressed }) => {
+          return {
+            ...styles.baseContainer,
+            dayHeight,
+            ...theme?.base?.({ ...metadata, isPressed }).container,
+            ...theme?.[metadata.state]?.({ ...metadata, isPressed }).container,
+          };
+        }}
       >
-        {children}
-      </Calendar.Item.Day>
+        {({ pressed: isPressed }) => {
+          return (
+            <>
+              <Text
+                style={{
+                  ...styles.baseContent,
+                  ...theme?.base?.({ ...metadata, isPressed }).content,
+                  ...theme?.[metadata.state]?.({ ...metadata, isPressed }).content,
+                }}
+              >
+                {children}
+              </Text>
+              <CalendarItemDayContent events={events} patrols={patrols} />
+            </>
+          );
+        }}
+      </Pressable>
 
-      {events?.map(event => (
-        <Text
-          key={event.title}
-          numberOfLines={1}
-          ellipsizeMode="clip"
-          allowFontScaling={false}
-          style={[styles.common, styles.event]}
-        >
-          {event.title}
-        </Text>
-      ))}
-
-      {patrols?.map(patrol => (
-        <Text
-          numberOfLines={1}
-          ellipsizeMode="clip"
-          allowFontScaling={false}
-          key={patrol.member.username}
-          style={[styles.common, styles.patrol, { backgroundColor: patrol.color }]}
-        >
-          {patrol.member.username}
-        </Text>
-      ))}
     </Calendar.Item.Day.Container>
   );
 };
 
 const styles = StyleSheet.create({
-  common: {
-    fontStyle: 'italic',
+  baseContainer: {
+    padding: 1,
+    // alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 2,
+    flex: 1,
+  },
+  baseContent: {
     textAlign: 'center',
-    borderRadius: 10,
-    backgroundColor: '#68a0cf',
-    margin: 1,
-  },
-  event: {
-    fontSize: 10,
-    fontWeight: 'bold',
-  },
-  patrol: {
-    fontSize: 12,
-    fontWeight: 'bold',
   },
 });

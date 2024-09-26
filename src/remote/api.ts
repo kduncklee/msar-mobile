@@ -268,6 +268,21 @@ export class Api {
     );
   }
 
+  async apiRemovePatrol(id: number) {
+    try {
+      const data = await this.#fetchWithCredentials(
+      `${this.#patrolsEndpoint() + id}/`,
+      'DELETE',
+      );
+      console.log(`removed patrol: ${JSON.stringify(data)}`);
+    }
+    catch (error) {
+      console.log(error);
+      // eslint-disable-next-line no-alert
+      alert(`Error removing patrol: ${error.message}`);
+    }
+  }
+
   async apiGetMembers(): Promise<any> {
     return this.#fetchJsonWithCredentials(this.#membersEndpoint());
   }

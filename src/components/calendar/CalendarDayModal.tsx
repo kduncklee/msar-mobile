@@ -1,7 +1,5 @@
 import React from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Toast from 'react-native-root-toast';
-import * as Sentry from '@sentry/react-native';
 import { fromDateId } from '@marceloterreiro/flash-calendar';
 import ModalFade from '@/components/modals/common/ModalFade';
 import type { patrol } from '@/types/patrol';
@@ -12,7 +10,6 @@ import CalendarPatrol from '@/components/calendar/CalendarPatrol';
 import { isUserSelf } from '@/types/user';
 import useAuth from '@/hooks/useAuth';
 import { usePatrolCreateMutation } from '@/remote/mutation';
-import { usePatrolListQuery } from '@/remote/query';
 
 interface CalendarDayModalProps {
   dateID: string;
@@ -24,7 +21,6 @@ interface CalendarDayModalProps {
 function CalendarDayModal({ dateID, events, patrols, onCancel }: CalendarDayModalProps) {
   const { username } = useAuth();
   const patrolCreateMutation = usePatrolCreateMutation();
-  const patrolQuery = usePatrolListQuery();
 
   console.log(events, patrols);
 
@@ -40,18 +36,7 @@ function CalendarDayModal({ dateID, events, patrols, onCancel }: CalendarDayModa
       start_at: fromDateId(dateID),
     };
 
-    patrolCreateMutation.mutate(patrol, {
-      onSuccess: (data, _variables, _context) => {
-        console.log('patrol created', data);
-        patrolQuery.refetch();
-      },
-      onError: (error, _variables, _context) => {
-        Sentry.captureException(error);
-        Toast.show(`Unable to create patrol: ${error.message}`, {
-          duration: Toast.durations.LONG,
-        });
-      },
-    });
+    patrolCreateMutation.mutate(patrol);
   }
 
   function createPatrol() {
