@@ -41,8 +41,8 @@ function CalendarDayModal({ dateID, events, patrols, onCancel }: CalendarDayModa
 
   function createPatrol() {
     const userPatrols = patrols?.filter(p => isUserSelf(p.member, username));
-    if (userPatrols) {
-      console.log(userPatrols);
+    if (userPatrols?.length) {
+      console.log('userPatrols', username, userPatrols);
       Alert.alert(
         'Duplicate patrol',
         'You already have a patrol on this day. Click the patrol above to edit it.',
