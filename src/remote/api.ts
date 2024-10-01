@@ -7,6 +7,7 @@ import type { callout } from '@/types/callout';
 import type { patrol } from '@/types/patrol';
 
 const local_server: string = 'http://192.168.1.120:8000';
+const scv_server: string = 'https://app.scvrescue.com';
 const legacy_server: string = 'https://malibusarhours.org/calloutapi';
 const dev_server: string = 'https://msar-dev-app.azurewebsites.net';
 const staging_server: string = 'https://staging.app.malibusarhours.org';
@@ -24,6 +25,8 @@ export class Api {
     switch (this.#_server) {
       case 'local':
         return local_server;
+      case 'scv':
+        return scv_server;
       case 'legacy':
         return legacy_server;
       case 'dev':
