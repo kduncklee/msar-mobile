@@ -5,25 +5,30 @@ import {
 } from '@marceloterreiro/flash-calendar';
 import { memo } from 'react';
 import { uppercaseFirstLetter } from '@marceloterreiro/flash-calendar/src/helpers/strings';
+import { Text } from 'react-native';
 import { CustomCalendarItemDay } from './CustomCalendarItemDay';
 import type { patrol } from '@/types/patrol';
 import type { event } from '@/types/event';
+import { CustomCalendarButton } from '@/components/calendar/CustomCalendarButton';
 
 interface CustomCalendarProps extends CalendarProps {
   events: Map<string, event[]>;
   patrols: Map<string, patrol[]>;
+  onPreviousMonthPress: () => void;
+  onNextMonthPress: () => void;
 }
 
 export const CustomCalendar = memo(
   ({
     events,
     patrols,
+    onPreviousMonthPress,
+    onNextMonthPress,
     onCalendarDayPress,
     calendarRowVerticalSpacing = 8,
     calendarRowHorizontalSpacing = 8,
     theme,
     calendarDayHeight = 48,
-    calendarMonthHeaderHeight = 20,
     calendarWeekHeaderHeight = calendarDayHeight,
 
     ...buildCalendarParams
@@ -33,12 +38,20 @@ export const CustomCalendar = memo(
 
     return (
       <Calendar.VStack alignItems="center" spacing={calendarRowVerticalSpacing}>
-        <Calendar.Row.Month
-          height={calendarMonthHeaderHeight}
-          theme={theme?.rowMonth}
+
+        <Calendar.HStack
+          alignItems="center"
+          justifyContent="space-around"
+          style={theme.rowMonth?.container}
+          width="100%"
         >
-          {uppercaseFirstLetter(calendarRowMonth)}
-        </Calendar.Row.Month>
+          <CustomCalendarButton onPress={onPreviousMonthPress}>{'<<'}</CustomCalendarButton>
+          <Text style={theme.rowMonth?.content}>
+            {uppercaseFirstLetter(calendarRowMonth)}
+          </Text>
+          <CustomCalendarButton onPress={onNextMonthPress}>{'>>'}</CustomCalendarButton>
+        </Calendar.HStack>
+
         <Calendar.Row.Week spacing={8} theme={theme?.rowWeek}>
           {weekDaysList.map((weekDay, i) => (
             <Calendar.Item.WeekName

@@ -1,7 +1,8 @@
 import type { CalendarTheme } from '@marceloterreiro/flash-calendar';
 import { toDateId } from '@marceloterreiro/flash-calendar';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
+import { add, sub } from 'date-fns';
 import Header from '@/components/Header';
 import colors from '@/styles/colors';
 import { CustomCalendar } from '@/components/calendar/CustomCalendar';
@@ -12,11 +13,12 @@ import type { event } from '@/types/event';
 import { compareUsername } from '@/types/user';
 
 const linearAccent = '#585ABF';
+const calendarFontSize = 20;
 
 const linearTheme: CalendarTheme = {
   rowMonth: {
     content: {
-      // textAlign: 'left',
+      fontSize: calendarFontSize,
       color: 'rgba(255, 255, 255, 0.9)',
       fontWeight: '700',
     },
@@ -28,7 +30,12 @@ const linearTheme: CalendarTheme = {
       borderStyle: 'solid',
     },
   },
-  itemWeekName: { content: { color: 'rgba(255, 255, 255, 0.9)' } },
+  itemWeekName: {
+    content: {
+      fontSize: calendarFontSize,
+      color: 'rgba(255, 255, 255, 0.9)',
+    },
+  },
   itemDayContainer: {
     activeDayFiller: {
       backgroundColor: linearAccent,
@@ -39,8 +46,10 @@ const linearTheme: CalendarTheme = {
       container: {
         backgroundColor: isPressed ? linearAccent : 'transparent',
         borderRadius: 4,
+        justifyContent: 'flex-start',
       },
       content: {
+        fontSize: calendarFontSize,
         color: !isWeekend && !isPressed ? 'rgba(255, 255, 255, 0.5)' : '#ffffff',
       },
     }),
@@ -52,6 +61,7 @@ const linearTheme: CalendarTheme = {
         backgroundColor: isPressed ? linearAccent : 'transparent',
       },
       content: {
+        fontSize: calendarFontSize,
         color: isPressed ? '#ffffff' : 'rgba(255, 255, 255, 0.5)',
       },
     }),
@@ -64,16 +74,16 @@ const linearTheme: CalendarTheme = {
         borderBottomRightRadius: isEndOfRange ? 4 : 0,
       },
       content: {
+        fontSize: calendarFontSize,
         color: '#ffffff',
       },
     }),
   },
 };
 
-const today = toDateId(new Date());
-
 function Page() {
   const [selectedDate, setSelectedDate] = useState<string>(null);
+  const [currentCalendarMonth, setCurrentCalendarMonth] = useState(new Date());
 
   const eventQuery = useEventListQuery();
   const events = new Map<string, event[]>();
@@ -114,6 +124,14 @@ function Page() {
     setSelectedDate(dateId);
   }
 
+  const handlePreviousMonth = useCallback(() => {
+    setCurrentCalendarMonth(sub(currentCalendarMonth, { months: 1 }));
+  }, [currentCalendarMonth]);
+
+  const handleNextMonth = useCallback(() => {
+    setCurrentCalendarMonth(add(currentCalendarMonth, { months: 1 }));
+  }, [currentCalendarMonth]);
+
   const onClose = () => {
     setSelectedDate(null);
   };
@@ -123,13 +141,15 @@ function Page() {
       <Header title="Calendar" backButton />
       <ScrollView style={styles.scrollView}>
         <CustomCalendar
-          calendarMonthId={today}
+          calendarMonthId={toDateId(currentCalendarMonth)}
           events={events}
           patrols={patrols}
           calendarFirstDayOfWeek="monday"
           calendarDayHeight={null}
           theme={linearTheme}
           onCalendarDayPress={onCalendarDayPress}
+          onPreviousMonthPress={handlePreviousMonth}
+          onNextMonthPress={handleNextMonth}
         />
       </ScrollView>
       {!!selectedDate && (<CalendarDayModal dateID={selectedDate} events={events[selectedDate]} patrols={patrols[selectedDate]} onCancel={onClose} />)}

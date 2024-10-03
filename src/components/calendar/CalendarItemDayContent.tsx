@@ -1,4 +1,4 @@
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import type { patrol } from '@/types/patrol';
 import type { event } from '@/types/event';
 
@@ -36,6 +36,8 @@ export const CalendarItemDayContent = ({
           {patrol.member.username}
         </Text>
       ))}
+
+      {!events && !patrols && <View style={styles.spacer} />}
     </>
   );
 };
@@ -53,7 +55,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   patrol: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: 'bold',
+  },
+  spacer: {
+    margin: 20,
   },
 });
