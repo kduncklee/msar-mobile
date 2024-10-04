@@ -109,12 +109,7 @@ function Page() {
       }
       else {
         patrols[dateId].push(p);
-        patrols[dateId].sort(
-          (a, b) => {
-            console.log(a.member.username, b.member.username);
-            return compareUsername(a.member, b.member);
-          },
-        );
+        patrols[dateId].sort((a, b) => { return compareUsername(a.member, b.member); });
       }
     });
   }
@@ -160,14 +155,14 @@ function Page() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.secondaryBg,
+    backgroundColor: colors.primaryBg,
   },
   scrollView: {
     marginTop: 0,
     flex: 1,
     paddingTop: 0,
     paddingHorizontal: 20,
-    backgroundColor: colors.secondaryBg,
+    backgroundColor: colors.primaryBg,
   },
 
 });

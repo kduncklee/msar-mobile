@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import type { patrol } from '@/types/patrol';
 import type { event } from '@/types/event';
+import colors from '@/styles/colors';
 
 interface CalendarItemDayContentProps {
   events: event[];
@@ -47,11 +48,11 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     textAlign: 'center',
     borderRadius: 10,
-    backgroundColor: '#68a0cf',
+    backgroundColor: colors.green,
     margin: 1,
   },
   event: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: 'bold',
   },
   patrol: {
