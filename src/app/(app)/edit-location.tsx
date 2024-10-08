@@ -12,6 +12,7 @@ import { geocodeAddress } from '@remote/google-maps';
 import ActivityModal from '@components/modals/ActivityModal';
 import type { geocodeAddressResponse } from '@remote/responses';
 import LocationSelectionModal from '@components/modals/LocationSelectModal';
+import { useForm } from '@tanstack/react-form';
 import type { location } from '@/types/location';
 import { locationToShortString, locationToString } from '@/types/location';
 import { useEditingLocation } from '@/storage/mmkv';
@@ -30,13 +31,18 @@ function Page() {
     latitudeDelta: 0.9091139902085246,
     longitudeDelta: 0.5355799588636216,
   });
-  const [addressText, setAddressText] = useState('');
   const [searchResults, setSearchResults] = useState<location[]>([]);
   const locationChanged = (currentLocation?.coordinates != null) && (
     (editingLocation == null) || (editingLocation.coordinates == null)
     || (editingLocation.coordinates.lat !== currentLocation.coordinates.lat)
     || (editingLocation.coordinates.long !== currentLocation.coordinates.long)
   );
+  const form = useForm({
+    defaultValues: {
+      address: '',
+    },
+  });
+  const addressText = form.useStore(state => state.values.address);
   useBackHandler(locationChanged);
   useStatusBarColor();
 
@@ -87,10 +93,6 @@ function Page() {
     if (currentLocation?.coordinates != null) {
       router.back();
     }
-  };
-
-  const onAddressChange = (text: string) => {
-    setAddressText(text);
   };
 
   const searchPressed = () => {
@@ -204,7 +206,8 @@ function Page() {
             <View style={[elements.tray, { margin: 20, position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20, paddingTop: 0 }]}>
               <View style={styles.searchBar}>
                 <FormTextInput
-                  onChange={onAddressChange}
+                  form={form}
+                  name="address"
                   placeholder="Search..."
                   returnKey="search"
                   onSubmit={performAddressSearch}

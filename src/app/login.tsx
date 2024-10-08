@@ -6,15 +6,34 @@ import { router } from 'expo-router';
 import FormTextInput from '@components/inputs/FormTextInput';
 import SmallButton from '@components/inputs/SmallButton';
 import ActivityModal from '@components/modals/ActivityModal';
+import { useForm } from '@tanstack/react-form';
 import useAuth from '@/hooks/useAuth';
 
 function Page() {
   const [topMargin, setTopMargin] = useState(0);
   const scrollViewRef = useRef(null);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const [showSpinner, setShowSpinner] = useState(false);
   const { login } = useAuth();
+
+  const form = useForm({
+    defaultValues: {
+      username: 'a',
+      password: '',
+    },
+    onSubmit: async ({ value }) => {
+      setShowSpinner(true);
+      const errorString = await login(value.username, value.password);
+      setShowSpinner(false);
+      if (errorString) {
+        Alert.alert('Problem logging in', errorString, [
+          { text: 'OK' },
+        ]);
+      }
+      else {
+        router.replace('/');
+      }
+    },
+  });
 
   useEffect(() => {
     if (Platform.OS === 'ios') {
@@ -37,28 +56,6 @@ function Page() {
     );
   }, []);
 
-  const usernameChanged = (text: string) => {
-    setUsername(text);
-  };
-
-  const passwordChanged = (text: string) => {
-    setPassword(text);
-  };
-
-  const loginPressed = async () => {
-    setShowSpinner(true);
-    const errorString = await login(username, password);
-    setShowSpinner(false);
-    if (errorString) {
-      Alert.alert('Problem logging in', errorString, [
-        { text: 'OK' },
-      ]);
-    }
-    else {
-      router.replace('/');
-    }
-  };
-
   return (
     <>
       <Image source={require('@assets/background.png')} style={styles.backgroundImage} />
@@ -75,19 +72,17 @@ function Page() {
             <Image source={require('@assets/msar_logo.png')} style={[styles.logoImage, { marginTop: topMargin }]} />
             <View style={[elements.tray, { padding: 20, margin: 20 }]}>
               <FormTextInput
+                form={form}
+                name="username"
                 title="Username"
                 icon={require('@assets/icons/user.png')}
-                value={username}
-                onChange={usernameChanged}
-                placeholder="Username"
               />
               <FormTextInput
+                form={form}
+                name="password"
                 title="Password"
                 icon={require('@assets/icons/lock.png')}
-                value={password}
-                onChange={passwordChanged}
-                placeholder="Password"
-                secure
+                secureTextEntry
                 autoCorrect={false}
                 autoCapitalize="none"
               />
@@ -96,7 +91,7 @@ function Page() {
                   title="Login"
                   backgroundColor={colors.yellow}
                   textColor={colors.black}
-                  onPress={() => loginPressed()}
+                  onPress={form.handleSubmit}
                 />
               </View>
             </View>

@@ -5,13 +5,16 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { elements } from '@styles/elements';
 import colors from '@styles/colors';
 
-interface DropdownSelectorProps {
+export interface DropdownSelectorCommonProps {
   title?: string;
   options: any[];
   placeholder: string;
-  selectedValue?: any;
   rightButton?: ImageRequireSource;
   onRightPress?: (value: any) => void;
+};
+
+interface DropdownSelectorProps extends DropdownSelectorCommonProps {
+  selectedValue: any;
   onSelect: (values: any) => void;
 };
 
@@ -36,9 +39,7 @@ function DropdownSelector({ title, options, placeholder, selectedValue, rightBut
           itemContainerStyle={{ backgroundColor: colors.primaryBg }}
           activeColor={colors.selectionBg}
           itemTextStyle={{ color: colors.primaryText }}
-          onChange={(item) => {
-            onSelect(item);
-          }}
+          onChange={onSelect}
           testID={title}
         />
         {onRightPress

@@ -25,6 +25,7 @@
     "@react-native-menu/menu": "^1.1.2",
     "@sentry/react-native": "~5.22.0",
     "@tanstack/query-persist-client-core": "^5.25.0",
+    "@tanstack/react-form": "^0.33.0",
     "@tanstack/react-query": "^5.17.0",
     "@types/react": "~18.2.79",
     "date-fns": "^4.1.0",

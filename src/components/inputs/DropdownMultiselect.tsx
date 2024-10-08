@@ -3,18 +3,26 @@ import { StyleSheet, Text, View } from 'react-native';
 import { MultiSelect } from 'react-native-element-dropdown';
 import { elements } from '@styles/elements';
 import colors from '@styles/colors';
+import type { LabelValue } from '@/utility/reactForm';
 
-interface DropdownMultiselectProps {
+export interface DropdownMultiselectCommonProps<
+  TOption extends LabelValue,
+> {
   title?: string;
-  options: any[];
+  options: TOption[];
   placeholder: string;
+};
+
+interface DropdownMultiselectProps<
+  TOption extends LabelValue,
+> extends DropdownMultiselectCommonProps<TOption> {
   selectedValues?: string[];
   onSelect: (values: any) => void;
 };
 
-function DropdownMultiselect({ title, options, placeholder, selectedValues, onSelect }: DropdownMultiselectProps) {
-  // const [selected, setSelected] = useState(selectedValues);
-
+function DropdownMultiselect<
+  TOption extends LabelValue,
+>({ title, options, placeholder, selectedValues, onSelect }: DropdownMultiselectProps<TOption>) {
   return (
     <View style={styles.container}>
       {!!title
@@ -37,7 +45,6 @@ function DropdownMultiselect({ title, options, placeholder, selectedValues, onSe
           itemTextStyle={{ color: colors.primaryText }}
           selectedStyle={styles.selectedStyle}
           onChange={(item) => {
-            // setSelected(item);
             onSelect(item);
           }}
         />

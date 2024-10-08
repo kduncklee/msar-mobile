@@ -1,50 +1,37 @@
-import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { elements } from '@styles/elements';
+import type { ReactFormApi } from '@tanstack/react-form';
+import type { DeepKeyValueName } from '@/utility/reactForm';
+import type { CheckboxPropsCommon } from '@/components/inputs/Checkbox';
+import Checkbox from '@/components/inputs/Checkbox';
 
-interface FormCheckboxProps {
-  title: string;
-  checked: boolean;
-  disabled?: boolean;
-  onToggle: (checked: boolean) => void;
+interface FormCheckboxProps<
+// eslint-disable-next-line ts/no-unnecessary-type-constraint
+  TFormData extends unknown,
+  TName extends DeepKeyValueName<TFormData, boolean>,
+> extends CheckboxPropsCommon {
+  form: ReactFormApi<TFormData, any>;
+  name: TName;
 }
 
-function FormCheckbox({ title, checked, disabled, onToggle }: FormCheckboxProps) {
-  const onCheckToggle = () => {
-    if (disabled) {
-      return;
-    }
-    onToggle(!checked);
-  };
-
-  let opacity: number = 1;
-  if (disabled) {
-    opacity = 0.5;
-  }
-
+function FormCheckbox<
+  // eslint-disable-next-line ts/no-unnecessary-type-constraint
+  TFormData extends unknown,
+  TName extends DeepKeyValueName<TFormData, boolean>,
+>({ form, name, ...checkboxProps }: FormCheckboxProps<TFormData, TName>) {
   return (
-    <View style={[styles.container, { opacity }]}>
-      <TouchableOpacity
-        activeOpacity={0.5}
-        style={[elements.inputContainer, { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' }]}
-        onPress={onCheckToggle}
-        testID={`${title}-checkbox`}
-      >
-        {checked
-        && <Image source={require('@assets/icons/check.png')} style={elements.fieldImage} testID={`${title}-checked`} />}
-      </TouchableOpacity>
-      <Text style={[elements.mediumText, { marginLeft: 10, fontWeight: '600' }]} testID={title}>{title}</Text>
-    </View>
+    <form.Field<any, any, any>
+      name={name}
+      // eslint-disable-next-line react/no-children-prop
+      children={(field) => {
+        return (
+          <Checkbox
+            {...checkboxProps}
+            onToggle={field.handleChange}
+            checked={field.state.value}
+          />
+        );
+      }}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    paddingTop: 20,
-    flexDirection: 'row',
-    alignContent: 'center',
-    alignItems: 'center',
-  },
-});
 
 export default FormCheckbox;

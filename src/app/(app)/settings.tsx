@@ -5,7 +5,7 @@ import { Platform, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity,
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
 import { getCriticalAlertsVolume, storeCriticalAlertsVolume } from '@storage/mmkv';
-import FormCheckbox from '@components/inputs/FormCheckbox';
+import Checkbox from '@components/inputs/Checkbox';
 import * as PushNotifications from '@utility/pushNotifications';
 import NotificationSettings from '@components/NotificationSettings';
 import FormSlider from '@components/inputs/FormSlider';
@@ -56,7 +56,7 @@ function Page() {
 
   const notifications = (
     <>
-      <FormCheckbox
+      <Checkbox
         title="Notifications"
         checked={pushEnabled}
         onToggle={onPushToggle}

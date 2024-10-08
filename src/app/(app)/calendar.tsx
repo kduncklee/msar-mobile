@@ -109,7 +109,7 @@ function Page() {
       }
       else {
         patrols[dateId].push(p);
-        patrols[dateId].sort((a, b) => { return compareUsername(a.member, b.member); });
+        patrols[dateId].sort((a, b) => compareUsername(a.member, b.member));
       }
     });
   }

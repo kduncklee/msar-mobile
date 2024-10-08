@@ -6,13 +6,12 @@ import Header from '@components/Header';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
 import { router, useLocalSearchParams } from 'expo-router';
-import DropdownSelector from '@components/inputs/DropdownSelector';
 import FormTextInput from '@components/inputs/FormTextInput';
 import FormTextArea from '@components/inputs/FormTextArea';
 import FormCheckbox from '@components/inputs/FormCheckbox';
-import DropdownMultiselect from '@components/inputs/DropdownMultiselect';
 import ActivityModal from '@components/modals/ActivityModal';
 import msarEventEmitter from '@utility/msarEventEmitter';
+import { useForm } from '@tanstack/react-form';
 import { useCalloutQuery, useNotificationsAvailableQuery, useRadioChannelsAvailableQuery } from '@/remote/query';
 import type { callout } from '@/types/callout';
 import type { location } from '@/types/location';
@@ -22,30 +21,17 @@ import { useEditingLocation } from '@/storage/mmkv';
 import { handleBackPressed, useBackHandler } from '@/utility/backHandler';
 import { useCalloutCreateMutation, useCalloutUpdateMutation } from '@/remote/mutation';
 import useStatusBarColor from '@/hooks/useStatusBarColor';
+import FormDropdownSelector from '@/components/inputs/FormDropdownSelector';
+import FormDropdownMultiselect from '@/components/inputs/FormDropdownMultiselect';
+import type { LabelValue } from '@/utility/reactForm';
+import { labelValueItem } from '@/utility/reactForm';
 
 function Page() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [showSpinner, setShowSpinner] = useState(false);
   const [spinnerMessage, setSpinnerMessage] = useState('');
-  const [title, setTitle] = useState<string>(null);
-  const [operationType, setOperationType] = useState<calloutType>(null);
-  const [subject, setSubject] = useState<string>(null);
-  const [subjectContact, setSubjectContact] = useState<string>(null);
-  const [informant, setInformant] = useState<string>(null);
-  const [informantContact, setInformantContact] = useState<string>(null);
-  const [radioFrequency, setRadioFrequency] = useState<string>(null);
-  const [additionalRadioFrequencies, setAdditionalRadioFrequencies] = useState<string[]>([]);
-  const [circumstances, setCircumstances] = useState<string>(null);
-  const [notificationsMade, setNotificationsMade] = useState<string[]>([]);
-  const [ten22, setTen22] = useState(false);
-  const [archived, setArchived] = useState(false);
-  const [resolutionNotes, setResolutionNotes] = useState<string>(null);
-  const [locationText, setLocationText] = useState('');
-  const [locationDescText, setLocationDescText] = useState('');
-  const [handlingUnit, setHandlingUnit] = useState<string>(null);
+
   const [editingLocation, setEditingLocation] = useEditingLocation();
-  const [calloutChanged, setCalloutChanged] = useState(false);
-  useBackHandler(calloutChanged);
   useStatusBarColor();
 
   const calloutQuery = useCalloutQuery(id);
@@ -59,35 +45,97 @@ function Page() {
   const calloutCreateMutation = useCalloutCreateMutation();
   const calloutUpdateMutation = useCalloutUpdateMutation();
 
+  const form = useForm({
+    defaultValues: {
+      title: existingData?.title ?? '',
+      operationType: stringToCalloutType(existingData?.operation_type),
+      locationText: locationToString(existingData?.location),
+      locationDescText: existingData?.location?.text,
+      subject: existingData?.subject,
+      subjectContact: existingData?.subject_contact,
+      informant: existingData?.informant,
+      informantContact: existingData?.informant_contact,
+      circumstances: existingData?.description,
+      radioFrequency: existingData?.radio_channel,
+      additionalRadioFrequencies: existingData?.additional_radio_channels ?? [],
+      notificationsMade: existingData?.notifications_made ?? [],
+      handlingUnit: existingData?.handling_unit,
+      ten22: existingData?.status === calloutStatus.RESOLVED,
+      archived: existingData?.status === calloutStatus.ARCHIVED,
+      resolutionNotes: existingData?.resolution,
+    },
+    onSubmit: async ({ value }) => {
+      console.log('form submit', value);
+
+      let locationObject: location = {};
+      if (editingLocation) {
+        locationObject = editingLocation;
+      }
+      locationObject.text = value.locationDescText;
+
+      // console.log(`Location: ${JSON.stringify(locationObject)}`);
+      const callout: callout = {
+        title: value.title,
+        operation_type: value.operationType,
+        description: value.circumstances,
+        subject: value.subject,
+        subject_contact: value.subjectContact,
+        informant: value.informant,
+        informant_contact: value.informantContact,
+        radio_channel: value.radioFrequency,
+        additional_radio_channels: value.additionalRadioFrequencies,
+        status: value.ten22 ? calloutStatus.RESOLVED : calloutStatus.ACTIVE,
+        notifications_made: value.notificationsMade,
+        resolution: value.resolutionNotes,
+        location: locationObject,
+        handling_unit: value.handlingUnit,
+      };
+
+      if (value.archived) {
+        callout.status = calloutStatus.ARCHIVED;
+      }
+
+      if (callout.status === calloutStatus.ACTIVE) {
+        callout.resolution = '';
+      }
+
+      createCalloutPressed(callout);
+    },
+  });
+  const ten22 = form.useStore(state => state.values.ten22);
+
+  const locationChanged = (editingLocation && (JSON.stringify(existingData?.location) !== JSON.stringify(editingLocation)));
+  const calloutChanged = form.state.isDirty || locationChanged;
+  useBackHandler(calloutChanged);
+  const backPressed = () => {
+    handleBackPressed(calloutChanged);
+  };
+
   let headerTitle: string = 'Create Callout';
-
-  const callOutTypeSelect = [
-    { label: 'Search', enum: calloutType.SEARCH, value: '0' },
-    { label: 'Rescue', enum: calloutType.RESCUE, value: '1' },
-  ];
-
   if (id && typeof id === 'string') {
     headerTitle = 'Update Callout';
   }
 
-  const labelValueItem = (name: string): any => {
-    return { label: name, value: name };
-  };
+  const callOutTypeSelect: LabelValue[] = [
+    { label: 'Search', value: calloutType.SEARCH },
+    { label: 'Rescue', value: calloutType.RESCUE },
+  ];
 
-  const notificationsAvailable = [];
+  const notificationsAvailable: LabelValue[] = [];
   if (notificationsAvailableQuery.data) {
     notificationsAvailableQuery.data.results.forEach((data: any) => {
       notificationsAvailable.push(labelValueItem(data.name));
     });
   }
+  const notificationsMade = form.getFieldValue('notificationsMade') ?? [];
   notificationsMade.forEach((name: string) => {
     if (!notificationsAvailable.find(item => (item.label === name))) {
       notificationsAvailable.push(labelValueItem(name));
     }
   });
 
-  const primaryRadioChannelsAvailable = [{ label: '', value: undefined }];
-  const additionalRadioChannelsAvailable = [];
+  const primaryRadioChannelsAvailable: LabelValue[] = [{ label: '', value: undefined }];
+  const additionalRadioChannelsAvailable: LabelValue[] = [];
   if (radioChanelsAvailableQuery.data) {
     radioChanelsAvailableQuery.data.results.forEach((data: any) => {
       if (data.is_primary) {
@@ -98,10 +146,12 @@ function Page() {
       }
     });
   }
+  const radioFrequency = form.getFieldValue('radioFrequency');
   if (radioFrequency && (!primaryRadioChannelsAvailable.find(item => (item.label === radioFrequency)))) {
     primaryRadioChannelsAvailable.push(labelValueItem(radioFrequency));
   }
-  additionalRadioFrequencies?.forEach((name: string) => {
+  const additionalRadioFrequencies = form.getFieldValue('additionalRadioFrequencies') ?? [];
+  additionalRadioFrequencies.forEach((name: string) => {
     if (!additionalRadioChannelsAvailable.find(item => (item.label === name))) {
       additionalRadioChannelsAvailable.push(labelValueItem(name));
     }
@@ -110,53 +160,25 @@ function Page() {
   useEffect(() => {
     if (editingLocation) {
       console.log('editingLocation useEffect', editingLocation);
-      setLocationText(locationToString(editingLocation));
-      if (editingLocation && (JSON.stringify(existingData?.location) !== JSON.stringify(editingLocation))) {
-        console.log('setCalloutChanged because of location');
-        setCalloutChanged(true);
-      }
+      form.setFieldValue('locationText', locationToString(editingLocation));
+      // This is only for UI, don't mark the form as dirty.
+      form.setFieldMeta('locationText', prev => ({ ...prev, isDirty: false }));
     }
-  }, [editingLocation, existingData?.location]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editingLocation]);
 
   useEffect(() => {
+    console.log('existingData useEffect', existingData?.location);
     if (existingData) {
-      populateFields();
+      setEditingLocation(existingData.location);
     }
     else {
       setEditingLocation(undefined);
-      setLocationText('');
     }
-    console.log('setCalloutChanged false');
-    setCalloutChanged(false);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [existingData]);
 
-  const populateFields = () => {
-    setTitle(existingData.title);
-    setOperationType(stringToCalloutType(existingData.operation_type));
-    setLocationText(locationToString(existingData.location));
-    setLocationDescText(existingData.location.text);
-    setEditingLocation(existingData.location);
-    setSubject(existingData.subject);
-    setSubjectContact(existingData.subject_contact);
-    setInformant(existingData.informant);
-    setInformantContact(existingData.informant_contact);
-    setCircumstances(existingData.description);
-    setRadioFrequency(existingData.radio_channel);
-    setAdditionalRadioFrequencies(existingData.additional_radio_channels);
-    setNotificationsMade(existingData.notifications_made);
-    setHandlingUnit(existingData.handling_unit);
-    if (existingData.status === calloutStatus.RESOLVED) {
-      setTen22(true);
-    }
-    setResolutionNotes(existingData.resolution);
-  };
-
-  const backPressed = () => {
-    handleBackPressed(calloutChanged);
-  };
-
-  const createCalloutPressed = () => {
+  const createCalloutPressed = (callout: callout) => {
     let shouldShowConfirmation: boolean = false;
     let confirmationMessage = 'Are you sure you want to mark this callout 10-22?';
     if (!existingData) {
@@ -177,12 +199,7 @@ function Page() {
         {
           text: 'Yes',
           onPress: () => {
-            if (!existingData) {
-              createCallout();
-            }
-            else {
-              updateCallout();
-            }
+            createOrUpdateCallout(callout);
           },
           style: 'destructive',
         },
@@ -193,57 +210,27 @@ function Page() {
       ]);
     }
     else {
-      if (!existingData) {
-        createCallout();
-      }
-      else {
-        updateCallout();
-      }
+      createOrUpdateCallout(callout);
     }
   };
 
-  const generateCallout = (): callout => {
-    let locationObject: location = {};
-    if (editingLocation) {
-      locationObject = editingLocation;
-    }
-    locationObject.text = locationDescText;
-
-    // console.log(`Location: ${JSON.stringify(locationObject)}`);
-    const callout: callout = {
-      title,
-      operation_type: operationType,
-      description: circumstances,
-      subject,
-      subject_contact: subjectContact,
-      informant,
-      informant_contact: informantContact,
-      radio_channel: radioFrequency,
-      additional_radio_channels: additionalRadioFrequencies,
-      status: ten22 ? calloutStatus.RESOLVED : calloutStatus.ACTIVE,
-      notifications_made: notificationsMade,
-      resolution: resolutionNotes,
-      location: locationObject,
-      handling_unit: handlingUnit,
-    };
-
-    if (archived) {
-      callout.status = calloutStatus.ARCHIVED;
-    }
-
-    // console.log("generated Callout: " + JSON.stringify(callout));
-    return callout;
-  };
-
-  const createCallout = async () => {
-    if (!validateFields()) {
+  const createOrUpdateCallout = async (callout: callout) => {
+    if (!validateFields(callout)) {
       return;
     }
+    if (!existingData) {
+      createCallout(callout);
+    }
+    else {
+      updateCallout(callout);
+    }
+  };
 
+  const createCallout = async (callout: callout) => {
     setSpinnerMessage('Creating Callout...');
     setShowSpinner(true);
 
-    calloutCreateMutation.mutate(generateCallout(), {
+    calloutCreateMutation.mutate(callout, {
       onSuccess: (data, _variables, _context) => {
         console.log(data);
         msarEventEmitter.emit('refreshCallout', {});
@@ -261,18 +248,14 @@ function Page() {
     });
   };
 
-  const updateCallout = async () => {
-    if (!validateFields()) {
-      return;
-    }
-
+  const updateCallout = async (callout: callout) => {
     const idInt: number = Number.parseInt(id);
 
     setSpinnerMessage('Updating Callout...');
     setShowSpinner(true);
 
     calloutUpdateMutation.mutate(
-      { idInt, callout: generateCallout() },
+      { idInt, callout },
       {
         onSuccess: (data, _variables, _context) => {
           console.log(data);
@@ -295,11 +278,11 @@ function Page() {
     );
   };
 
-  const validateFields = (): boolean => {
+  const validateFields = (callout: callout): boolean => {
     // TODO: add validation
     let error = '';
 
-    if (!title) {
+    if (!callout.title) {
       error += 'Title is a required field\n';
     }
     if (error) {
@@ -308,87 +291,8 @@ function Page() {
     return !error;
   };
 
-  const titleChanged = (text: string) => {
-    setTitle(text);
-    setCalloutChanged(true);
-  };
-
-  const calloutTypeSelected = (item: any) => {
-    const opType = item.enum as calloutType;
-    setOperationType(opType);
-    setCalloutChanged(true);
-  };
-
-  const locationChanged = (text: string) => {
-    setLocationText(text);
-    setCalloutChanged(true);
-  };
-
-  const locationDescChanged = (text: string) => {
-    setLocationDescText(text);
-    setCalloutChanged(true);
-  };
-
   const locationButtonPressed = () => {
     router.push({ pathname: 'edit-location' });
-  };
-
-  const subjectChanged = (text: string) => {
-    setSubject(text);
-    setCalloutChanged(true);
-  };
-
-  const subjectContactChanged = (text: string) => {
-    setSubjectContact(text);
-    setCalloutChanged(true);
-  };
-
-  const informantChanged = (text: string) => {
-    setInformant(text);
-    setCalloutChanged(true);
-  };
-
-  const informantContactChanged = (text: string) => {
-    setInformantContact(text);
-    setCalloutChanged(true);
-  };
-
-  const circumstancesChanged = (text: string) => {
-    setCircumstances(text);
-    setCalloutChanged(true);
-  };
-
-  const radioFreqSelected = (item: any) => {
-    setRadioFrequency(item.label);
-    setCalloutChanged(true);
-  };
-
-  const additionalRadioFrequenciesSelected = (items: string[]) => {
-    setAdditionalRadioFrequencies(items);
-    setCalloutChanged(true);
-  };
-
-  const notificationsSelected = (items: string[]) => {
-    setNotificationsMade(items);
-    setCalloutChanged(true);
-  };
-
-  const on1022Toggle = (checked: boolean) => {
-    setTen22(checked);
-    if (!checked) {
-      setResolutionNotes('');
-    }
-    setCalloutChanged(true);
-  };
-
-  const resolutionChanged = (text: string) => {
-    setResolutionNotes(text);
-    setCalloutChanged(true);
-  };
-
-  const handlingUnitChanged = (text: string) => {
-    setHandlingUnit(text);
-    setCalloutChanged(true);
   };
 
   return (
@@ -401,117 +305,115 @@ function Page() {
           keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -500} // Adjust the offset as needed
         >
           <ScrollView style={styles.scrollView}>
-            <DropdownSelector
+            <FormDropdownSelector
+              form={form}
+              name="operationType"
               title="Callout Type"
               options={callOutTypeSelect}
               placeholder="Select type"
-              selectedValue={`${callOutTypeSelect.findIndex(item => item.enum === operationType)}`}
-              onSelect={calloutTypeSelected}
             />
             <FormTextInput
+              form={form}
+              name="title"
               title="Title"
-              onChange={titleChanged}
               placeholder="Title - Few Word Summary"
-              value={title}
             />
             <FormTextArea
+              form={form}
+              name="circumstances"
               title="Circumstances / Call Details"
               height={100}
-              onChange={circumstancesChanged}
               placeholder="Call Details - Full Description"
-              value={circumstances}
             />
             <FormTextInput
+              form={form}
+              name="locationText"
               title="Location"
               rightButton={require('@assets/icons/map.png')}
               onRightPress={locationButtonPressed}
-              onChange={locationChanged}
-              placeholder="Location"
-              value={locationText}
               editable={false}
             />
             <FormTextInput
-              onChange={locationDescChanged}
+              form={form}
+              name="locationDescText"
               placeholder="Location Description"
-              value={locationDescText}
             />
             <FormTextInput
+              form={form}
+              name="subject"
               title="Subject / Victim / Missing Person"
-              onChange={subjectChanged}
               placeholder="Subject"
-              value={subject}
             />
             <FormTextInput
+              form={form}
+              name="subjectContact"
               icon={require('@assets/icons/phone.png')}
-              onChange={subjectContactChanged}
               placeholder="Subject Contact"
-              value={subjectContact}
             />
             <FormTextInput
+              form={form}
+              name="informant"
               title="Informant / Reporting Party"
-              onChange={informantChanged}
               placeholder="Informant"
-              value={informant}
             />
             <FormTextInput
+              form={form}
+              name="informantContact"
               icon={require('@assets/icons/phone.png')}
-              onChange={informantContactChanged}
               placeholder="Informant Contact"
-              value={informantContact}
             />
-            <DropdownSelector
+            <FormDropdownSelector
+              form={form}
+              name="radioFrequency"
               title="Tactical Talkgroup"
               options={primaryRadioChannelsAvailable}
               placeholder="Select Frequency"
-              selectedValue={radioFrequency}
-              onSelect={radioFreqSelected}
             />
-            <DropdownMultiselect
+            <FormDropdownMultiselect
+              form={form}
+              name="additionalRadioFrequencies"
               title="Other Radio Channels"
               options={additionalRadioChannelsAvailable}
               placeholder="Select Frequencies"
-              selectedValues={additionalRadioFrequencies}
-              onSelect={additionalRadioFrequenciesSelected}
             />
-            <DropdownMultiselect
+            <FormDropdownMultiselect
+              form={form}
+              name="notificationsMade"
               title="Notifications Made"
               options={notificationsAvailable}
               placeholder="Select Notifications"
-              selectedValues={notificationsMade}
-              onSelect={notificationsSelected}
             />
             <FormTextInput
+              form={form}
+              name="handlingUnit"
               title="Handling Unit / Tag #"
-              onChange={handlingUnitChanged}
-              placeholder="Handling Unit / Tag #"
-              value={handlingUnit}
             />
             <FormCheckbox
+              form={form}
+              name="ten22"
               title="10-22"
-              checked={ten22}
-              onToggle={on1022Toggle}
             />
             {ten22
             && (
               <FormTextArea
+                form={form}
+                name="resolutionNotes"
                 height={100}
-                onChange={resolutionChanged}
                 placeholder="Resolution Notes"
-                value={resolutionNotes}
               />
             )}
             {ten22
             && (
               <FormCheckbox
+                form={form}
+                name="archived"
                 title="Archive"
-                checked={archived}
-                onToggle={() => setArchived(true)}
               />
             )}
             <TouchableOpacity
               activeOpacity={0.8}
               style={[elements.capsuleButton, styles.submitCalloutButton]}
-              onPress={() => createCalloutPressed()}
+              onPress={form.handleSubmit}
             >
               <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>{headerTitle}</Text>
             </TouchableOpacity>

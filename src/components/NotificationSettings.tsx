@@ -7,7 +7,7 @@ import {
   storeSoundForChannel,
 } from '@storage/mmkv';
 import DropdownSelector from '@components/inputs/DropdownSelector';
-import FormCheckbox from '@components/inputs/FormCheckbox';
+import Checkbox from '@components/inputs/Checkbox';
 
 interface NotificationSettingsProps {
   title: string;
@@ -59,7 +59,7 @@ function NotificationSettings({
         rightButton={require('@assets/icons/frequency.png')}
       />
       {allowCritical && (
-        <FormCheckbox
+        <Checkbox
           title="Critical Alert"
           checked={critical}
           onToggle={onCheckToggle}
