@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { fromDateId } from '@marceloterreiro/flash-calendar';
 import ModalFade from '@/components/modals/common/ModalFade';
 import type { patrol } from '@/types/patrol';
 import type { event } from '@/types/event';
@@ -9,7 +8,7 @@ import { elements } from '@/styles/elements';
 import CalendarPatrol from '@/components/calendar/CalendarPatrol';
 import { isUserSelf } from '@/types/user';
 import useAuth from '@/hooks/useAuth';
-import { usePatrolCreateMutation } from '@/remote/mutation';
+import CalendarPatrolModal from '@/components/calendar/CalendarPatrolModal';
 
 interface CalendarDayModalProps {
   dateID: string;
@@ -19,8 +18,11 @@ interface CalendarDayModalProps {
 };
 
 function CalendarDayModal({ dateID, events, patrols, onCancel }: CalendarDayModalProps) {
+  const [selectedPatrolDate, setSelectedPatrolDate] = useState<string>(null);
   const { username } = useAuth();
-  const patrolCreateMutation = usePatrolCreateMutation();
+
+  const userPatrol = patrols?.find(p => isUserSelf(p.member, username));
+  // patrols?.filter(p => isUserSelf(p.member, username));
 
   console.log(events, patrols);
 
@@ -31,38 +33,13 @@ function CalendarDayModal({ dateID, events, patrols, onCancel }: CalendarDayModa
     );
   }
 
-  function completeCreatePatrol() {
-    const patrol: patrol = {
-      start_at: fromDateId(dateID),
-    };
-
-    patrolCreateMutation.mutate(patrol);
-  }
-
   function createPatrol() {
-    const userPatrols = patrols?.filter(p => isUserSelf(p.member, username));
-    if (userPatrols?.length) {
-      console.log('userPatrols', username, userPatrols);
-      Alert.alert(
-        'Duplicate patrol',
-        'You already have a patrol on this day. Click the patrol above to edit it.',
-      );
-    }
-    else {
-      console.log('create patrol');
-      Alert.alert('Confirm Patrol Creation', `Are you sure you want to sign up for patrol on ${dateID}?`, [
-        {
-          text: 'Yes',
-          onPress: completeCreatePatrol,
-          style: 'destructive',
-        },
-        {
-          text: 'No',
-          style: 'cancel',
-        },
-      ]);
-    }
+    setSelectedPatrolDate(dateID);
   }
+
+  const closePatrolModal = () => {
+    setSelectedPatrolDate(null);
+  };
 
   return (
     <ModalFade
@@ -103,10 +80,11 @@ function CalendarDayModal({ dateID, events, patrols, onCancel }: CalendarDayModa
           onPress={createPatrol}
         >
           <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>
-            Create Patrol
+            {userPatrol ? 'Edit Patrol' : 'Create Patrol'}
           </Text>
         </TouchableOpacity>
       </View>
+      {!!selectedPatrolDate && <CalendarPatrolModal dateID={selectedPatrolDate} patrol={userPatrol} onCancel={closePatrolModal} />}
     </ModalFade>
   );
 }
@@ -117,31 +95,10 @@ const styles = StyleSheet.create({
     alignContent: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
   },
-  centeredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 22,
-  },
   sectionHeader: {
     marginTop: 10,
     marginLeft: 20,
     marginRight: 20,
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
   },
   common: {
     fontStyle: 'italic',

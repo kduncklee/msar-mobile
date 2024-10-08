@@ -50,9 +50,20 @@ export function usePatrolCreateMutation() {
 
 export function usePatrolUpdateMutation() {
   const { api } = useAuth();
+  const patrolQuery = usePatrolListQuery();
   return useMutation({
     mutationFn: ({ idInt, patrol }: { idInt: number; patrol: patrol }) =>
       api.apiUpdatePatrol(idInt, patrol),
+    onSuccess: (data, _variables, _context) => {
+      console.log('patrol updated', data);
+      patrolQuery.refetch();
+    },
+    onError: (error, _variables, _context) => {
+      Sentry.captureException(error);
+      Toast.show(`Unable to update patrol: ${error.message}`, {
+        duration: Toast.durations.LONG,
+      });
+    },
   });
 }
 
