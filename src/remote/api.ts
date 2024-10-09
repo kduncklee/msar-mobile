@@ -29,7 +29,7 @@ export class Api {
   }
 
   #server(): string {
-    if (this.#_server.startsWith('http')) {
+    if (this.#_server?.startsWith('http')) {
       return this.#_server;
     }
     switch (this.#_server) {
