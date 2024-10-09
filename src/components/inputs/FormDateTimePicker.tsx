@@ -64,7 +64,7 @@ function FormDateTimePicker<
               </TouchableOpacity>
 
             </View>
-            {field.state.meta.errors
+            {field.state.meta.errors.length
               ? (
                   <Text style={elements.smallYellowText}>{field.state.meta.errors.join(', ')}</Text>
                 )

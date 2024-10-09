@@ -7,7 +7,11 @@ import FormTextInput from '@components/inputs/FormTextInput';
 import SmallButton from '@components/inputs/SmallButton';
 import ActivityModal from '@components/modals/ActivityModal';
 import { useForm } from '@tanstack/react-form';
+import { zodValidator } from '@tanstack/zod-form-adapter';
+import { z } from 'zod';
 import useAuth from '@/hooks/useAuth';
+import { server_choices } from '@/remote/api';
+import FormDropdownSelector from '@/components/inputs/FormDropdownSelector';
 
 function Page() {
   const [topMargin, setTopMargin] = useState(0);
@@ -15,14 +19,34 @@ function Page() {
   const [showSpinner, setShowSpinner] = useState(false);
   const { login } = useAuth();
 
+  const baseSchema = z.object({
+    username: z.string().min(1, 'Username is required.'),
+    password: z.string().min(1, 'Password is required.'),
+  });
+
+  const schema = z.union([
+    z.object({
+      server: z.literal(''),
+      custom_server: z.string().startsWith('http', 'Must start with http or https').url('Malformed URL'),
+    }),
+    z.object({ server: z.string().min(1) }),
+  ]).and(baseSchema);
+
   const form = useForm({
     defaultValues: {
-      username: 'a',
+      username: '',
       password: '',
+      server: server_choices[0].value,
+      custom_server: '',
+    },
+    validatorAdapter: zodValidator(),
+    validators: {
+      onSubmit: schema,
     },
     onSubmit: async ({ value }) => {
       setShowSpinner(true);
-      const errorString = await login(value.username, value.password);
+      const server = value.server || value.custom_server;
+      const errorString = await login(value.username, value.password, server);
       setShowSpinner(false);
       if (errorString) {
         Alert.alert('Problem logging in', errorString, [
@@ -34,6 +58,7 @@ function Page() {
       }
     },
   });
+  const use_custom_server = !form.useStore(state => state.values.server);
 
   useEffect(() => {
     if (Platform.OS === 'ios') {
@@ -71,6 +96,20 @@ function Page() {
           >
             <Image source={require('@assets/msar_logo.png')} style={[styles.logoImage, { marginTop: topMargin }]} />
             <View style={[elements.tray, { padding: 20, margin: 20 }]}>
+              <FormDropdownSelector
+                form={form}
+                name="server"
+                title="Team"
+                placeholder="Select a team"
+                options={server_choices}
+              />
+              {use_custom_server && (
+                <FormTextInput
+                  form={form}
+                  name="custom_server"
+                  title="Custom Server"
+                />
+              )}
               <FormTextInput
                 form={form}
                 name="username"

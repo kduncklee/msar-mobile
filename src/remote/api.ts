@@ -1,6 +1,7 @@
 import * as FileSystem from 'expo-file-system';
 import * as Application from 'expo-application';
 import { Platform } from 'react-native';
+import type { LabelValue } from '../utility/reactForm';
 import type { calloutGetLogResponse, loginResponse, tokenValidationResponse } from './responses';
 import { calloutFromResponse } from '@/types/callout';
 import type { callout } from '@/types/callout';
@@ -13,6 +14,12 @@ const dev_server: string = 'https://msar-dev-app.azurewebsites.net';
 const staging_server: string = 'https://staging.app.malibusarhours.org';
 const prod_server: string = 'https://app.malibusarhours.org';
 
+export const server_choices: LabelValue[] = [
+  { label: 'Malibu', value: 'prod' },
+  { label: 'Santa Clarita Valley', value: 'scv' },
+  { label: 'Custom', value: '' },
+];
+
 export class Api {
   #_server = '';
   #token = '';
@@ -22,6 +29,9 @@ export class Api {
   }
 
   #server(): string {
+    if (this.#_server.startsWith('http')) {
+      return this.#_server;
+    }
     switch (this.#_server) {
       case 'local':
         return local_server;
@@ -120,6 +130,7 @@ export class Api {
 
   async login(server: string, username: string, password: string): Promise<loginResponse> {
     this.#_server = server;
+    console.log('Logging into', this.#server());
     return this.#apiGetToken(username, password);
   }
 

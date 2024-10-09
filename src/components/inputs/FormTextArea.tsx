@@ -44,6 +44,11 @@ function FormTextArea<
                 {...inputProps}
               />
             </View>
+            {field.state.meta.errors.length
+              ? (
+                  <Text style={elements.smallYellowText}>{field.state.meta.errors.join(', ')}</Text>
+                )
+              : null}
           </View>
         );
       }}

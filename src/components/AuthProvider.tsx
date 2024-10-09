@@ -12,7 +12,7 @@ export interface AuthContextType {
   server: string;
   api: Api;
   loading: boolean;
-  login: (username: string, password: string) => Promise<string>;
+  login: (username: string, password: string, server?: string) => Promise<string>;
   logout: () => void;
 }
 
@@ -43,25 +43,25 @@ export function AuthProvider({
     tokenCheck();
   }, []);
 
-  async function login(username: string, password: string) {
+  async function login(username: string, password: string, server?: string) {
     setLoading(true);
 
-    let server;
+    let login_server = server ?? '';
     let server_username = username;
     const match = username.match(/_([^_]+)_(.+)/);
     if (match) {
-      server = match[1];
+      login_server = match[1];
       server_username = match[2];
-      console.log(server, server_username);
-      await storeServer(server);
-      setServer(server);
+    }
+    console.log(login_server, server_username);
+    setServer(login_server);
+    if (login_server) {
+      await storeServer(login_server);
     }
     else {
-      console.log('clear server', server_username);
       await clearServer();
-      setServer(null);
     }
-    const response: loginResponse = await api.login(server, server_username, password);
+    const response: loginResponse = await api.login(login_server, server_username, password);
     if (response.non_field_errors) {
       setLoading(false);
       return response.non_field_errors.join('\n');
