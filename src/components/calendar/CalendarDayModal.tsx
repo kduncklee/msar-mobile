@@ -33,7 +33,7 @@ function CalendarDayModal({ dateID, events, patrols, onCancel }: CalendarDayModa
     );
   }
 
-  function createPatrol() {
+  function createOrEditPatrol() {
     setSelectedPatrolDate(dateID);
   }
 
@@ -45,7 +45,7 @@ function CalendarDayModal({ dateID, events, patrols, onCancel }: CalendarDayModa
     <ModalFade
       modalVisible={!!dateID}
       onCancel={onCancel}
-      header={dateID}
+      headerTitle={dateID}
     >
       <ScrollView style={styles.dataContainer}>
 
@@ -60,7 +60,7 @@ function CalendarDayModal({ dateID, events, patrols, onCancel }: CalendarDayModa
           {patrols ? 'Patrols:' : 'No patrols for this day.'}
         </Text>
         {patrols?.map(patrol => (
-          <CalendarPatrol patrol={patrol} key={patrol.id} />
+          <CalendarPatrol patrol={patrol} key={patrol.id} onEditPress={createOrEditPatrol} />
         ))}
 
       </ScrollView>
@@ -77,7 +77,7 @@ function CalendarDayModal({ dateID, events, patrols, onCancel }: CalendarDayModa
         <TouchableOpacity
           activeOpacity={0.8}
           style={[elements.capsuleButton, elements.splitButton]}
-          onPress={createPatrol}
+          onPress={createOrEditPatrol}
         >
           <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>
             {userPatrol ? 'Edit Patrol' : 'Create Patrol'}

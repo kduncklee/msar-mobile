@@ -114,13 +114,14 @@ function Page() {
                 form={form}
                 name="username"
                 title="Username"
-                icon={require('@assets/icons/user.png')}
+                icon="account-outline"
               />
+
               <FormTextInput
                 form={form}
                 name="password"
                 title="Password"
-                icon={require('@assets/icons/lock.png')}
+                icon="lock-outline"
                 secureTextEntry
                 autoCorrect={false}
                 autoCapitalize="none"

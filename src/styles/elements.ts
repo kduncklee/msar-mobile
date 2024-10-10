@@ -48,6 +48,7 @@ export const elements = StyleSheet.create({
   },
   inputContainer: {
     flexDirection: 'row',
+    alignItems: 'center',
     padding: 4,
     borderColor: colors.grayText,
     borderWidth: 1,
@@ -89,6 +90,9 @@ export const elements = StyleSheet.create({
     textAlign: 'center',
     fontWeight: '500',
     color: colors.black,
+  },
+  fieldIcon: {
+    paddingHorizontal: 8,
   },
   fieldImage: {
     resizeMode: 'contain',

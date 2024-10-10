@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { elements } from '@styles/elements';
 import type { ReactFormApi } from '@tanstack/react-form';
 import type { DateTimePickerProps } from 'react-native-modal-datetime-picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { fromDateId } from '@marceloterreiro/flash-calendar';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import type { DeepKeyValueName } from '@/utility/reactForm';
 import { getFullDateTimeString, getTimeString } from '@/utility/dateHelper';
 
@@ -60,7 +61,7 @@ function FormDateTimePicker<
                 activeOpacity={0.8}
                 onPress={showDatePicker}
               >
-                <Image source={require('@assets/icons/map.png')} style={elements.fieldImage} testID={`${title}-button`} />
+                <View style={elements.fieldIcon}><MaterialCommunityIcons name="clock-outline" size={22} color="white" /></View>
               </TouchableOpacity>
 
             </View>

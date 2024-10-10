@@ -1,14 +1,17 @@
 import { Modal, SafeAreaView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import Header from '@/components/Header';
+import type { IconName } from '@/utility/icon';
 
 interface ModalFadeProps {
   children: React.ReactNode;
-  header?: string;
+  headerTitle?: string;
+  headerRightIcon?: IconName;
+  onHeaderRight?: () => void;
   modalVisible: boolean;
   onCancel: () => void;
 }
 
-function ModalFade({ children, header, modalVisible, onCancel }: ModalFadeProps) {
+function ModalFade({ children, headerTitle, headerRightIcon, onHeaderRight, modalVisible, onCancel }: ModalFadeProps) {
   return (
     <Modal
       visible={modalVisible}
@@ -21,7 +24,7 @@ function ModalFade({ children, header, modalVisible, onCancel }: ModalFadeProps)
       </TouchableWithoutFeedback>
       <SafeAreaView style={styles.modalContent}>
         {/* Use top:0 because Android Modal already appears to adjust it. */}
-        {header && (<Header title={header} zeroTopMargin backButton onBackPressed={onCancel} />)}
+        {headerTitle && (<Header title={headerTitle} zeroTopMargin backButton onBackPressed={onCancel} rightButtonIcon={headerRightIcon} onRightPressed={onHeaderRight} />)}
         {children}
       </SafeAreaView>
     </Modal>

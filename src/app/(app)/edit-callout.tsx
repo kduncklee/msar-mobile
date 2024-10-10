@@ -329,7 +329,7 @@ function Page() {
               form={form}
               name="locationText"
               title="Location"
-              rightButton={require('@assets/icons/map.png')}
+              rightButton="map-search-outline"
               onRightPress={locationButtonPressed}
               editable={false}
             />
@@ -347,7 +347,7 @@ function Page() {
             <FormTextInput
               form={form}
               name="subjectContact"
-              icon={require('@assets/icons/phone.png')}
+              icon="phone"
               placeholder="Subject Contact"
             />
             <FormTextInput
@@ -359,7 +359,7 @@ function Page() {
             <FormTextInput
               form={form}
               name="informantContact"
-              icon={require('@assets/icons/phone.png')}
+              icon="phone"
               placeholder="Informant Contact"
             />
             <FormDropdownSelector

@@ -20,7 +20,7 @@ function UserModal({ user, onCancel }: UserModalProps) {
     <ModalFade
       modalVisible={!!user}
       onCancel={onCancel}
-      header={user.full_name}
+      headerTitle={user.full_name}
     >
       <View style={styles.dataContainer}>
         <InformationTray

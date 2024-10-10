@@ -1,11 +1,11 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { fromDateId } from '@marceloterreiro/flash-calendar';
 import { useForm } from '@tanstack/react-form';
 import ModalFade from '@/components/modals/common/ModalFade';
 import type { patrol } from '@/types/patrol';
 import { elements } from '@/styles/elements';
-import { usePatrolCreateMutation, usePatrolUpdateMutation } from '@/remote/mutation';
+import { usePatrolCreateMutation, usePatrolRemoveMutation, usePatrolUpdateMutation } from '@/remote/mutation';
 import FormTextInput from '@/components/inputs/FormTextInput';
 import FormDateTimePicker from '@/components/inputs/FormDateTimePicker';
 import FormCheckbox from '@/components/inputs/FormCheckbox';
@@ -19,6 +19,7 @@ interface CalendarPatrolModalProps {
 function CalendarPatrolModal({ dateID, patrol, onCancel }: CalendarPatrolModalProps) {
   const patrolCreateMutation = usePatrolCreateMutation();
   const patrolUpdateMutation = usePatrolUpdateMutation();
+  const patrolRemoveMutation = usePatrolRemoveMutation();
 
   console.log('CalendarPatrolModal', dateID, patrol);
 
@@ -60,11 +61,30 @@ function CalendarPatrolModal({ dateID, patrol, onCancel }: CalendarPatrolModalPr
   });
   const all_day = form.useStore(state => state.values.all_day);
 
+  function deletePatrol(): void {
+    console.log('edit patrol');
+    Alert.alert('Confirm Patrol Deletion', `Are you sure you want to delete this patrol?`, [
+      {
+        text: 'Yes',
+        onPress: () => {
+          patrolRemoveMutation.mutate(patrol.id);
+          onCancel();
+        },
+        style: 'destructive',
+      },
+      {
+        text: 'No',
+        style: 'cancel',
+      },
+    ]);
+  }
   return (
     <ModalFade
       modalVisible={!!dateID}
       onCancel={onCancel}
-      header={dateID}
+      headerTitle={dateID}
+      headerRightIcon="delete-outline"
+      onHeaderRight={deletePatrol}
     >
       <ScrollView style={styles.dataContainer}>
 

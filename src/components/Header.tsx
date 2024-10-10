@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BackHandler, Image, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
 import { getConditionalTimeString } from '@utility/dateHelper';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import type { IconName } from '@/utility/icon';
 
 interface HeaderProps {
   title: string;
@@ -11,12 +13,12 @@ interface HeaderProps {
   background?: any;
   backButton?: boolean;
   onBackPressed?: () => void;
-  rightButton?: boolean;
+  rightButtonIcon?: IconName;
   onRightPressed?: () => void;
   timestamp?: Date;
 };
 
-function Header({ title, zeroTopMargin, background, backButton = false, onBackPressed, rightButton = false, timestamp = null }: HeaderProps) {
+function Header({ title, zeroTopMargin, background, backButton = false, onBackPressed, rightButtonIcon, onRightPressed, timestamp = null }: HeaderProps) {
   const [headerMargin, setHeaderMargin] = useState(0);
 
   useEffect(() => {
@@ -52,11 +54,6 @@ function Header({ title, zeroTopMargin, background, backButton = false, onBackPr
     }
   };
 
-  const settingsPressed = () => {
-    router.push('/settings');
-    console.log('settings');
-  };
-
   const viewStyle = background ? { backgroundColor: background } : {};
 
   return (
@@ -79,10 +76,10 @@ function Header({ title, zeroTopMargin, background, backButton = false, onBackPr
           <Text style={elements.smallYellowText} testID="header-timestamp">{getConditionalTimeString(timestamp)}</Text>
         </View>
       )}
-      {rightButton
+      {rightButtonIcon
       && (
-        <TouchableOpacity activeOpacity={0.2} style={styles.rightContainer} onPress={() => settingsPressed()}>
-          <Image source={require('@assets/icons/settings.png')} style={styles.rightImage} />
+        <TouchableOpacity activeOpacity={0.2} style={styles.rightContainer} onPress={onRightPressed}>
+          <View style={elements.fieldIcon}><MaterialCommunityIcons name={rightButtonIcon} size={22} color="white" /></View>
         </TouchableOpacity>
       )}
     </View>
@@ -108,7 +105,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   rightContainer: {
-    width: 30,
     height: 30,
     marginRight: 10,
     alignItems: 'center',
@@ -117,11 +113,6 @@ const styles = StyleSheet.create({
   backImage: {
     width: 20,
     height: 20,
-    resizeMode: 'contain',
-  },
-  rightImage: {
-    width: 40,
-    height: 40,
     resizeMode: 'contain',
   },
 });

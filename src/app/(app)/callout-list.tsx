@@ -79,10 +79,15 @@ function Page() {
     router.push({ pathname: 'view-callout', params: { id: calloutSummary.id, title: calloutSummary.title } });
   };
 
+  const settingsPressed = () => {
+    router.push('/settings');
+    console.log('settings');
+  };
+
   return (
     <>
       <SafeAreaView style={styles.container}>
-        <Header title="Callouts" backButton rightButton />
+        <Header title="Callouts" backButton rightButtonIcon="cog" onRightPressed={settingsPressed} />
         <TabSelector tabs={tabs} onTabChange={tabChanged} />
         <View style={styles.contentContainer}>
           {query.isLoading ? (<Text>Loading...</Text>) : (null)}

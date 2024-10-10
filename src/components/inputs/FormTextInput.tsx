@@ -1,10 +1,12 @@
 import React from 'react';
-import type { ImageRequireSource, ReturnKeyType, TextInputProps } from 'react-native';
-import { Image, Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import type { ReturnKeyType, TextInputProps } from 'react-native';
+import { Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { elements } from '@styles/elements';
 import colors from '@styles/colors';
 import type { ReactFormApi } from '@tanstack/react-form';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import type { DeepKeyValueName } from '@/utility/reactForm';
+import type { IconName } from '@/utility/icon';
 
 interface FormTextInputProps<
   // eslint-disable-next-line ts/no-unnecessary-type-constraint
@@ -14,9 +16,9 @@ interface FormTextInputProps<
   form: ReactFormApi<TFormData, any>;
   name: TName;
   title?: string;
-  icon?: ImageRequireSource;
+  icon?: IconName;
   placeholder?: string;
-  rightButton?: ImageRequireSource;
+  rightButton?: IconName;
   returnKey?: ReturnKeyType;
   onSubmit?: () => void;
   onRightPress?: (value: any) => void;
@@ -49,8 +51,9 @@ function FormTextInput<
             {!!title
             && <Text style={elements.fieldTitle} testID={`${title}-label`}>{title}</Text>}
             <View style={[elements.inputContainer, { height: 50 }]}>
-              {!!icon
-              && <Image source={icon} style={elements.fieldImage} />}
+              {!!icon && (
+                <View style={elements.fieldIcon}><MaterialCommunityIcons name={icon} size={22} color="white" /></View>
+              )}
               <TextInput
                 style={[elements.fieldText, { flex: 1, padding: 8 }]}
                 onChangeText={field.handleChange}
@@ -70,7 +73,7 @@ function FormTextInput<
                   onPress={onRightPress}
                 >
                   {rightButton
-                  && <Image source={rightButton} style={elements.fieldImage} testID={`${title}-button`} />}
+                  && <View style={elements.fieldIcon}><MaterialCommunityIcons name={rightButton} size={22} color="white" testID={`${title}-button`} /></View>}
                 </TouchableOpacity>
               )}
             </View>
