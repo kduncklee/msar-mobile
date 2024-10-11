@@ -59,6 +59,7 @@ const linearTheme: CalendarTheme = {
         borderRadius: isPressed ? 4 : 30,
         borderWidth: 1,
         backgroundColor: isPressed ? linearAccent : 'transparent',
+        justifyContent: 'flex-start',
       },
       content: {
         fontSize: calendarFontSize,
@@ -72,6 +73,7 @@ const linearTheme: CalendarTheme = {
         borderBottomLeftRadius: isStartOfRange ? 4 : 0,
         borderTopRightRadius: isEndOfRange ? 4 : 0,
         borderBottomRightRadius: isEndOfRange ? 4 : 0,
+        justifyContent: 'flex-start',
       },
       content: {
         fontSize: calendarFontSize,
