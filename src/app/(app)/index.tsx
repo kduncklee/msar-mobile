@@ -2,13 +2,15 @@ import { useEffect, useState } from 'react';
 import { Image, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { router } from 'expo-router';
 import colors from '@styles/colors';
-import { elements } from '@styles/elements';
+import { elements, getFontScale } from '@styles/elements';
 import SnoozeModal from 'components/modals/SnoozeModal';
 import { getSnoozeExpires, storeSnoozeExpires, useLastRead } from 'storage/mmkv';
 import { logEntriesFromInfiniteQueryData } from 'types/logEntry';
 import { activeTabStatusQuery } from 'types/calloutSummary';
 import Badge from 'components/Badge';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useCalloutListQuery, useChatLogInfiniteQuery } from '@/remote/query';
+import type { IconName } from '@/utility/icon';
 
 // Warning: this limits at PAGE_SIZE. We should never have that many active.
 function useNumberActiveCallouts(): number {
@@ -30,8 +32,9 @@ function useChatUnread(): boolean {
 }
 
 interface Items {
-  key?: string;
   text: string;
+  icon?: IconName;
+  key?: string;
   url?: string;
   onPress?: () => unknown;
   badge?: string | number;
@@ -44,15 +47,18 @@ function Page() {
   const [snoozeTitle, setSnoozeTitle] = useState('Snooze');
   const chatHasUnread = useChatUnread();
   const numberActiveCallouts = useNumberActiveCallouts();
+  const fontScale = getFontScale();
 
+  const iconSize = 30 * fontScale;
   const items: Items[] = [
-    { text: 'Callouts', url: '/callout-list', badge: numberActiveCallouts },
-    { text: 'Announcements', url: '/chat', badge: chatHasUnread && '!' },
-    { text: 'Roster', url: '/roster' },
-    { text: 'Calendar', url: '/calendar' },
-    { text: 'Settings', url: '/settings' },
-    { key: 'snooze', text: snoozeTitle, onPress: () => setSnoozeModalVisible(true) },
+    { text: 'Callouts', icon: 'car-emergency', url: '/callout-list', badge: numberActiveCallouts },
+    { text: 'Log', icon: 'forum-outline', url: '/chat', badge: chatHasUnread && '!' },
+    { text: 'Roster', icon: 'account-multiple-outline', url: '/roster' },
+    { text: 'Calendar', icon: 'calendar', url: '/calendar' },
+    { text: 'Settings', icon: 'cog', url: '/settings' },
+    { text: snoozeTitle, icon: 'alarm-snooze', key: 'snooze', onPress: () => setSnoozeModalVisible(true) },
   ];
+  console.log('fontScale', fontScale, getFontScale());
 
   useEffect(() => {
     if (Platform.OS === 'ios') {
@@ -109,20 +115,27 @@ function Page() {
       <SafeAreaView style={styles.container}>
         <ScrollView style={styles.scrollView}>
           <Image source={require('@assets/msar_logo.png')} style={[styles.logoImage, { marginTop: topMargin }]} />
-          {items.map(item => (
-            <TouchableOpacity
-              activeOpacity={0.5}
-              onPress={item.onPress ? item.onPress : () => router.push(item.url)}
-              testID={item.text}
-              key={item.text}
-            >
-              <View style={[elements.tray, styles.contentTray]}>
-                <Text style={styles.buttonText}>{item.text}</Text>
-                {/* @ts-expect-error Badge has typescript errors. */}
-                {!!item.badge && <Badge style={styles.badge}>{item.badge}</Badge>}
-              </View>
-            </TouchableOpacity>
-          ))}
+          <View style={styles.buttonSectionContainer}>
+            {items.map(item => (
+              <TouchableOpacity
+                activeOpacity={0.5}
+                onPress={item.onPress ? item.onPress : () => router.push(item.url)}
+                testID={item.text}
+                key={item.text}
+                style={[{
+                  flexBasis: 'auto',
+                  width: fontScale > 1.5 ? '100%' : '50%',
+                }]}
+              >
+                <View style={[elements.tray, styles.contentTray]}>
+                  {item.icon && <View style={styles.buttonIcon}><MaterialCommunityIcons name={item.icon} size={iconSize} color="white" /></View>}
+                  <Text style={styles.buttonText}>{item.text}</Text>
+                  {/* @ts-expect-error Badge has typescript errors. */}
+                  {!!item.badge && <Badge style={styles.badge}>{item.badge}</Badge>}
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
         </ScrollView>
       </SafeAreaView>
 
@@ -147,23 +160,30 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.clear,
   },
-  contentContainer: {
-    flex: 1,
+  buttonSectionContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+    width: '100%',
   },
   contentTray: {
-    flexDirection: 'row',
-    height: 100,
-    marginHorizontal: 20,
-    marginVertical: 10,
-    overflow: 'hidden',
+    flex: 1,
+    flexDirection: 'column',
+    marginHorizontal: 8,
+    marginVertical: 8,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonIcon: {
+    paddingTop: 8, // bottom padding handled by text below
+    paddingHorizontal: 8,
   },
   buttonText: {
     fontSize: 24,
     fontWeight: '500',
     color: colors.primaryText,
-    flex: 1,
-    marginHorizontal: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
   },
   scrollView: {
     marginTop: 0,
@@ -177,14 +197,10 @@ const styles = StyleSheet.create({
     height: 200,
     resizeMode: 'contain',
   },
-  buttonTray: {
-    marginTop: 20,
-    width: 120,
-    alignSelf: 'flex-end',
-  },
   badge: {
     position: 'absolute',
-    right: 5,
+    right: 7,
+    top: 7,
   },
 });
 

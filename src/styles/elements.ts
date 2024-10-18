@@ -1,5 +1,13 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import colors from '@styles/colors';
+
+export const {
+  fontScale,
+} = Dimensions.get('window');
+export function getFontScale() {
+  const { fontScale } = Dimensions.get('window');
+  return fontScale;
+}
 
 export const elements = StyleSheet.create({
   tray: {

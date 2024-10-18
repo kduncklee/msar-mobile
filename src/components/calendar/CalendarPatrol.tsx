@@ -5,6 +5,7 @@ import type { patrol } from '@/types/patrol';
 import { isUserSelf, userToString } from '@/types/user';
 import { getDateTimeRangeString } from '@/utility/dateHelper';
 import useAuth from '@/hooks/useAuth';
+import { textColorForBackground } from '@/styles/colors';
 
 interface CalendarPatrolProps {
   patrol: patrol;
@@ -13,7 +14,7 @@ interface CalendarPatrolProps {
 
 function CalendarPatrol({ patrol, onEditPress }: CalendarPatrolProps) {
   const { username } = useAuth();
-  const textColor = patrol.color?.toLocaleLowerCase() === '#ffffff' ? '#000000' : null;
+  const textColor = textColorForBackground(patrol?.color);
   const time = getDateTimeRangeString(patrol.start_at, patrol.finish_at);
   const isSelf = isUserSelf(patrol.member, username);
 
