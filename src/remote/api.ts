@@ -75,6 +75,10 @@ export class Api {
     return `${this.#server()}/api/patrols/`;
   }
 
+  #memberStatusTypesEndpoint(): string {
+    return `${this.#server()}/api/member_status_types/`;
+  }
+
   #membersEndpoint(): string {
     return `${this.#server()}/api/members/`;
   }
@@ -260,12 +264,12 @@ export class Api {
     return this.#apiPostLogFromUrl(this.#chatEndpoint(), message);
   }
 
-  async apiGetEvents(): Promise<any> {
-    return this.#fetchJsonWithCredentials(this.#eventsEndpoint());
+  async apiGetEvents(args: string): Promise<any> {
+    return this.#fetchJsonWithCredentials(this.#eventsEndpoint() + args);
   }
 
-  async apiGetPatrols(): Promise<any> {
-    return this.#fetchJsonWithCredentials(this.#patrolsEndpoint());
+  async apiGetPatrols(args: string): Promise<any> {
+    return this.#fetchJsonWithCredentials(this.#patrolsEndpoint() + args);
   }
 
   async apiCreatePatrol(patrol: patrol): Promise<any> {
@@ -295,6 +299,10 @@ export class Api {
       // eslint-disable-next-line no-alert
       alert(`Error removing patrol: ${error.message}`);
     }
+  }
+
+  async apiGetMemberStatusTypes(): Promise<any> {
+    return this.#fetchJsonWithCredentials(this.#memberStatusTypesEndpoint());
   }
 
   async apiGetMembers(): Promise<any> {

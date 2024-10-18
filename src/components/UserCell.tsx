@@ -1,6 +1,6 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { elements } from '@styles/elements';
-import colors from '@styles/colors';
+import colors, { textColorForBackground } from '@styles/colors';
 import type { user_detail } from '@/types/user';
 import { makePhoneCall } from '@/utility/phone';
 
@@ -10,7 +10,7 @@ interface UserCellProps {
 };
 
 function UserCell({ user, onPress }: UserCellProps) {
-  const tintColor = user.color?.toLocaleLowerCase() === '#ffffff' ? '#000000' : null;
+  const tintColor = textColorForBackground(user.color);
   return (
     <View style={[elements.tray, styles.container]}>
       <TouchableOpacity

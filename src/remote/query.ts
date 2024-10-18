@@ -1,9 +1,11 @@
 import type { QueryClient } from '@tanstack/react-query';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { formatISO } from 'date-fns';
 import type { Api } from './api';
 import type { calloutSummary } from '@/types/calloutSummary';
 import { calloutSummaryFromResponse } from '@/types/calloutSummary';
-import { userDetailsFromResponse } from '@/types/user';
+import type { member_status_type, user_detail } from '@/types/user';
+import { memberStatusTypeFromResponse, userDetailsFromResponse } from '@/types/user';
 import useAuth from '@/hooks/useAuth';
 import type { event } from '@/types/event';
 import { eventFromResponse } from '@/types/event';
@@ -40,12 +42,26 @@ export function useRadioChannelsAvailableQuery() {
 
 /// /// Events List
 
+function argsStartAtFinishAt(startAt: Date, finishAt: Date, isEvent: boolean) {
+  // TODO: This should be finish_at to handle multi-day patrols, but that doesn't work if finish_at is null.
+  const finish_filter = isEvent ? 'finish_at' : 'start_at';
+  let args = isEvent ? '&' : '?';
+  if (startAt) {
+    args += `start_at_iso_after=${formatISO(startAt)}`;
+  }
+  if (finishAt) {
+    args += `${args ? '&' : '?'}${finish_filter}_iso_before=${formatISO(finishAt)}`;
+  }
+  return args;
+}
+
 const eventListQueryKey = ['events'];
-function eventListQueryParams(api: Api) {
+function eventListQueryParams(api: Api, startAt?: Date, finishAt?: Date) {
+  const args = argsStartAtFinishAt(startAt, finishAt, true);
   return {
-    queryKey: eventListQueryKey,
+    queryKey: [...eventListQueryKey, args],
     queryFn: async (): Promise<event[]> => {
-      const response = await api.apiGetEvents();
+      const response = await api.apiGetEvents(args);
       return response.results.map((result: any) => eventFromResponse(result));
     },
   };
@@ -55,19 +71,20 @@ export async function prefetchEventListQuery(queryClient: QueryClient, api: Api)
   return queryClient.prefetchQuery(eventListQueryParams(api));
 }
 
-export function useEventListQuery() {
+export function useEventListQuery(startAt?: Date, finishAt?: Date) {
   const { api } = useAuth();
-  return useQuery(eventListQueryParams(api));
+  return useQuery(eventListQueryParams(api, startAt, finishAt));
 }
 
 /// /// Patrols List
 
 const patrolListQueryKey = ['patrols'];
-function patrolListQueryParams(api: Api) {
+function patrolListQueryParams(api: Api, startAt?: Date, finishAt?: Date) {
+  const args = argsStartAtFinishAt(startAt, finishAt, false);
   return {
-    queryKey: patrolListQueryKey,
+    queryKey: [...patrolListQueryKey, args],
     queryFn: async (): Promise<patrol[]> => {
-      const response = await api.apiGetPatrols();
+      const response = await api.apiGetPatrols(args);
       return response.results.map((result: any) => patrolFromResponse(result));
     },
   };
@@ -77,9 +94,31 @@ export async function prefetchPatrolListQuery(queryClient: QueryClient, api: Api
   return queryClient.prefetchQuery(patrolListQueryParams(api));
 }
 
-export function usePatrolListQuery() {
+export async function invalidatePatrolListQuery(queryClient: QueryClient) {
+  return queryClient.invalidateQueries({ queryKey: patrolListQueryKey });
+}
+
+export function usePatrolListQuery(startAt?: Date, finishAt?: Date) {
   const { api } = useAuth();
-  return useQuery(patrolListQueryParams(api));
+  return useQuery(patrolListQueryParams(api, startAt, finishAt));
+}
+
+/// /// Member Status Types List
+
+export const memberStatusTypesQueryKey = ['members'];
+function memberStatusTypesQueryParams(api: Api) {
+  return {
+    queryKey: memberListQueryKey,
+    queryFn: async (): Promise<member_status_type[]> => {
+      const response = await api.apiGetMemberStatusTypes();
+      return response.results.map((result: any) => memberStatusTypeFromResponse(result));
+    },
+  };
+}
+
+export function useMemberStatusTypesQuery() {
+  const { api } = useAuth();
+  return useQuery(memberStatusTypesQueryParams(api));
 }
 
 /// /// Members List
@@ -88,7 +127,7 @@ export const memberListQueryKey = ['members'];
 function memberListQueryParams(api: Api) {
   return {
     queryKey: memberListQueryKey,
-    queryFn: async () => {
+    queryFn: async (): Promise<user_detail[]> => {
       const response = await api.apiGetMembers();
       return response.results.map((result: any) => userDetailsFromResponse(result));
     },

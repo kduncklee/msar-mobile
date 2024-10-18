@@ -7,7 +7,7 @@ import { logEntryFromRespsonse } from '@/types/logEntry';
 import { messageSuccessNotification } from '@/utility/pushNotifications';
 import type { callout } from '@/types/callout';
 import type { patrol } from '@/types/patrol';
-import { usePatrolListQuery } from '@/remote/query';
+import { invalidatePatrolListQuery } from '@/remote/query';
 
 //////////////////////////////////////////////////////////////////////////////
 // React Query Mutations
@@ -32,12 +32,12 @@ export function useCalloutUpdateMutation() {
 /// /// Patrol Mutations
 export function usePatrolCreateMutation() {
   const { api } = useAuth();
-  const patrolQuery = usePatrolListQuery();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (patrol: patrol) => api.apiCreatePatrol(patrol),
     onSuccess: (data, _variables, _context) => {
       console.log('patrol created', data);
-      patrolQuery.refetch();
+      invalidatePatrolListQuery(queryClient);
     },
     onError: (error, _variables, _context) => {
       Sentry.captureException(error);
@@ -50,13 +50,13 @@ export function usePatrolCreateMutation() {
 
 export function usePatrolUpdateMutation() {
   const { api } = useAuth();
-  const patrolQuery = usePatrolListQuery();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ idInt, patrol }: { idInt: number; patrol: patrol }) =>
       api.apiUpdatePatrol(idInt, patrol),
     onSuccess: (data, _variables, _context) => {
       console.log('patrol updated', data);
-      patrolQuery.refetch();
+      invalidatePatrolListQuery(queryClient);
     },
     onError: (error, _variables, _context) => {
       Sentry.captureException(error);
@@ -69,12 +69,12 @@ export function usePatrolUpdateMutation() {
 
 export function usePatrolRemoveMutation() {
   const { api } = useAuth();
-  const patrolQuery = usePatrolListQuery();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (idInt: number) => api.apiRemovePatrol(idInt),
     onSuccess: (data, _variables, _context) => {
       console.log('patrol deleted', data);
-      patrolQuery.refetch();
+      invalidatePatrolListQuery(queryClient);
     },
     onError: (error, _variables, _context) => {
       Sentry.captureException(error);

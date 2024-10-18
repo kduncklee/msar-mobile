@@ -2,7 +2,7 @@ import type { CalendarTheme } from '@marceloterreiro/flash-calendar';
 import { toDateId } from '@marceloterreiro/flash-calendar';
 import { useCallback, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
-import { add, sub } from 'date-fns';
+import { add, endOfMonth, startOfMonth, sub } from 'date-fns';
 import Header from '@/components/Header';
 import colors from '@/styles/colors';
 import { CustomCalendar } from '@/components/calendar/CustomCalendar';
@@ -11,6 +11,7 @@ import CalendarDayModal from '@/components/calendar/CalendarDayModal';
 import type { patrol } from '@/types/patrol';
 import type { event } from '@/types/event';
 import { compareUsername } from '@/types/user';
+import CalendarFooter from '@/components/calendar/CalendarFooter';
 
 const linearAccent = '#585ABF';
 const calendarFontSize = 20;
@@ -86,8 +87,10 @@ const linearTheme: CalendarTheme = {
 function Page() {
   const [selectedDate, setSelectedDate] = useState<string>(null);
   const [currentCalendarMonth, setCurrentCalendarMonth] = useState(new Date());
+  const startDate = startOfMonth(currentCalendarMonth);
+  const endDate = endOfMonth(currentCalendarMonth);
 
-  const eventQuery = useEventListQuery();
+  const eventQuery = useEventListQuery(startDate, endDate);
   const events = new Map<string, event[]>();
   if (eventQuery.isSuccess) {
     eventQuery.data.forEach((e) => {
@@ -101,7 +104,7 @@ function Page() {
     });
   }
 
-  const patrolQuery = usePatrolListQuery();
+  const patrolQuery = usePatrolListQuery(startDate, endDate);
   const patrols = new Map<string, patrol[]>();
   if (patrolQuery.isSuccess) {
     patrolQuery.data.forEach((p) => {
@@ -148,6 +151,7 @@ function Page() {
           onPreviousMonthPress={handlePreviousMonth}
           onNextMonthPress={handleNextMonth}
         />
+        <CalendarFooter patrols={patrolQuery.data} />
       </ScrollView>
       {!!selectedDate && (<CalendarDayModal dateID={selectedDate} events={events[selectedDate]} patrols={patrols[selectedDate]} onCancel={onClose} />)}
     </SafeAreaView>

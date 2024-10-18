@@ -19,8 +19,21 @@ export interface user_detail extends user {
   status_order: number;
   color: string;
   is_current: boolean;
+  is_available: boolean;
+  is_display: boolean;
   phone_numbers: phone[];
   employee_id: string;
+}
+
+export interface member_status_type {
+  id: string;
+  short: string;
+  long: string;
+  position: number;
+  color: string;
+  is_current: boolean;
+  is_available: boolean;
+  is_display: boolean;
 }
 
 export function userToString(user: user): string {
@@ -62,5 +75,11 @@ export function userDetailsFromResponse(memberResponse: any): user_detail {
     first_name: memberResponse.short_name,
     phone_numbers: memberResponse.phone_set?.map(phoneFromResponse),
     employee_id: memberResponse.emp,
+  };
+}
+
+export function memberStatusTypeFromResponse(response: any): member_status_type {
+  return {
+    ...response,
   };
 }
