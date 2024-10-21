@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   dropdown: {
-    flex: 1,
+    width: '100%',
     height: 'auto',
     paddingHorizontal: 8,
   },
