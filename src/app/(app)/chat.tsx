@@ -25,7 +25,7 @@ function Page() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header title="Announcements" backButton />
+      <Header title="Messages" backButton />
       <KeyboardAvoidingView
         style={styles.contentContainer}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}

@@ -52,7 +52,7 @@ function Page() {
   const iconSize = 30 * fontScale;
   const items: Items[] = [
     { text: 'Callouts', icon: 'car-emergency', url: '/callout-list', badge: numberActiveCallouts },
-    { text: 'Log', icon: 'forum-outline', url: '/chat', badge: chatHasUnread && '!' },
+    { text: 'Messages', icon: 'forum-outline', url: '/chat', badge: chatHasUnread && '!' },
     { text: 'Roster', icon: 'account-multiple-outline', url: '/roster' },
     { text: 'Calendar', icon: 'calendar', url: '/calendar' },
     { text: 'Settings', icon: 'cog', url: '/settings' },
