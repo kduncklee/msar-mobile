@@ -20,6 +20,7 @@ export interface user_detail extends user {
   color: string;
   is_current: boolean;
   is_available: boolean;
+  is_patrol_eligible: boolean;
   is_display: boolean;
   phone_numbers: phone[];
   employee_id: string;

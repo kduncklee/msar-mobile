@@ -46,7 +46,7 @@ function CalendarFooter({ patrols }: CalendarFooterProps) {
   });
 
   const sorted: user_ext[] = memberQuery.data
-    ? [...memberQuery.data].filter(item => item.is_current).sort((a, b) => {
+    ? [...memberQuery.data].filter(item => (item.is_current && item.is_patrol_eligible)).sort((a, b) => {
         // if (a.status_order !== b.status_order) {
         if (a.color !== b.color) {
           return a.status_order < b.status_order ? -1 : 1;
