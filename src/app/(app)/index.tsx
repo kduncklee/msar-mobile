@@ -9,8 +9,10 @@ import { logEntriesFromInfiniteQueryData } from 'types/logEntry';
 import { activeTabStatusQuery } from 'types/calloutSummary';
 import Badge from 'components/Badge';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useCalloutListQuery, useChatLogInfiniteQuery } from '@/remote/query';
 import type { IconName } from '@/utility/icon';
+import { getTimeString } from '@/utility/dateHelper';
 
 // Warning: this limits at PAGE_SIZE. We should never have that many active.
 function useNumberActiveCallouts(): number {
@@ -43,6 +45,7 @@ interface Items {
 function Page() {
   const [topMargin, setTopMargin] = useState(0);
   const [snoozeModalVisible, setSnoozeModalVisible] = useState(false);
+  const [snoozeDatePickerVisible, setSnoozeDatePickerVisible] = useState(false);
   const [snoozeExpireTime, setSnoozeExpireTime] = useState(0);
   const [snoozeTitle, setSnoozeTitle] = useState('Snooze');
   const chatHasUnread = useChatUnread();
@@ -78,11 +81,16 @@ function Page() {
 
   useEffect(() => {
     const updateSnooze = () => {
-      const snoozeRemaining = snoozeExpireTime - new Date().getTime();
-      const snoozing = snoozeRemaining > 0;
-      const title = snoozing
-        ? (`Snoozing until ${new Date(snoozeExpireTime).toLocaleTimeString()}`)
-        : 'Snooze';
+      const one_day = 24 * 60 * 60 * 1000;
+      let snoozeRemaining = snoozeExpireTime - new Date().getTime();
+      let title = 'Snooze';
+      if (snoozeRemaining > one_day) {
+        title = `Snoozing until ${new Date(snoozeExpireTime).toLocaleString()}`;
+        snoozeRemaining -= one_day; // Update text when 24h remains
+      }
+      else if (snoozeRemaining > 0) {
+        title = `Snoozing until ${new Date(snoozeExpireTime).toLocaleTimeString()}`;
+      }
       setSnoozeTitle(title);
       return snoozeRemaining;
     };
@@ -92,20 +100,27 @@ function Page() {
     return () => clearInterval(interval);
   }, [snoozeExpireTime]);
 
+  const updateSnoozeExpireTime = (ms: number) => {
+    storeSnoozeExpires(ms);
+    setSnoozeExpireTime(ms);
+  };
+
   const snoozeSelected = (minutes: number) => {
-    console.log(minutes);
+    console.log('snoozeSelected', minutes);
     setSnoozeModalVisible(false);
-    if (0 && !minutes) {
-      storeSnoozeExpires(0);
-      setSnoozeExpireTime(0);
+    if (!minutes) {
+      updateSnoozeExpireTime(0);
+      return;
+    }
+    if (minutes < 0) {
+      setSnoozeDatePickerVisible(true);
       return;
     }
     const minutesToMs = 60 * 1000;
     const currentTime = new Date().getTime();
     const expireTime = currentTime + minutes * minutesToMs;
     const expireDate = new Date(expireTime);
-    storeSnoozeExpires(expireTime);
-    setSnoozeExpireTime(expireTime);
+    updateSnoozeExpireTime(expireTime);
     console.log(expireTime, expireDate.toLocaleTimeString());
   };
 
@@ -143,6 +158,17 @@ function Page() {
         modalVisible={snoozeModalVisible}
         onSelect={snoozeSelected}
         onCancel={() => setSnoozeModalVisible(false)}
+      />
+      <DateTimePickerModal
+        isVisible={snoozeDatePickerVisible}
+        mode="datetime"
+        date={new Date()}
+        onConfirm={(date) => {
+          console.log('DateTimePickerModal', getTimeString(date));
+          setSnoozeDatePickerVisible(false);
+          updateSnoozeExpireTime(date.getTime());
+        }}
+        onCancel={() => setSnoozeDatePickerVisible(false)}
       />
     </>
   );

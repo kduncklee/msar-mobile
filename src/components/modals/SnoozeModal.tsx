@@ -11,6 +11,12 @@ function SnoozeModal({ modalVisible, onSelect, onCancel }: SnoozeModalProps) {
   const title = 'Snooze sounds for:';
   const buttons = [
     {
+      title: 'Custom',
+      value: -1,
+      backgroundColor: colors.blue,
+      textColor: colors.primaryText,
+    },
+    {
       title: '24 hours',
       value: 24 * 60,
       backgroundColor: colors.red,
