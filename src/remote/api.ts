@@ -11,12 +11,14 @@ const local_server: string = 'http://192.168.1.120:8000';
 const scv_server: string = 'https://app.scvrescue.com';
 const legacy_server: string = 'https://malibusarhours.org/calloutapi';
 const dev_server: string = 'https://msar-dev-app.azurewebsites.net';
+const demo_server: string = 'https://demo.app.malibusarhours.org';
 const staging_server: string = 'https://staging.app.malibusarhours.org';
 const prod_server: string = 'https://app.malibusarhours.org';
 
 export const server_choices: LabelValue[] = [
   { label: 'Malibu', value: 'prod' },
   { label: 'Santa Clarita Valley', value: 'scv' },
+  { label: 'Demo', value: 'demo' },
   { label: 'Custom', value: '' },
 ];
 
@@ -41,6 +43,8 @@ export class Api {
         return legacy_server;
       case 'dev':
         return dev_server;
+      case 'demo':
+        return demo_server;
       case 'staging':
         return staging_server;
     }
