@@ -5,25 +5,6 @@ export enum eventType {
   COMMUNITY = 'community',
 }
 
-export enum calloutType {
-  SEARCH = 'search',
-  RESCUE = 'rescue',
-  INFORMATION = 'information',
-}
-
-export function stringToCalloutType(value: string): calloutType | undefined {
-  switch (value) {
-    case 'search':
-      return calloutType.SEARCH;
-    case 'rescue':
-      return calloutType.RESCUE;
-    case 'information':
-      return calloutType.INFORMATION;
-  }
-
-  return undefined;
-}
-
 export enum responseType {
   TEN7 = '10-7',
   TEN8 = '10-8',

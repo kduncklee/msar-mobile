@@ -63,6 +63,10 @@ export class Api {
     return `${this.#server()}/api/radio_channels/`;
   }
 
+  #operationTypesAvailableEndpoint(): string {
+    return `${this.#server()}/api/operation_types/`;
+  }
+
   #calloutsEndpoint(): string {
     return `${this.#server()}/api/callouts/`;
   }
@@ -199,6 +203,10 @@ export class Api {
 
   async apiGetRadioChannelsAvailable(): Promise<any> {
     return this.#fetchJsonWithCredentials(this.#radioChannelsAvailableEndpoint());
+  }
+
+  async apiGetOperationTypesAvailable(): Promise<any> {
+    return this.#fetchJsonWithCredentials(this.#operationTypesAvailableEndpoint());
   }
 
   async apiGetCallouts(status?: string): Promise<any> {

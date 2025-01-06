@@ -40,6 +40,19 @@ export function useRadioChannelsAvailableQuery() {
   return useQuery(radioChannelsAvailabletQueryParams(api));
 }
 
+/// /// Operation Types Available
+function operationTypesAvailabletQueryParams(api: Api) {
+  return {
+    queryKey: ['operationTypesAvailable'],
+    queryFn: () => api.apiGetOperationTypesAvailable(),
+  };
+}
+
+export function useOperationTypesAvailableQuery() {
+  const { api } = useAuth();
+  return useQuery(operationTypesAvailabletQueryParams(api));
+}
+
 /// /// Events List
 
 function argsStartAtFinishAt(startAt: Date, finishAt: Date, isEvent: boolean) {

@@ -12,11 +12,11 @@ import FormCheckbox from '@components/inputs/FormCheckbox';
 import ActivityModal from '@components/modals/ActivityModal';
 import msarEventEmitter from '@utility/msarEventEmitter';
 import { useForm } from '@tanstack/react-form';
-import { useCalloutQuery, useNotificationsAvailableQuery, useRadioChannelsAvailableQuery } from '@/remote/query';
+import { useCalloutQuery, useNotificationsAvailableQuery, useOperationTypesAvailableQuery, useRadioChannelsAvailableQuery } from '@/remote/query';
 import type { callout } from '@/types/callout';
 import type { location } from '@/types/location';
 import { locationToString } from '@/types/location';
-import { calloutStatus, calloutType, stringToCalloutType } from '@/types/enums';
+import { calloutStatus } from '@/types/enums';
 import { useEditingLocation } from '@/storage/mmkv';
 import { handleBackPressed, useBackHandler } from '@/utility/backHandler';
 import { useCalloutCreateMutation, useCalloutUpdateMutation } from '@/remote/mutation';
@@ -41,6 +41,7 @@ function Page() {
   }
   const notificationsAvailableQuery = useNotificationsAvailableQuery();
   const radioChanelsAvailableQuery = useRadioChannelsAvailableQuery();
+  const operationTypesAvailableQuery = useOperationTypesAvailableQuery();
 
   const calloutCreateMutation = useCalloutCreateMutation();
   const calloutUpdateMutation = useCalloutUpdateMutation();
@@ -48,7 +49,7 @@ function Page() {
   const form = useForm({
     defaultValues: {
       title: existingData?.title ?? '',
-      operationType: stringToCalloutType(existingData?.operation_type),
+      operationType: existingData?.operation_type,
       locationText: locationToString(existingData?.location),
       locationDescText: existingData?.location?.text,
       subject: existingData?.subject,
@@ -116,11 +117,6 @@ function Page() {
     headerTitle = 'Update Callout';
   }
 
-  const callOutTypeSelect: LabelValue[] = [
-    { label: 'Search', value: calloutType.SEARCH },
-    { label: 'Rescue', value: calloutType.RESCUE },
-  ];
-
   const notificationsAvailable: LabelValue[] = [];
   if (notificationsAvailableQuery.data) {
     notificationsAvailableQuery.data.results.forEach((data: any) => {
@@ -156,6 +152,19 @@ function Page() {
       additionalRadioChannelsAvailable.push(labelValueItem(name));
     }
   });
+
+  const operationTypesAvailable: LabelValue[] = [];
+  if (operationTypesAvailableQuery.data) {
+    operationTypesAvailableQuery.data.results.forEach((data: any) => {
+      if (data.enabled) {
+        operationTypesAvailable.push(labelValueItem(data.name));
+      }
+    });
+  }
+  const operationTypeSelected = form.getFieldValue('operationType');
+  if (operationTypeSelected && !operationTypesAvailable.find(item => (item.label === operationTypeSelected))) {
+    operationTypesAvailable.push(labelValueItem(operationTypeSelected));
+  }
 
   useEffect(() => {
     if (editingLocation) {
@@ -309,7 +318,7 @@ function Page() {
               form={form}
               name="operationType"
               title="Callout Type"
-              options={callOutTypeSelect}
+              options={operationTypesAvailable}
               placeholder="Select type"
             />
             <FormTextInput

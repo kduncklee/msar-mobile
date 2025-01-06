@@ -1,7 +1,6 @@
-import type { ImageRequireSource } from 'react-native';
 import colors from '@styles/colors';
 import type { location } from '@/types/location';
-import { calloutStatus, calloutType, responseType, stringToCalloutStatus, stringToCalloutType, stringToResponseType } from '@/types/enums';
+import { calloutStatus, responseType, stringToCalloutStatus, stringToResponseType } from '@/types/enums';
 import type { respondedItem } from '@/types/respondedItem';
 
 // {
@@ -20,7 +19,9 @@ import type { respondedItem } from '@/types/respondedItem';
 
 export interface calloutSummary {
   id: number;
-  operation_type: calloutType;
+  operation_type: string;
+  operation_type_icon: string;
+  operation_type_color: string;
   title?: string;
   my_response?: responseType;
   responded?: respondedItem[];
@@ -34,7 +35,9 @@ export interface calloutSummary {
 export function calloutSummaryFromResponse(data: any): calloutSummary {
   return {
     id: data.id,
-    operation_type: stringToCalloutType(data.operation_type),
+    operation_type: data.operation_type,
+    operation_type_icon: data.operation_type_icon,
+    operation_type_color: data.operation_type_color,
     title: data.title,
     my_response: stringToResponseType(data.my_response),
     responded: data.responded,
@@ -60,50 +63,15 @@ export function textForCalloutStatus(type: calloutStatus): string {
   }
 }
 
-export function colorForType(type: calloutType): string {
-  switch (type) {
-    case calloutType.SEARCH:
-      return colors.secondaryYellow;
-    case calloutType.RESCUE:
-      return colors.red;
-    case calloutType.INFORMATION:
-      return colors.blue;
-  }
-}
-
-export function colorForTypeAndStatus(type: calloutType, status: calloutStatus): string {
-  if (status === calloutStatus.RESOLVED) {
+export function colorForTypeAndStatus(callout: calloutSummary): string {
+  if (callout.status === calloutStatus.RESOLVED) {
     return colors.green;
   }
-  return colorForType(type);
+  return callout.operation_type_color || colors.blue;
 }
 
-export function imageForType(type: calloutType): ImageRequireSource {
-  switch (type) {
-    case calloutType.SEARCH:
-      return require('@assets/icons/search.png');
-    case calloutType.RESCUE:
-      return require('@assets/icons/rescue.png'); ;
-    case calloutType.INFORMATION:
-      return require('@assets/icons/information.png'); ;
-  }
-  // Avoid null image error.
-  return require('@assets/icons/pencil.png');
-}
-
-export function textForType(type?: calloutType): string {
-  if (type == null) {
-    return 'N/A';
-  }
-
-  switch (type as calloutType) {
-    case calloutType.SEARCH:
-      return 'Search';
-    case calloutType.RESCUE:
-      return 'Rescue';
-    case calloutType.INFORMATION:
-      return 'Information';
-  }
+export function iconForType(callout: calloutSummary): any {
+  return callout.operation_type_icon || 'progress-question';
 }
 
 export function colorForResponseType(type?: responseType): string {

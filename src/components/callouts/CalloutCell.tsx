@@ -3,8 +3,9 @@ import { elements } from '@styles/elements';
 import colors from '@styles/colors';
 import { getConditionalTimeString } from '@utility/dateHelper';
 import { useLastRead } from 'storage/mmkv';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import type { calloutSummary } from '@/types/calloutSummary';
-import { colorForResponseType, colorForTypeAndStatus, imageForType, textForResponseType } from '@/types/calloutSummary';
+import { colorForResponseType, colorForTypeAndStatus, iconForType, textForResponseType } from '@/types/calloutSummary';
 import { calloutStatus, responseType } from '@/types/enums';
 import { locationToShortString } from '@/types/location';
 import type { respondedItem } from '@/types/respondedItem';
@@ -43,8 +44,9 @@ function CalloutCell({ summary, onPress }: CalloutCellProps) {
   return (
     <TouchableOpacity activeOpacity={0.5} onPress={cellPressed}>
       <View style={[elements.tray, styles.container]}>
-        <View style={[styles.sideBar, { backgroundColor: colorForTypeAndStatus(summary.operation_type, summary.status) }]}>
-          <Image source={imageForType(summary.operation_type)} style={styles.sideBarImage} />
+        <View style={[styles.sideBar, { backgroundColor: colorForTypeAndStatus(summary) }]}>
+          <View style={elements.fieldIcon}><MaterialCommunityIcons name={iconForType(summary)} size={22} color="black" /></View>
+
           <View style={styles.sideBarDiv} />
           <Text style={styles.sideBarNumber}>{calculateResponseCount()}</Text>
         </View>

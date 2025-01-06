@@ -8,7 +8,7 @@ import { elements } from '@styles/elements';
 import { getFullDateTimeString } from '@utility/dateHelper';
 import { router } from 'expo-router';
 import type { callout } from '@/types/callout';
-import { colorForResponseType, textForCalloutStatus, textForResponseType, textForType } from '@/types/calloutSummary';
+import { colorForResponseType, textForCalloutStatus, textForResponseType } from '@/types/calloutSummary';
 import { calloutStatus } from '@/types/enums';
 import { locationIsSet } from '@/types/location';
 import InformationPhoneField from '@/components/fields/InformationPhoneField';
@@ -46,7 +46,7 @@ function CalloutInformationTab({ callout }: CalloutInformationTabProps) {
         <View style={elements.informationDiv} />
         <InformationField
           title="Type"
-          value={textForType(callout.operation_type)}
+          value={callout.operation_type}
         />
         <View style={elements.informationDiv} />
         {!!callout.subject

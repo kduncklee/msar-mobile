@@ -1,5 +1,5 @@
-import type { calloutStatus, calloutType } from '@/types/enums';
-import { responseType, stringToCalloutStatus, stringToCalloutType, stringToResponseType } from '@/types/enums';
+import type { calloutStatus } from '@/types/enums';
+import { responseType, stringToCalloutStatus, stringToResponseType } from '@/types/enums';
 import type { location } from '@/types/location';
 import type { opResponse, operationalPeriod } from '@/types/operationalPeriod';
 import type { user } from '@/types/user';
@@ -9,7 +9,7 @@ import { dataFileFromResponse } from '@/types/dataFile';
 export interface callout {
   id?: number;
   title: string;
-  operation_type: calloutType;
+  operation_type: string;
   description?: string;
   subject?: string;
   subject_contact?: string;
@@ -35,7 +35,7 @@ export function calloutFromResponse(data: any): callout {
   return {
     id: data.id,
     title: data.title,
-    operation_type: stringToCalloutType(data.operation_type),
+    operation_type: data.operation_type,
     description: data.description,
     subject: data.subject,
     subject_contact: data.subject_contact,
