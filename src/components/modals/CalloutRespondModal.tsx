@@ -1,6 +1,6 @@
 import ButtonListModal from '@components/modals/common/ButtonListModal';
-import colors from '@styles/colors';
-import { responseType } from '@/types/enums';
+import colors, { textColorForBackground } from '@styles/colors';
+import { useCalloutResponsesAvailableQuery } from '@/remote/query';
 
 interface CalloutRespondModalProps {
   modalVisible: boolean;
@@ -14,26 +14,20 @@ function CalloutRespondModal({
   onCancel,
 }: CalloutRespondModalProps) {
   const title = 'Respond:';
-  const buttons = [
-    {
-      title: '10-19',
-      value: responseType.TEN19,
-      backgroundColor: colors.secondaryYellow,
-      textColor: colors.black,
-    },
-    {
-      title: '10-8',
-      value: responseType.TEN8,
-      backgroundColor: colors.green,
-      textColor: colors.primaryText,
-    },
-    {
-      title: '10-7',
-      value: responseType.TEN7,
-      backgroundColor: colors.red,
-      textColor: colors.primaryText,
-    },
-  ];
+  const calloutResponesQuery = useCalloutResponsesAvailableQuery();
+
+  const buttons = [];
+  if (calloutResponesQuery.data) {
+    calloutResponesQuery.data.results.forEach((data: any) => {
+      const backgroundColor: string = data.color ?? colors.white;
+      buttons.push({
+        title: data.response,
+        value: data.response,
+        backgroundColor,
+        textColor: textColorForBackground(backgroundColor),
+      });
+    });
+  }
 
   return (
     <ButtonListModal

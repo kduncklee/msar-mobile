@@ -15,13 +15,11 @@ import LogInput from '@components/callouts/LogInput';
 import msarEventEmitter from '@utility/msarEventEmitter';
 import CalloutRespondModal from '@components/modals/CalloutRespondModal';
 import CalloutFileTab from 'components/callouts/CalloutFileTab';
-import { calloutLogQueryKey, calloutQueryKey, useCalloutLogInfiniteQuery, useCalloutQuery } from '@/remote/query';
+import { calloutLogQueryKey, calloutQueryKey, useCalloutLogInfiniteQuery, useCalloutQuery, useCalloutResponsesAvailableMap } from '@/remote/query';
 import { useCalloutLogMutation } from '@/remote/mutation';
 import { calloutResponseBadge } from '@/types/callout';
 import type { tabItem } from '@/types/tabItem';
 import { calloutStatus } from '@/types/enums';
-import type { responseType } from '@/types/enums';
-import { textForResponseType } from '@/types/calloutSummary';
 import { calloutResponseSuccessNotification } from '@/utility/pushNotifications';
 import type { calloutResponse } from '@/types/calloutResponse';
 import useAuth from '@/hooks/useAuth';
@@ -31,6 +29,7 @@ enum CalloutTabs { INFO, LOG, FILES, PERSONNEL };
 function Page() {
   const { id, title, type } = useLocalSearchParams<{ id: string; title: string; type?: string }>();
   const { api } = useAuth();
+  const calloutResponseMap = useCalloutResponsesAvailableMap();
   const [headerTitle, setHeaderTitle] = useState(title);
   const scrollViewRef = useRef(null);
 
@@ -135,7 +134,7 @@ function Page() {
     if (callout) {
       const numberOfFiles = callout.files?.length;
       setHeaderTitle(callout.title);
-      setPersonnelBadge(calloutResponseBadge(callout));
+      setPersonnelBadge(calloutResponseBadge(callout, calloutResponseMap));
       setLogBadge(callout.log_count);
       setFileBadge(numberOfFiles || null);
       setCalloutTimestamp(callout.created_at);
@@ -153,7 +152,7 @@ function Page() {
         setIsResolved(false);
       }
     }
-  }, [callout]);
+  }, [callout, calloutResponseMap]);
 
   const refreshCallout = () => {
     console.log('refreshCallout');
@@ -170,9 +169,9 @@ function Page() {
     refreshCallout();
   };
 
-  const responseSelected = (response: responseType) => {
-    console.log(textForResponseType(response));
-    submitCalloutResponse(textForResponseType(response));
+  const responseSelected = (response: string) => {
+    console.log('selected response', response);
+    submitCalloutResponse(response);
     setModalVisible(false);
   };
 

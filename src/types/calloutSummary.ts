@@ -1,7 +1,8 @@
 import colors from '@styles/colors';
 import type { location } from '@/types/location';
-import { calloutStatus, responseType, stringToCalloutStatus, stringToResponseType } from '@/types/enums';
+import { calloutStatus, stringToCalloutStatus } from '@/types/enums';
 import type { respondedItem } from '@/types/respondedItem';
+import type { calloutResponseAvailable } from '@/types/calloutResponseAvailable';
 
 // {
 //     "created_at": "2023-10-12T18:45:18.623621-07:00",
@@ -23,7 +24,7 @@ export interface calloutSummary {
   operation_type_icon: string;
   operation_type_color: string;
   title?: string;
-  my_response?: responseType;
+  my_response?: string;
   responded?: respondedItem[];
   created_at: Date;
   location: location;
@@ -39,7 +40,7 @@ export function calloutSummaryFromResponse(data: any): calloutSummary {
     operation_type_icon: data.operation_type_icon,
     operation_type_color: data.operation_type_color,
     title: data.title,
-    my_response: stringToResponseType(data.my_response),
+    my_response: data.my_response,
     responded: data.responded,
     created_at: new Date(data.created_at),
     location: data.location,
@@ -74,36 +75,13 @@ export function iconForType(callout: calloutSummary): any {
   return callout.operation_type_icon || 'progress-question';
 }
 
-export function colorForResponseType(type?: responseType): string {
-  if (type == null) {
-    return colors.grayText;
+export function colorForResponseType(
+  type: string,
+  calloutResponsesAvailableMap: Map<string, calloutResponseAvailable>,
+): string {
+  const t = calloutResponsesAvailableMap?.get(type);
+  if (t && t.color) {
+    return t.color;
   }
-
-  switch (type as responseType) {
-    case responseType.TEN7:
-      return colors.red;
-    case responseType.TEN8:
-      return colors.green;
-    case responseType.TEN19:
-      return colors.secondaryYellow;
-    case responseType.TEN22:
-      return colors.blue;
-  }
-}
-
-export function textForResponseType(type?: responseType): string {
-  if (type == null) {
-    return 'N/A';
-  }
-
-  switch (type as responseType) {
-    case responseType.TEN7:
-      return '10-7';
-    case responseType.TEN8:
-      return '10-8';
-    case responseType.TEN19:
-      return '10-19';
-    case responseType.TEN22:
-      return '10-22';
-  }
+  return colors.grayText;
 }

@@ -8,16 +8,18 @@ import { elements } from '@styles/elements';
 import { getFullDateTimeString } from '@utility/dateHelper';
 import { router } from 'expo-router';
 import type { callout } from '@/types/callout';
-import { colorForResponseType, textForCalloutStatus, textForResponseType } from '@/types/calloutSummary';
+import { colorForResponseType, textForCalloutStatus } from '@/types/calloutSummary';
 import { calloutStatus } from '@/types/enums';
 import { locationIsSet } from '@/types/location';
 import InformationPhoneField from '@/components/fields/InformationPhoneField';
+import { useCalloutResponsesAvailableMap } from '@/remote/query';
 
 interface CalloutInformationTabProps {
   callout: callout;
 };
 
 function CalloutInformationTab({ callout }: CalloutInformationTabProps) {
+  const calloutResponseMap = useCalloutResponsesAvailableMap();
   const showEdit: boolean = callout.status !== calloutStatus.ARCHIVED;
 
   const editDetailsPressed = () => {
@@ -158,8 +160,8 @@ function CalloutInformationTab({ callout }: CalloutInformationTabProps) {
           <>
             <InformationField
               title="My Response"
-              value={textForResponseType(callout.my_response)}
-              valueColor={colorForResponseType(callout.my_response)}
+              value={callout.my_response}
+              valueColor={colorForResponseType(callout.my_response, calloutResponseMap)}
             />
 
             <View style={elements.informationDiv} />

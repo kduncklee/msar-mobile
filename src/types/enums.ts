@@ -5,22 +5,6 @@ export enum eventType {
   COMMUNITY = 'community',
 }
 
-export enum responseType {
-  TEN7 = '10-7',
-  TEN8 = '10-8',
-  TEN19 = '10-19',
-  TEN22 = '10-22',
-}
-
-export function stringToResponseType(value: string): responseType | undefined {
-  const enumValue = value as responseType;
-  if (Object.values(responseType).includes(enumValue)) {
-    return enumValue;
-  }
-
-  return undefined;
-}
-
 export enum locationType {
   DESCRIPTION,
   COORDINATES,

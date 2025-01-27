@@ -7,7 +7,7 @@ import TextAreaField from '@components/fields/TextAreaField';
 import { storeLastRead } from 'storage/mmkv';
 import { logEntriesFromInfiniteQueryData } from '@/types/logEntry';
 import type { logEntry } from '@/types/logEntry';
-import { logType, stringToResponseType } from '@/types/enums';
+import { logType } from '@/types/enums';
 
 interface CalloutLogTabProps {
   id: number;
@@ -63,7 +63,7 @@ function CalloutLogTab({ id, useInfiniteQueryFn }: CalloutLogTabProps) {
       renderItem={({ item }) => {
         switch (item.type) {
           case logType.RESPONSE:
-            return (<LogResponseField key={item.id} member={item.member} response={stringToResponseType(item.update)} timestamp={item.created_at} />);
+            return (<LogResponseField key={item.id} member={item.member} response={item.update} timestamp={item.created_at} />);
           case logType.SYSTEM:
             return (<LogSystemField key={item.id} member={item.member} update={item.update} timestamp={item.created_at} />);
           case logType.MESSAGE:

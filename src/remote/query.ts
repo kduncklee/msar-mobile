@@ -10,6 +10,7 @@ import useAuth from '@/hooks/useAuth';
 import type { event } from '@/types/event';
 import { eventFromResponse } from '@/types/event';
 import { type patrol, patrolFromResponse } from '@/types/patrol';
+import type { calloutResponseAvailable } from '@/types/calloutResponseAvailable';
 
 //////////////////////////////////////////////////////////////////////////////
 // React Query
@@ -51,6 +52,27 @@ function operationTypesAvailabletQueryParams(api: Api) {
 export function useOperationTypesAvailableQuery() {
   const { api } = useAuth();
   return useQuery(operationTypesAvailabletQueryParams(api));
+}
+
+/// /// Callout Responses Available
+function calloutResponsesAvailabletQueryParams(api: Api) {
+  return {
+    queryKey: ['calloutResponsesAvailable'],
+    queryFn: () => api.apiGetCalloutResponsesAvailable(),
+  };
+}
+
+export function useCalloutResponsesAvailableQuery() {
+  const { api } = useAuth();
+  return useQuery(calloutResponsesAvailabletQueryParams(api));
+}
+
+export function useCalloutResponsesAvailableMap(): Map<string, calloutResponseAvailable> {
+  const calloutResponesQuery = useCalloutResponsesAvailableQuery();
+  if (!calloutResponesQuery.data) {
+    return new Map();
+  };
+  return new Map(calloutResponesQuery.data.results.map(i => [i.response, i] as [string, calloutResponseAvailable]));
 }
 
 /// /// Events List

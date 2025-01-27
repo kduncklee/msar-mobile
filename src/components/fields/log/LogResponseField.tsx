@@ -2,24 +2,26 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import colors from '@styles/colors';
 import { getConditionalTimeString } from '@utility/dateHelper';
-import type { responseType } from '@/types/enums';
-import { colorForResponseType, textForResponseType } from '@/types/calloutSummary';
+import { colorForResponseType } from '@/types/calloutSummary';
 import type { user } from '@/types/user';
 import { userToString } from '@/types/user';
+import { useCalloutResponsesAvailableMap } from '@/remote/query';
 
 interface LogResponseFieldProps {
   member: user;
-  response: responseType;
+  response: string;
   timestamp: Date;
 };
 
 function LogResponseField({ member, response, timestamp }: LogResponseFieldProps) {
+  const calloutResponseMap = useCalloutResponsesAvailableMap();
+
   return (
     <View style={styles.container}>
-      <Text style={[styles.valueText, { color: colorForResponseType(response) }]}>
+      <Text style={[styles.valueText, { color: colorForResponseType(response, calloutResponseMap) }]}>
         {userToString(member)}
         {' responded '}
-        {textForResponseType(response)}
+        {response}
       </Text>
       <Text style={styles.logTimestamp}>
         {getConditionalTimeString(timestamp)}

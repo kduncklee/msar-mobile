@@ -67,6 +67,10 @@ export class Api {
     return `${this.#server()}/api/operation_types/`;
   }
 
+  #calloutResponsesAvailableEndpoint(): string {
+    return `${this.#server()}/api/callout_responses/`;
+  }
+
   #calloutsEndpoint(): string {
     return `${this.#server()}/api/callouts/`;
   }
@@ -207,6 +211,10 @@ export class Api {
 
   async apiGetOperationTypesAvailable(): Promise<any> {
     return this.#fetchJsonWithCredentials(this.#operationTypesAvailableEndpoint());
+  }
+
+  async apiGetCalloutResponsesAvailable(): Promise<any> {
+    return this.#fetchJsonWithCredentials(this.#calloutResponsesAvailableEndpoint());
   }
 
   async apiGetCallouts(status?: string): Promise<any> {

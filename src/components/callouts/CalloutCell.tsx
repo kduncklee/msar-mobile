@@ -5,10 +5,11 @@ import { getConditionalTimeString } from '@utility/dateHelper';
 import { useLastRead } from 'storage/mmkv';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import type { calloutSummary } from '@/types/calloutSummary';
-import { colorForResponseType, colorForTypeAndStatus, iconForType, textForResponseType } from '@/types/calloutSummary';
-import { calloutStatus, responseType } from '@/types/enums';
+import { colorForResponseType, colorForTypeAndStatus, iconForType } from '@/types/calloutSummary';
+import { calloutStatus } from '@/types/enums';
 import { locationToShortString } from '@/types/location';
 import type { respondedItem } from '@/types/respondedItem';
+import { useCalloutResponsesAvailableMap } from '@/remote/query';
 
 interface CalloutCellProps {
   summary: calloutSummary;
@@ -19,6 +20,8 @@ function CalloutCell({ summary, onPress }: CalloutCellProps) {
   const [lastLogRead, _setLastLogRead] = useLastRead(summary?.id);
   const hasUnread = (lastLogRead === undefined) || (lastLogRead < summary.log_last_id);
   const isResolved = summary.status === calloutStatus.RESOLVED;
+  const calloutResponseMap = useCalloutResponsesAvailableMap();
+
   // console.log(summary.id, lastLogRead, summary.log_last_id, hasUnread);
 
   const cellPressed = () => {
@@ -33,7 +36,8 @@ function CalloutCell({ summary, onPress }: CalloutCellProps) {
     let total = 0;
     const responded = summary.responded as respondedItem[];
     responded.forEach((item: respondedItem) => {
-      if (item.response !== responseType.TEN7) {
+      const t = calloutResponseMap?.get(item.response);
+      if (t && t.is_attending) {
         total += item.total;
       }
     });
@@ -53,7 +57,7 @@ function CalloutCell({ summary, onPress }: CalloutCellProps) {
         <View style={styles.contentBar}>
           <View style={styles.contentTop}>
             <Text style={styles.subjectText} numberOfLines={1} ellipsizeMode="tail">{summary.title}</Text>
-            <Text style={[styles.responseText, { color: colorForResponseType(summary.my_response) }]}>{textForResponseType(summary.my_response)}</Text>
+            <Text style={[styles.responseText, { color: colorForResponseType(summary.my_response, calloutResponseMap) }]}>{summary.my_response}</Text>
           </View>
           <View style={styles.contentMiddle}>
             <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">{locationToShortString(summary.location)}</Text>

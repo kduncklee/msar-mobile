@@ -1,10 +1,11 @@
 import type { calloutStatus } from '@/types/enums';
-import { responseType, stringToCalloutStatus, stringToResponseType } from '@/types/enums';
+import { stringToCalloutStatus } from '@/types/enums';
 import type { location } from '@/types/location';
-import type { opResponse, operationalPeriod } from '@/types/operationalPeriod';
+import type { operationalPeriod } from '@/types/operationalPeriod';
 import type { user } from '@/types/user';
 import type { dataFile } from '@/types/dataFile';
 import { dataFileFromResponse } from '@/types/dataFile';
+import type { calloutResponseAvailable } from '@/types/calloutResponseAvailable';
 
 export interface callout {
   id?: number;
@@ -25,7 +26,7 @@ export interface callout {
   files?: dataFile[];
   handling_unit?: string;
   created_at?: Date;
-  my_response?: responseType;
+  my_response?: string;
   created_by?: user;
   log_count?: number;
   log_last_id?: number;
@@ -51,25 +52,26 @@ export function calloutFromResponse(data: any): callout {
     files: data.files.map(dataFileFromResponse),
     handling_unit: data.handling_unit,
     created_at: new Date(data.created_at),
-    my_response: stringToResponseType(data.my_response),
+    my_response: data.my_response,
     created_by: data.created_by,
     log_count: data.log_count,
     log_last_id: data.log_last_id,
   };
 }
 
-export function calloutResponseBadge(callout: callout): string | null {
+export function calloutResponseBadge(
+  callout: callout,
+  calloutResponsesAvailableMap: Map<string, calloutResponseAvailable>,
+): string | null {
   if (callout.operational_periods[0]) {
     const responses = callout.operational_periods[0].responses;
-    const filterByTen19: opResponse[] = responses.filter((opResponse) => {
-      return opResponse.response === responseType.TEN19;
+    let badgeCount = 0;
+    responses.forEach((response) => {
+      const t = calloutResponsesAvailableMap?.get(response.response);
+      if (t && t.is_attending) {
+        badgeCount += 1;
+      }
     });
-
-    const filterByTen8: opResponse[] = responses.filter((opResponse) => {
-      return opResponse.response === responseType.TEN8;
-    });
-
-    const badgeCount = filterByTen19.length + filterByTen8.length;
     if (badgeCount > 0) {
       return `${badgeCount}`;
     }
