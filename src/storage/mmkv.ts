@@ -1,5 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
-import { MMKV, useMMKVNumber, useMMKVObject, useMMKVString } from 'react-native-mmkv';
+import { MMKV, useMMKVBoolean, useMMKVNumber, useMMKVObject, useMMKVString } from 'react-native-mmkv';
 import { getData, removeData } from '@storage/storage';
 import type { location } from '@/types/location';
 
@@ -77,6 +77,14 @@ export function storeLastRead(id: number, value: number) {
     console.log('storeLastRead', id, value);
     storage.set(`last-read-${id.toString()}`, value);
   }
+}
+
+export function useSoundOverride() {
+  return useMMKVBoolean('sound-override');
+}
+
+export function getSoundOverride(): boolean {
+  return sharedStorage.getBoolean('sound-override');
 }
 
 export function getCriticalAlertsVolume(): number {

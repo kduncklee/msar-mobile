@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { Platform, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
-import { getCriticalAlertsVolume, storeCriticalAlertsVolume } from '@storage/mmkv';
+import { getCriticalAlertsVolume, storeCriticalAlertsVolume, useSoundOverride } from '@storage/mmkv';
 import Checkbox from '@components/inputs/Checkbox';
 import * as PushNotifications from '@utility/pushNotifications';
 import NotificationSettings from '@components/NotificationSettings';
@@ -17,25 +17,34 @@ import { checkPushToken, sendPushToken } from '@/utility/pushNotificationToken';
 function Page() {
   const [notificationLoading, setNotificationLoading] = useState('Loading...');
   const [pushEnabled, setPushEnabled] = useState(null);
+  const [expandNotificationSounds, setExpandNotificationSounds] = useState(false);
   const [criticalAlertsVolume, setCriticalAlertsVolume] = useState(null);
   const { username, server, api, logout } = useAuth();
   const serverName = server || 'Production';
+  const [soundOverride, setSoundOverride] = useSoundOverride();
 
   useEffect(() => {
     checkPushToken(api).then(
       setPushEnabled,
       () => setNotificationLoading('Unable to connect'),
     );
+
     setCriticalAlertsVolume(getCriticalAlertsVolume());
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onPushToggle = async () => {
     const pushStatus = !pushEnabled;
-
     await sendPushToken(api, pushStatus);
-
     setPushEnabled(pushStatus);
+  };
+
+  const onSoundOverrideToggle = async () => {
+    setSoundOverride(!soundOverride);
+  };
+
+  const onNotificationSoundsPress = async () => {
+    setExpandNotificationSounds(!expandNotificationSounds);
   };
 
   const onCriticalAlertSlidingComplete = async (value: number) => {
@@ -63,49 +72,71 @@ function Page() {
       />
       {pushEnabled && (
         <>
-          <HorrizontalLine title="Notification Sounds" />
+          {Platform.OS === 'android' && (
+            <Checkbox
+              title="Override critical notification sounds"
+              checked={soundOverride}
+              onToggle={onSoundOverrideToggle}
+            />
+          )}
           <TouchableOpacity
             style={styles.buttonContainer}
             activeOpacity={0.5}
-            onPress={onRestoreNotificationDefaultsPress}
+            onPress={onNotificationSoundsPress}
           >
-            <Text style={[elements.mediumText, styles.signOutText]}>
-              Restore default notification sounds
-            </Text>
+            <HorrizontalLine title="Notification Sounds" />
+            {!expandNotificationSounds && (
+              <Text style={[elements.mediumText, { textAlign: 'center' }]}>
+                [ Click to expand ]
+              </Text>
+            )}
           </TouchableOpacity>
-          {Platform.OS === 'ios' && (
-            <FormSlider
-              title="Critical Alert Volume"
-              value={criticalAlertsVolume}
-              onChange={onCriticalAlertSlidingComplete}
-            />
+          {expandNotificationSounds && (
+            <>
+              <TouchableOpacity
+                style={styles.buttonContainer}
+                activeOpacity={0.5}
+                onPress={onRestoreNotificationDefaultsPress}
+              >
+                <Text style={[elements.mediumText, styles.signOutText]}>
+                  Restore default notification sounds
+                </Text>
+              </TouchableOpacity>
+              {Platform.OS === 'ios' && (
+                <FormSlider
+                  title="Critical Alert Volume"
+                  value={criticalAlertsVolume}
+                  onChange={onCriticalAlertSlidingComplete}
+                />
+              )}
+              <NotificationSettings title="New Callout" channel="callout" />
+              <NotificationSettings
+                title="Callout 10-22"
+                channel="callout-resolved"
+              />
+              <NotificationSettings
+                title="Updates for a Callout"
+                channel="log" // callout-log
+              />
+              <NotificationSettings
+                title="Callout Responses: 10-7"
+                channel="callout-response-no"
+              />
+              <NotificationSettings
+                title="Callout Responses: 10-8 & 10-19"
+                channel="callout-response-yes"
+              />
+              <NotificationSettings
+                title="Announcements"
+                channel="announcement"
+              />
+              <NotificationSettings
+                title="Message sent successfully"
+                channel="sent"
+                allowCritical={false}
+              />
+            </>
           )}
-          <NotificationSettings title="New Callout" channel="callout" />
-          <NotificationSettings
-            title="Callout 10-22"
-            channel="callout-resolved"
-          />
-          <NotificationSettings
-            title="Updates for a Callout"
-            channel="log" // callout-log
-          />
-          <NotificationSettings
-            title="Callout Responses: 10-7"
-            channel="callout-response-no"
-          />
-          <NotificationSettings
-            title="Callout Responses: 10-8 & 10-19"
-            channel="callout-response-yes"
-          />
-          <NotificationSettings
-            title="Announcements"
-            channel="announcement"
-          />
-          <NotificationSettings
-            title="Message sent successfully"
-            channel="sent"
-            allowCritical={false}
-          />
         </>
       )}
     </>

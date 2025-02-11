@@ -6,9 +6,11 @@ import messaging from '@react-native-firebase/messaging';
 import notifee, { EventType } from '@notifee/react-native';
 import * as Sentry from '@sentry/react-native';
 import * as Notifications from 'expo-notifications';
-import { getCriticalAlertsVolume, getCriticalForChannel, getIsSnoozing, getSoundForChannel, storeBadgeCount, storeCriticalAlertsVolume, storeCriticalForChannel, storeSoundForChannel } from '@storage/mmkv';
+import { getCriticalAlertsVolume, getCriticalForChannel, getIsSnoozing, getSoundForChannel, getSoundOverride, storeBadgeCount, storeCriticalAlertsVolume, storeCriticalForChannel, storeSoundForChannel } from '@storage/mmkv';
 import msarEventEmitter from '@utility/msarEventEmitter';
 import { queryClient } from '@utility/reactQuery';
+import { playNotificationSound } from '@modules/notification-sound-player';
+import { Asset } from 'expo-asset';
 import { updatePushToken } from './pushNotificationToken';
 import { prefetchCalloutListQuery, prefetchCalloutLogQuery, prefetchCalloutQuery, prefetchChatLogQuery } from '@/remote/query';
 import { activeTabStatusQuery } from '@/types/calloutSummary';
@@ -20,24 +22,26 @@ const NO_NOTIFICATION = 'none';
 const SILENT = 'silent2'; // 'silent' was already used with default sound.
 
 const availableChannels = [
-  { label: 'System Default', value: 'default' },
-  { label: 'Distortion - Short', value: 'distortion_1_time' },
-  { label: 'Distortion - Long', value: 'distortion_3_times' },
-  { label: 'MDC new call', value: 'mdc_new_call' },
-  { label: 'Rising 1 beep', value: 'beeprising' },
-  { label: 'Rising 4 beeps', value: 'uprising' },
-  { label: 'Radio - Short', value: 'radio_1_time' },
-  { label: 'Radio - Long', value: 'radio_4_times' },
-  { label: 'Serene multi-ding', value: 'serene_multi_ding' },
-  { label: 'Ships bells', value: 'ships_bells' },
-  { label: 'Simple ding', value: 'simple_ding' },
-  { label: 'Sweet - Short', value: 'sweet_1_time' },
-  { label: 'Sweet - Long', value: 'sweet_6_times' },
-  { label: 'Trumpets - Short', value: 'trumpets_1_time' },
-  { label: 'Trumpets - Long', value: 'trumpets_4_times' },
-  { label: 'Wooden drum', value: 'wooden_drum' },
-  { label: 'Yucatan - Short', value: 'yucatan_1_time' },
-  { label: 'Yucatan - Long', value: 'yucatan_6_times' },
+  /* eslint-disable ts/no-require-imports */
+  { label: 'System Default', value: 'default', asset: require('assets/sounds/yucatan_6_times.mp3') },
+  { label: 'Distortion - Short', value: 'distortion_1_time', asset: require('assets/sounds/distortion_1_time.mp3') },
+  { label: 'Distortion - Long', value: 'distortion_3_times', asset: require('assets/sounds/distortion_3_times.mp3') },
+  { label: 'MDC new call', value: 'mdc_new_call', asset: require('assets/sounds/mdc_new_call.mp3') },
+  { label: 'Rising 1 beep', value: 'beeprising', asset: require('assets/sounds/beeprising.mp3') },
+  { label: 'Rising 4 beeps', value: 'uprising', asset: require('assets/sounds/uprising.mp3') },
+  { label: 'Radio - Short', value: 'radio_1_time', asset: require('assets/sounds/radio_1_time.mp3') },
+  { label: 'Radio - Long', value: 'radio_4_times', asset: require('assets/sounds/radio_4_times.mp3') },
+  { label: 'Serene multi-ding', value: 'serene_multi_ding', asset: require('assets/sounds/serene_multi_ding.mp3') },
+  { label: 'Ships bells', value: 'ships_bells', asset: require('assets/sounds/ships_bells.mp3') },
+  { label: 'Simple ding', value: 'simple_ding', asset: require('assets/sounds/simple_ding.mp3') },
+  { label: 'Sweet - Short', value: 'sweet_1_time', asset: require('assets/sounds/sweet_1_time.mp3') },
+  { label: 'Sweet - Long', value: 'sweet_6_times', asset: require('assets/sounds/sweet_6_times.mp3') },
+  { label: 'Trumpets - Short', value: 'trumpets_1_time', asset: require('assets/sounds/trumpets_1_time.mp3') },
+  { label: 'Trumpets - Long', value: 'trumpets_4_times', asset: require('assets/sounds/trumpets_4_times.mp3') },
+  { label: 'Wooden drum', value: 'wooden_drum', asset: require('assets/sounds/wooden_drum.mp3') },
+  { label: 'Yucatan - Short', value: 'yucatan_1_time', asset: require('assets/sounds/yucatan_1_time.mp3') },
+  { label: 'Yucatan - Long', value: 'yucatan_6_times', asset: require('assets/sounds/yucatan_6_times.mp3') },
+  /* eslint-enable ts/no-require-imports */
 ];
 
 export const availableSounds = [
@@ -127,6 +131,34 @@ async function setupChannels() {
   });
 }
 
+async function playOverrideSound(sound: string) {
+  console.log('test start');
+  // eslint-disable-next-line ts/no-require-imports, ts/no-var-requires
+  let asset = Asset.fromModule(require('assets/sounds/yucatan_6_times.mp3'));
+
+  availableChannels.forEach((element) => {
+    if (element.value === sound) {
+      asset = Asset.fromModule(element.asset);
+    }
+  });
+  console.log('sound', asset, asset?.localUri);
+
+  if (!asset.localUri) {
+    // localUri being null indicates we need to load the asset
+    await asset.downloadAsync();
+  }
+  console.log('sound2', asset, asset?.localUri);
+  playNotificationSound(asset.localUri).then(
+    (value: any) => {
+      console.log('test ok', value);
+    },
+    (reason: any) => {
+      console.error('error playing sound', reason);
+    },
+  );
+  console.log('test done');
+}
+
 function getChannelForNotification(remoteMessage) {
   const dataChannel: string = remoteMessage.data?.channel ?? 'default';
   const dataLogType = remoteMessage.data?.logType;
@@ -154,8 +186,9 @@ async function displayNotification(remoteMessage) {
   const silent = snoozed || (sound === SILENT);
   const ios_sound = silent ? {} : { sound: `${sound}.mp3` };
   const vibration = vibrationForChannel[channel] ?? 'short';
+  const android_override = getSoundOverride();
   let android_channel = `${sound}-${vibration}${critical ? '-alarm' : ''}`;
-  if (silent) {
+  if (silent || android_override) {
     android_channel = SILENT;
   }
   console.log('display', remoteMessage.data?.body, critical, ios_critical, channel, sound, android_channel);
@@ -173,6 +206,9 @@ async function displayNotification(remoteMessage) {
       ...(ios_critical),
     },
   });
+  if (android_override) {
+    playOverrideSound(sound);
+  }
 }
 
 export async function testDisplayNotification(channel: string = 'callout') {

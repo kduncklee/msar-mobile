@@ -4,6 +4,7 @@
     "baseUrl": "./src/",
     "paths": {
       "@/*": ["./*"],
+      "@modules/*": ["../modules/*"],
       "@assets/*": ["./assets/*"],
       "@components/*": ["./components/*"],
       "@remote/*": ["./remote/*"],
