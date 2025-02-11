@@ -12,8 +12,9 @@ credentials.json
 google-services.json
 GoogleService-Info.plist
 src/utility/constants.ts
-ios/
-android/
+/ios/
+/android/
+build/
 build-*.aab
 build-*.ipa
 build*.apks
