@@ -1,8 +1,5 @@
 {
-  "platforms": ["ios", "tvos", "android", "web"],
-  "ios": {
-    "modules": ["NotificationSoundPlayerModule"]
-  },
+  "platforms": ["android"],
   "android": {
     "modules": ["org.malibusar.app.notification_sound_player.NotificationSoundPlayerModule"]
   }

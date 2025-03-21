@@ -31,7 +31,8 @@ class NotificationSoundPlayerModule : Module() {
         .setUsage(AudioAttributes.USAGE_ALARM)
         .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
         .build())
-      //mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC)
+
+      //mediaPlayer?.setAudioStreamType(AudioManager.STREAM_ALARM)
       mediaPlayer?.setDataSource(sound)
       mediaPlayer?.setLooping(false)
       mediaPlayer?.prepare()
