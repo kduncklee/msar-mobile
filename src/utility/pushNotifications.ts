@@ -186,7 +186,8 @@ async function displayNotification(remoteMessage) {
   const silent = snoozed || (sound === SILENT);
   const ios_sound = silent ? {} : { sound: `${sound}.mp3` };
   const vibration = vibrationForChannel[channel] ?? 'short';
-  const android_override = getSoundOverride();
+  const android_override = (Platform.OS === 'android') && critical && getSoundOverride();
+  console.log('overide', android_override, Platform.OS, critical, getSoundOverride());
   let android_channel = `${sound}-${vibration}${critical ? '-alarm' : ''}`;
   if (silent || android_override) {
     android_channel = SILENT;

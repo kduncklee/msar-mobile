@@ -80,11 +80,11 @@ export function storeLastRead(id: number, value: number) {
 }
 
 export function useSoundOverride() {
-  return useMMKVBoolean('sound-override');
+  return useMMKVBoolean('sound-override', storage);
 }
 
 export function getSoundOverride(): boolean {
-  return sharedStorage.getBoolean('sound-override');
+  return storage.getBoolean('sound-override');
 }
 
 export function getCriticalAlertsVolume(): number {
