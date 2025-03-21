@@ -82,10 +82,10 @@ function argsStartAtFinishAt(startAt: Date, finishAt: Date, isEvent: boolean) {
   const finish_filter = isEvent ? 'finish_at' : 'start_at';
   let args = isEvent ? '&' : '?';
   if (startAt) {
-    args += `start_at_iso_after=${formatISO(startAt)}`;
+    args += `start_at_iso_after=${encodeURIComponent(formatISO(startAt))}`;
   }
   if (finishAt) {
-    args += `${args ? '&' : '?'}${finish_filter}_iso_before=${formatISO(finishAt)}`;
+    args += `${args ? '&' : '?'}${finish_filter}_iso_before=${encodeURIComponent(formatISO(finishAt))}`;
   }
   return args;
 }
