@@ -6,6 +6,8 @@ import InformationTray from '@/components/fields/InformationTray';
 import InformationField from '@/components/fields/InformationField';
 import InformationPhoneField from '@/components/fields/InformationPhoneField';
 import ModalFade from '@/components/modals/common/ModalFade';
+import { useCertsQuery } from '@/remote/query';
+import { getPaddedDateString } from '@/utility/dateHelper';
 
 interface UserModalProps {
   user?: user_detail;
@@ -13,8 +15,9 @@ interface UserModalProps {
 };
 
 function UserModal({ user, onCancel }: UserModalProps) {
-  console.log(user);
-  //
+  const certQuery = useCertsQuery(user.id);
+  const certs = certQuery.data;
+  console.log('UserModal', certs);
 
   return (
     <ModalFade
@@ -45,6 +48,19 @@ function UserModal({ user, onCancel }: UserModalProps) {
             />
           ))}
         </InformationTray>
+
+        {!!certs?.length && (
+          <InformationTray title="Certs" titleBarColor={colors.green}>
+            {certs.map(cert => (
+              <InformationField
+                key={cert.id}
+                title={cert.type_name + (cert.subtype_name ? `: ${cert.subtype_name}` : '')}
+                value={(cert.expires_on ? `Expires: ${getPaddedDateString(cert.expires_on, true)}` : '')
+                + (cert.description ? ` ${cert.description}` : '')}
+              />
+            ))}
+          </InformationTray>
+        )}
       </View>
     </ModalFade>
   );

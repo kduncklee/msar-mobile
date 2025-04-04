@@ -11,6 +11,8 @@ import type { event } from '@/types/event';
 import { eventFromResponse } from '@/types/event';
 import { type patrol, patrolFromResponse } from '@/types/patrol';
 import type { calloutResponseAvailable } from '@/types/calloutResponseAvailable';
+import type { cert, member_cert_summary } from '@/types/cert';
+import { certFromResponse, memberCertSummaryFromResponse } from '@/types/cert';
 
 //////////////////////////////////////////////////////////////////////////////
 // React Query
@@ -140,10 +142,10 @@ export function usePatrolListQuery(startAt?: Date, finishAt?: Date) {
 
 /// /// Member Status Types List
 
-export const memberStatusTypesQueryKey = ['members'];
+export const memberStatusTypesQueryKey = ['member_status'];
 function memberStatusTypesQueryParams(api: Api) {
   return {
-    queryKey: memberListQueryKey,
+    queryKey: memberStatusTypesQueryKey,
     queryFn: async (): Promise<member_status_type[]> => {
       const response = await api.apiGetMemberStatusTypes();
       return response.results.map((result: any) => memberStatusTypeFromResponse(result));
@@ -176,6 +178,48 @@ export async function prefetchMemberListQuery(queryClient: QueryClient, api: Api
 export function useMemberListQuery() {
   const { api } = useAuth();
   return useQuery(memberListQueryParams(api));
+}
+
+/// /// Certs List
+
+export const certsQueryKey = ['certs'];
+function certsQueryParams(api: Api, member_id?: number) {
+  return {
+    queryKey: [...certsQueryKey, member_id],
+    queryFn: async (): Promise<cert[]> => {
+      const response = await api.apiGetCerts(member_id);
+      return response.results.map((result: any) => certFromResponse(result));
+    },
+  };
+}
+
+export async function prefetchCertsQuery(queryClient: QueryClient, api: Api) {
+  return queryClient.prefetchQuery(certsQueryParams(api));
+}
+
+export function useCertsQuery(member_id?: number) {
+  const { api } = useAuth();
+  return useQuery(certsQueryParams(api, member_id));
+}
+
+export const teamCertsQueryKey = ['certs_team'];
+function teamCertsQueryParams(api: Api) {
+  return {
+    queryKey: certsQueryKey,
+    queryFn: async (): Promise<member_cert_summary[]> => {
+      const response = await api.apiGetTeamCerts();
+      return response.results.map((result: any) => memberCertSummaryFromResponse(result));
+    },
+  };
+}
+
+export async function prefetchTeamCertsQuery(queryClient: QueryClient, api: Api) {
+  return queryClient.prefetchQuery(teamCertsQueryParams(api));
+}
+
+export function useTeamCertsQuery() {
+  const { api } = useAuth();
+  return useQuery(teamCertsQueryParams(api));
 }
 
 /// /// Callout List

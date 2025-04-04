@@ -95,6 +95,14 @@ export class Api {
     return `${this.#server()}/api/members/`;
   }
 
+  #certsEndpoint(): string {
+    return `${this.#server()}/api/certs/`;
+  }
+
+  #teamCertsEndpoint(): string {
+    return `${this.#server()}/api/member_certs/`;
+  }
+
   #devicesEndpoint(): string {
     return `${this.#server()}/api/devices/`;
   }
@@ -327,6 +335,15 @@ export class Api {
 
   async apiGetMembers(): Promise<any> {
     return this.#fetchJsonWithCredentials(this.#membersEndpoint());
+  }
+
+  async apiGetCerts(member_id?: number): Promise<any> {
+    const params = (member_id === undefined) ? '' : `?member=${member_id}`;
+    return this.#fetchJsonWithCredentials(this.#certsEndpoint() + params);
+  }
+
+  async apiGetTeamCerts(): Promise<any> {
+    return this.#fetchJsonWithCredentials(this.#teamCertsEndpoint());
   }
 
   async apiSetDeviceId(token: string, active: boolean = true) {
