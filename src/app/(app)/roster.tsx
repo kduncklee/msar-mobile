@@ -12,7 +12,7 @@ import UserModal from '@/components/modals/UserModal';
 import useStatusBarColor from '@/hooks/useStatusBarColor';
 
 function Page() {
-  const [sortName, setSortName] = useState('Name');
+  const [sortName, setSortName] = useState('Last Name');
   const [sortKey, setSortKey] = useState('last_name');
   const [reversed, setReversed] = useState(false);
   const [selectedUser, setSelectedUser] = useState<user_detail>(null);
@@ -29,9 +29,10 @@ function Page() {
   }
 
   const sortMenuItems = [
-    { name: 'Name', sortKey: 'last_name' },
+    { name: 'First Name', sortKey: 'first_name' },
+    { name: 'Last Name', sortKey: 'last_name' },
     { name: 'Status', sortKey: 'status_order' },
-    { name: 'R number', sortKey: 'username' },
+    { name: 'ID', sortKey: 'username' },
   ].map((item) => {
     return {
       name: item.name,

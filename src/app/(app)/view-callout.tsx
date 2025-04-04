@@ -139,18 +139,8 @@ function Page() {
       setFileBadge(numberOfFiles || null);
       setCalloutTimestamp(callout.created_at);
 
-      if (callout.status === calloutStatus.ACTIVE) {
-        setIsActive(true);
-      }
-      else {
-        setIsActive(false);
-      }
-      if (callout.status === calloutStatus.RESOLVED) {
-        setIsResolved(true);
-      }
-      else {
-        setIsResolved(false);
-      }
+      setIsActive(callout.status === calloutStatus.ACTIVE);
+      setIsResolved(callout.status === calloutStatus.RESOLVED);
     }
   }, [callout, calloutResponseMap]);
 
