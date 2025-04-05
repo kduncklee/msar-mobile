@@ -1,3 +1,5 @@
+import type { user_detail } from '@/types/user';
+
 export interface cert {
   id: number;
   expires_on?: Date;
@@ -24,6 +26,12 @@ export interface member_cert_summary {
   status: string;
   status_order: number;
   certs: display_cert[];
+};
+
+// Fields added by combining user data
+export interface member_cert_summary_ext extends member_cert_summary {
+  user?: user_detail;
+  username?: string;
 };
 
 export function certFromResponse(response: any): cert {

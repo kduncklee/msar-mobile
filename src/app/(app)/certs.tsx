@@ -8,7 +8,8 @@ import { memberListQueryKey, teamCertsQueryKey, useMemberListQuery, useTeamCerts
 import type { user_detail } from '@/types/user';
 import UserModal from '@/components/modals/UserModal';
 import useStatusBarColor from '@/hooks/useStatusBarColor';
-import type { display_cert } from '@/types/cert';
+import type { display_cert, member_cert_summary_ext } from '@/types/cert';
+import type { LabelValue } from '@/utility/reactForm';
 
 function Page() {
   const [direction, setDirection] = useState(null);
@@ -22,28 +23,46 @@ function Page() {
   const memberQuery = useMemberListQuery();
 
   useEffect(() => {
-    setTableData(certQuery.data);
-  }, [certQuery.data]);
+    const data = [];
+    certQuery.data?.forEach((item) => {
+      const combined: member_cert_summary_ext = { ...item };
+      const user = memberQuery.data?.find(user => user.id === item.id);
+      combined.user = user;
+      combined.username = user.username;
+      data.push(combined);
+    });
+    setTableData(data);
+  }, [certQuery.data, memberQuery.data]);
 
   console.log('tableData[0]', tableData?.at(0));
 
+  const fixedColumnMap: LabelValue[] = useMemo(() => [
+    { label: 'Name', value: 'full_name' },
+    { label: 'ID', value: 'username' },
+    { label: 'Status', value: 'status' },
+  ], []);
   const certColumns = useMemo(() => certQuery.data?.at(0)?.certs?.map(cert => cert.type), [certQuery.data]);
-  const fixedColumns = useMemo(() => ['Name', 'ID', 'Status'], []);
+  const fixedColumns = fixedColumnMap.map(item => item.label);
   const allColumns = useMemo(() => fixedColumns.concat(certColumns), [certColumns, fixedColumns]);
 
   const sortTable = useCallback(
     (column) => {
       const newDirection = direction === 'desc' ? 'asc' : 'desc';
+      const fixedKey = fixedColumnMap.find(item => item.label === column)?.value;
+      const certSort = function (o) {
+        return o?.certs?.find(c => c.type === column)?.description;
+      };
+      console.log('sort', column, fixedKey, certSort, fixedKey || certSort, certSort(tableData[0]));
       const sortedData = _.orderBy(
         tableData,
-        [column.toLowerCase()],
+        [fixedKey || certSort],
         [newDirection],
       );
       setSelectedColumn(column);
       setDirection(newDirection);
       setTableData(sortedData);
     },
-    [direction, tableData],
+    [direction, fixedColumnMap, tableData],
   );
 
   const arrowRotation = useMemo(
@@ -117,17 +136,16 @@ function Page() {
                 ListHeaderComponent={renderTableHeader(allColumns)}
                 stickyHeaderIndices={[0]}
                 renderItem={({ item }) => {
-                  const user = memberQuery.data?.find(user => user.id === item.id);
                   return (
                     <View style={styles.rowContainer}>
                       <TouchableOpacity
                         activeOpacity={0.5}
-                        onPress={() => setSelectedUser(user)}
+                        onPress={() => setSelectedUser(item.user)}
                         style={[styles.columnFlex, styles.columnRowTxt]}
                       >
                         <Text style={[styles.columnFirst]}>{item.full_name}</Text>
                       </TouchableOpacity>
-                      <Text style={[styles.columnFlex, styles.columnRowTxt]}>{user?.username}</Text>
+                      <Text style={[styles.columnFlex, styles.columnRowTxt]}>{item.username}</Text>
                       <Text style={[styles.columnFlex, styles.columnRowTxt]}>{item.status}</Text>
                       {certColumns?.map(cert => renderCert(item.certs, cert))}
                     </View>
