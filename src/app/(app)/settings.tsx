@@ -83,6 +83,7 @@ function Page() {
             style={styles.buttonContainer}
             activeOpacity={0.5}
             onPress={onNotificationSoundsPress}
+            testID="expand-notifications"
           >
             <HorrizontalLine title="Notification Sounds" />
             {!expandNotificationSounds && (

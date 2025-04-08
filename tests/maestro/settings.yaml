@@ -14,12 +14,16 @@ appId: org.malibusar.app
 - tapOn:
     id: Notifications-checkbox
     retryTapIfNoChange: false
+- tapOn:
+    id: expand-notifications
 - assertVisible: Restore default notification sounds
 - tapOn: Restore default notification sounds
 - assertVisible:
     text: Snooze
 - tapOn:
     text: Settings
+- tapOn:
+    id: expand-notifications
 - assertVisible: Yucatan - Long
 - tapOn:
     id: backButton
