@@ -102,7 +102,7 @@ function Page() {
     badgeColor: colors.red,
   };
   tabs[CalloutTabs.PERSONNEL] = {
-    title: 'Personnel',
+    title: 'Response',
     badge: personnelBadge,
     badgeColor: colors.green,
   };
