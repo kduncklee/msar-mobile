@@ -9,7 +9,7 @@ import { useEffect } from 'react';
 import { queryClient, useReactQueryAppStateRefresh } from 'utility/reactQuery';
 import { AuthProvider } from '@/components/AuthProvider';
 
-const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
+const routingInstrumentation = Sentry.reactNavigationIntegration();
 
 Sentry.init({
   dsn: SentryDsn,
@@ -18,9 +18,7 @@ Sentry.init({
   attachScreenshot: true,
   attachViewHierarchy: true,
   integrations: [
-    new Sentry.ReactNativeTracing({
-      routingInstrumentation,
-    }),
+    routingInstrumentation,
   ],
 });
 

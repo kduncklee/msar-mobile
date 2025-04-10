@@ -15,6 +15,7 @@ export interface cert {
 
 export interface display_cert {
   type: string;
+  type_display?: string;
   description: string;
   color: string;
   count: number;
