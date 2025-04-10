@@ -24,7 +24,7 @@ import { calloutResponseSuccessNotification } from '@/utility/pushNotifications'
 import type { calloutResponse } from '@/types/calloutResponse';
 import useAuth from '@/hooks/useAuth';
 
-enum CalloutTabs { INFO, LOG, FILES, PERSONNEL };
+enum CalloutTabs { INFO, LOG, PERSONNEL, FILES };
 
 function Page() {
   const { id, title, type } = useLocalSearchParams<{ id: string; title: string; type?: string }>();
