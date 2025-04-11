@@ -90,7 +90,7 @@ function Page() {
 
   const updateMaxWidth = useCallback((index: number, event: LayoutChangeEvent) => {
     const width = event?.nativeEvent?.layout?.width;
-    if (width > columnWidths[index] + columnWidthExtra) {
+    if (!columnWidths[index] || (width > columnWidths[index] + columnWidthExtra)) {
       const copy = [...columnWidths];
       copy[index] = width;
       console.log('update', index, width, columnWidths[index] + columnWidthExtra, columnWidths[index]);
