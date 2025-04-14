@@ -7,7 +7,6 @@ import { calloutFromResponse } from '@/types/callout';
 import type { callout } from '@/types/callout';
 import type { patrol } from '@/types/patrol';
 
-const local_server: string = 'http://192.168.1.120:8000';
 const scv_server: string = 'https://app.scvrescue.com';
 const legacy_server: string = 'https://malibusarhours.org/calloutapi';
 const dev_server: string = 'https://msar-dev-app.azurewebsites.net';
@@ -15,12 +14,28 @@ const demo_server: string = 'https://demo.app.malibusarhours.org';
 const staging_server: string = 'https://staging.app.malibusarhours.org';
 const prod_server: string = 'https://app.malibusarhours.org';
 
-export const server_choices: LabelValue[] = [
-  { label: 'Malibu', value: 'prod' },
-  { label: 'Santa Clarita Valley', value: 'scv' },
-  { label: 'Demo', value: 'demo' },
-  { label: 'Custom', value: '' },
+interface Server extends LabelValue {
+  logo: any;
+};
+
+export const server_choices: Server[] = [
+  { label: 'Malibu', value: 'prod', logo: require('@assets/logos/msar.png') },
+  { label: 'Santa Clarita Valley', value: 'scv', logo: require('@assets/logos/scv.png') },
+  { label: 'Demo', value: 'demo', logo: require('@assets/logos/la_co.jpeg') },
+  { label: 'Custom', value: '', logo: require('@assets/logos/custom.png') },
 ];
+
+const server_all_choices: Server[] = [
+  { label: 'Staging', value: 'staging', logo: require('@assets/logos/msar_bw.png') },
+  { label: 'Dev', value: 'dev', logo: require('@assets/logos/msar_bw.png') },
+  { label: 'Legacy', value: 'legacy', logo: require('@assets/logos/msar_bw.png') },
+  ...server_choices,
+];
+
+export function logo_for_server(server: string) {
+  const logo = server_all_choices.find(item => item.value === server)?.logo;
+  return logo || require('@assets/logos/custom.png');
+}
 
 export class Api {
   #_server = '';
@@ -30,13 +45,15 @@ export class Api {
     this.#token = token;
   }
 
+  logo() {
+    return logo_for_server(this.#_server);
+  }
+
   #server(): string {
     if (this.#_server?.startsWith('http')) {
       return this.#_server;
     }
     switch (this.#_server) {
-      case 'local':
-        return local_server;
       case 'scv':
         return scv_server;
       case 'legacy':

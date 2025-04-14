@@ -13,6 +13,7 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useCalloutListQuery, useChatLogInfiniteQuery } from '@/remote/query';
 import type { IconName } from '@/utility/icon';
 import { getTimeString } from '@/utility/dateHelper';
+import useAuth from '@/hooks/useAuth';
 
 // Warning: this limits at PAGE_SIZE. We should never have that many active.
 function useNumberActiveCallouts(): number {
@@ -50,6 +51,7 @@ function Page() {
   const [snoozeTitle, setSnoozeTitle] = useState('Snooze');
   const chatHasUnread = useChatUnread();
   const numberActiveCallouts = useNumberActiveCallouts();
+  const { api } = useAuth();
   const fontScale = getFontScale();
 
   const iconSize = 30 * fontScale;
@@ -130,7 +132,7 @@ function Page() {
       <Image source={require('@assets/background.png')} style={styles.backgroundImage} />
       <SafeAreaView style={styles.container}>
         <ScrollView style={styles.scrollView}>
-          <Image source={require('@assets/msar_logo.png')} style={[styles.logoImage, { marginTop: topMargin }]} />
+          <Image source={api.logo()} style={[styles.logoImage, { marginTop: topMargin }]} />
           <View style={styles.buttonSectionContainer}>
             {items.map(item => (
               <TouchableOpacity

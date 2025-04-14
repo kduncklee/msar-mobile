@@ -10,7 +10,7 @@ import { useForm } from '@tanstack/react-form';
 import { zodValidator } from '@tanstack/zod-form-adapter';
 import { z } from 'zod';
 import useAuth from '@/hooks/useAuth';
-import { server_choices } from '@/remote/api';
+import { logo_for_server, server_choices } from '@/remote/api';
 import FormDropdownSelector from '@/components/inputs/FormDropdownSelector';
 
 function Page() {
@@ -58,7 +58,8 @@ function Page() {
       }
     },
   });
-  const use_custom_server = !form.useStore(state => state.values.server);
+  const serverSelected = form.useStore(state => state.values.server);
+  const use_custom_server = !serverSelected;
 
   useEffect(() => {
     if (Platform.OS === 'ios') {
@@ -94,7 +95,7 @@ function Page() {
             style={styles.scrollView}
             ref={scrollViewRef}
           >
-            <Image source={require('@assets/msar_logo.png')} style={[styles.logoImage, { marginTop: topMargin }]} />
+            <Image source={logo_for_server(serverSelected)} style={[styles.logoImage, { marginTop: topMargin }]} />
             <View style={[elements.tray, { padding: 20, margin: 20 }]}>
               <FormDropdownSelector
                 form={form}
