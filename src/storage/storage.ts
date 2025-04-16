@@ -57,7 +57,7 @@ export async function storeServer(server: string) {
 }
 
 export async function getServer(): Promise<string> {
-  return getData('server');
+  return (await getData('server')) || 'prod'; // Old app versions didn't save server name
 }
 
 export async function clearServer(): Promise<void> {

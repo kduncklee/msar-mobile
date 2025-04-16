@@ -20,7 +20,6 @@ function Page() {
   const [expandNotificationSounds, setExpandNotificationSounds] = useState(false);
   const [criticalAlertsVolume, setCriticalAlertsVolume] = useState(null);
   const { username, server, api, logout } = useAuth();
-  const serverName = server || 'Production';
   const [soundOverride, setSoundOverride] = useSoundOverride();
 
   useEffect(() => {
@@ -155,7 +154,7 @@ function Page() {
         </View>
         <View style={styles.userContainer}>
           <Text style={elements.mediumText}>Server</Text>
-          <Text style={[elements.mediumText, styles.userText]}>{serverName}</Text>
+          <Text style={[elements.mediumText, styles.userText]}>{server}</Text>
         </View>
         <View style={styles.userContainer}>
           <Text style={elements.mediumText}>Version</Text>
