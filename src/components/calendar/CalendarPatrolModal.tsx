@@ -67,7 +67,9 @@ function CalendarPatrolModal({ dateID, patrol, onCancel }: CalendarPatrolModalPr
       {
         text: 'Yes',
         onPress: () => {
-          patrolRemoveMutation.mutate(patrol.id);
+          if (patrol) {
+            patrolRemoveMutation.mutate(patrol.id);
+          }
           onCancel();
         },
         style: 'destructive',
