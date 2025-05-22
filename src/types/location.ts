@@ -17,6 +17,13 @@ export function locationIsSet(location: location): boolean {
     || !!(location?.coordinates?.lat && location.coordinates?.long));
 }
 
+export function locationCoordinatesToString(location: location): string {
+  if (location?.coordinates?.lat && location.coordinates?.long) {
+    return `${location.coordinates.lat}, ${location.coordinates.long}`;
+  }
+  return 'UNKNOWN';
+}
+
 export function locationToString(location: location): string {
   if (location?.address?.street) {
     let address = `${location.address.street}`;
@@ -33,7 +40,7 @@ export function locationToString(location: location): string {
   }
 
   if (location?.coordinates?.lat && location.coordinates?.long) {
-    return `${location.coordinates.lat}, ${location.coordinates.long}`;
+    return locationCoordinatesToString(location);
   }
 
   return 'UNKNOWN';
@@ -45,7 +52,7 @@ export function locationToShortString(location: location): string {
   }
 
   if (location?.coordinates?.lat && location.coordinates?.long) {
-    return `${location.coordinates.lat}, ${location.coordinates.long}`;
+    return locationCoordinatesToString(location);
   }
 
   if (location?.text) {

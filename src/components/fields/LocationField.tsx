@@ -7,7 +7,7 @@ import MapView, { Marker } from 'react-native-maps';
 import { coordinateFromString } from '@utility/locationHeler';
 import * as Clipboard from 'expo-clipboard';
 import SmallButton from '../inputs/SmallButton';
-import { locationToShortString, locationToString } from '@/types/location';
+import { locationCoordinatesToString, locationToShortString, locationToString } from '@/types/location';
 import type { location } from '@/types/location';
 import { locationType } from '@/types/enums';
 
@@ -78,6 +78,12 @@ function LocationField({ location }: LocationFieldProps) {
           <Text style={[elements.smallText, { margin: 16 }]} selectable>
             {locationToString(location)}
           </Text>
+          {(locType === locationType.ADDRESS) && coordinates.latitude
+          && (
+            <Text style={[elements.smallText, { marginHorizontal: 16, marginBottom: 16 }]} selectable>
+              {locationCoordinatesToString(location)}
+            </Text>
+          )}
           {location.text
           && (
             <Text style={[elements.smallText, { marginHorizontal: 16, marginBottom: 16 }]} selectable>
