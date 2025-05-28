@@ -1,0 +1,17 @@
+site_name: MSAR Mobile App
+site_url: https://kduncklee.github.io/msar-mobile
+theme:
+  name: material
+  features:
+    - navigation.indexes
+    - navigation.sections
+
+nav:
+  - index.md
+  - Screens:
+      - screens/login.md
+      - screens/home.md
+      - screens/callouts.md
+
+markdown_extensions:
+  - def_list
