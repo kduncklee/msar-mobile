@@ -8,6 +8,7 @@ import type { callout } from '@/types/callout';
 import type { patrol } from '@/types/patrol';
 
 const scv_server: string = 'https://app.scvrescue.com';
+const countywide_server: string = 'https://countywide.app.malibusarhours.org';
 const legacy_server: string = 'https://malibusarhours.org/calloutapi';
 const dev_server: string = 'https://msar-dev-app.azurewebsites.net';
 const demo_server: string = 'https://demo.app.malibusarhours.org';
@@ -21,7 +22,8 @@ interface Server extends LabelValue {
 export const server_choices: Server[] = [
   { label: 'Malibu', value: 'prod', logo: require('@assets/logos/msar.png') },
   { label: 'Santa Clarita Valley', value: 'scv', logo: require('@assets/logos/scv.png') },
-  { label: 'Demo', value: 'demo', logo: require('@assets/logos/la_co.jpeg') },
+  { label: 'LASD Countywide', value: 'countywide', logo: require('@assets/logos/la_co.jpeg') },
+  { label: 'Demo', value: 'demo', logo: require('@assets/logos/custom.png') },
   { label: 'Custom', value: '', logo: require('@assets/logos/custom.png') },
 ];
 
@@ -56,6 +58,8 @@ export class Api {
     switch (this.#_server) {
       case 'scv':
         return scv_server;
+      case 'countywide':
+        return countywide_server;
       case 'legacy':
         return legacy_server;
       case 'dev':
