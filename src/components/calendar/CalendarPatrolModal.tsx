@@ -1,7 +1,7 @@
 import React from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { fromDateId } from '@marceloterreiro/flash-calendar';
-import { useForm } from '@tanstack/react-form';
+import { useForm, useStore } from '@tanstack/react-form';
 import ModalFade from '@/components/modals/common/ModalFade';
 import type { patrol } from '@/types/patrol';
 import { elements } from '@/styles/elements';
@@ -59,7 +59,7 @@ function CalendarPatrolModal({ dateID, patrol, onCancel }: CalendarPatrolModalPr
       }
     },
   });
-  const all_day = form.useStore(state => state.values.all_day);
+  const all_day = useStore(form.store, state => state.values.all_day);
 
   function deletePatrol(): void {
     console.log('edit patrol');

@@ -6,7 +6,7 @@ import { router } from 'expo-router';
 import FormTextInput from '@components/inputs/FormTextInput';
 import SmallButton from '@components/inputs/SmallButton';
 import ActivityModal from '@components/modals/ActivityModal';
-import { useForm } from '@tanstack/react-form';
+import { useForm, useStore } from '@tanstack/react-form';
 import { zodValidator } from '@tanstack/zod-form-adapter';
 import { z } from 'zod';
 import useAuth from '@/hooks/useAuth';
@@ -58,7 +58,7 @@ function Page() {
       }
     },
   });
-  const serverSelected = form.useStore(state => state.values.server);
+  const serverSelected = useStore(form.store, state => state.values.server);
   const use_custom_server = !serverSelected;
 
   useEffect(() => {

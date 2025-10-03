@@ -11,7 +11,7 @@ import FormTextArea from '@components/inputs/FormTextArea';
 import FormCheckbox from '@components/inputs/FormCheckbox';
 import ActivityModal from '@components/modals/ActivityModal';
 import msarEventEmitter from '@utility/msarEventEmitter';
-import { useForm } from '@tanstack/react-form';
+import { useForm, useStore } from '@tanstack/react-form';
 import { useCalloutQuery, useNotificationsAvailableQuery, useOperationTypesAvailableQuery, useRadioChannelsAvailableQuery } from '@/remote/query';
 import type { callout } from '@/types/callout';
 import type { location } from '@/types/location';
@@ -103,7 +103,7 @@ function Page() {
       createCalloutPressed(callout);
     },
   });
-  const ten22 = form.useStore(state => state.values.ten22);
+  const ten22 = useStore(form.store, state => state.values.ten22);
 
   const locationChanged = (editingLocation && (JSON.stringify(existingData?.location) !== JSON.stringify(editingLocation)));
   const calloutChanged = form.state.isDirty || locationChanged;

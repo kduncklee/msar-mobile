@@ -24,7 +24,7 @@ function ModalFade({ children, headerTitle, headerRightIcon, onHeaderRight, moda
       </TouchableWithoutFeedback>
       <SafeAreaView style={styles.modalContent}>
         {/* Use top:0 because Android Modal already appears to adjust it. */}
-        {headerTitle && (<Header title={headerTitle} zeroTopMargin backButton onBackPressed={onCancel} rightButtonIcon={headerRightIcon} onRightPressed={onHeaderRight} />)}
+        {headerTitle && (<Header title={headerTitle} backButton onBackPressed={onCancel} rightButtonIcon={headerRightIcon} onRightPressed={onHeaderRight} />)}
         {children}
       </SafeAreaView>
     </Modal>

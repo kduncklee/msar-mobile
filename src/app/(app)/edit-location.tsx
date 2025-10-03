@@ -12,7 +12,7 @@ import { geocodeAddress } from '@remote/google-maps';
 import ActivityModal from '@components/modals/ActivityModal';
 import type { geocodeAddressResponse } from '@remote/responses';
 import LocationSelectionModal from '@components/modals/LocationSelectModal';
-import { useForm } from '@tanstack/react-form';
+import { useForm, useStore } from '@tanstack/react-form';
 import type { location } from '@/types/location';
 import { locationToShortString, locationToString } from '@/types/location';
 import { useEditingLocation } from '@/storage/mmkv';
@@ -42,7 +42,7 @@ function Page() {
       address: '',
     },
   });
-  const addressText = form.useStore(state => state.values.address);
+  const addressText = useStore(form.store, state => state.values.address);
   useBackHandler(locationChanged);
   useStatusBarColor();
 

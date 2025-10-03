@@ -3,7 +3,7 @@ import type { AppStateStatus } from 'react-native';
 import { AppState, Platform } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import { QueryCache, QueryClient, focusManager, onlineManager } from '@tanstack/react-query';
-import { experimental_createPersister } from '@tanstack/query-persist-client-core';
+import { experimental_createQueryPersister } from '@tanstack/query-persist-client-core';
 import * as Sentry from '@sentry/react-native';
 import Toast from 'react-native-root-toast';
 import superjson from 'superjson';
@@ -14,12 +14,12 @@ export const queryClient = new QueryClient({
     queries: {
       gcTime: 1000 * 60 * 60 * 24, // 24 hours
       staleTime: 1000 * 10, // 10 seconds
-      persister: experimental_createPersister({
+      persister: experimental_createQueryPersister({
         storage: clientStorage,
         maxAge: 1000 * 60 * 60 * 24, // 24 hours
         serialize: superjson.stringify,
         deserialize: superjson.parse,
-      }),
+      }).persisterFn,
     },
   },
   queryCache: new QueryCache({

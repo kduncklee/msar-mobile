@@ -14,7 +14,7 @@ import { Asset } from 'expo-asset';
 import { updatePushToken } from './pushNotificationToken';
 import { prefetchCalloutListQuery, prefetchCalloutLogQuery, prefetchCalloutQuery, prefetchChatLogQuery } from '@/remote/query';
 import { activeTabStatusQuery } from '@/types/calloutSummary';
-import { Api } from '@/remote/api';
+import type { Api } from '@/remote/api';
 import useAuth from '@/hooks/useAuth';
 import { getCredentials, getServer } from '@/storage/storage';
 

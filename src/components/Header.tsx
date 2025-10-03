@@ -32,12 +32,8 @@ function Header({ title, zeroTopMargin, background, backButton = false, onBackPr
 
   useFocusEffect(() => {
     // console.log('added back handler: ' + pathname)
-    BackHandler.addEventListener('hardwareBackPress', handleBackButton);
-
-    return () => {
-      // console.log('removed back handler: ' + pathname);
-      BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
-    };
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+    return () => backHandler.remove();
   });
 
   const handleBackButton = () => {
