@@ -1,4 +1,5 @@
-import { type user, userDetailsFromResponse } from '@/types/user';
+import type { user } from '@/types/user';
+import { userDetailsFromResponse } from '@/types/user';
 
 export interface patrol {
   id?: number;

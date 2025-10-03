@@ -1,6 +1,6 @@
+import type { IconName } from '@/utility/icon';
 import { Modal, SafeAreaView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import Header from '@/components/Header';
-import type { IconName } from '@/utility/icon';
 
 interface ModalFadeProps {
   children: React.ReactNode;

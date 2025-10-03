@@ -1,9 +1,9 @@
-import React from 'react';
 import type { ImageRequireSource } from 'react-native';
+import colors from '@styles/colors';
+import { elements } from '@styles/elements';
+import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
-import { elements } from '@styles/elements';
-import colors from '@styles/colors';
 
 export interface DropdownSelectorCommonProps {
   title?: string;
@@ -22,7 +22,7 @@ function DropdownSelector({ title, options, placeholder, selectedValue, rightBut
   return (
     <View style={styles.container}>
       {!!title
-      && <Text style={elements.fieldTitle}>{title}</Text>}
+        && <Text style={elements.fieldTitle}>{title}</Text>}
       <View style={elements.inputContainer}>
         <Dropdown
           style={[styles.dropdown]}
@@ -43,15 +43,15 @@ function DropdownSelector({ title, options, placeholder, selectedValue, rightBut
           testID={title}
         />
         {onRightPress
-        && (
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={onRightPress}
-          >
-            {rightButton
-            && <Image source={rightButton} style={elements.fieldImage} />}
-          </TouchableOpacity>
-        )}
+          && (
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={onRightPress}
+            >
+              {rightButton
+                && <Image source={rightButton} style={elements.fieldImage} />}
+            </TouchableOpacity>
+          )}
       </View>
     </View>
   );

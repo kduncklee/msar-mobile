@@ -1,17 +1,17 @@
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import * as FileSystem from 'expo-file-system';
-import * as IntentLauncher from 'expo-intent-launcher';
-import * as Sharing from 'expo-sharing';
+import type { Api } from '@/remote/api';
+import type { dataFile } from '@/types/dataFile';
+import * as Sentry from '@sentry/react-native';
+import { useLocalDataFilePath } from '@storage/mmkv';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
 import { getConditionalTimeString } from '@utility/dateHelper';
-import { useLocalDataFilePath } from '@storage/mmkv';
+import * as FileSystem from 'expo-file-system';
+import * as IntentLauncher from 'expo-intent-launcher';
+import * as Sharing from 'expo-sharing';
+import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import FileViewer from 'react-native-file-viewer';
 import * as ContextMenu from 'zeego/context-menu';
-import * as Sentry from '@sentry/react-native';
-import type { dataFile } from '@/types/dataFile';
 import useAuth from '@/hooks/useAuth';
-import type { Api } from '@/remote/api';
 
 async function downloadFile(api: Api, id: number, destination: string) {
   return api.apiDownloadFile(id, destination)

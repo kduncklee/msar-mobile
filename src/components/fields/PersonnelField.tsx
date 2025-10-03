@@ -1,7 +1,7 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import type { opResponse } from '@/types/operationalPeriod';
 import colors from '@styles/colors';
 import { makePhoneCall } from '@utility/phone';
-import type { opResponse } from '@/types/operationalPeriod';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { userToString } from '@/types/user';
 
 interface PersonnelFieldProps {
@@ -12,14 +12,14 @@ function PersonnelField({ opResponse }: PersonnelFieldProps) {
   return (
     <View style={styles.container}>
       {!!opResponse.member.mobile_phone
-      && (
-        <TouchableOpacity style={styles.button} activeOpacity={0.5} onPress={() => makePhoneCall(opResponse.member.mobile_phone)}>
-          <Text style={styles.valueText}>{userToString(opResponse.member)}</Text>
-          <Image source={require('@assets/icons/phone.png')} style={styles.iconImage} />
-        </TouchableOpacity>
-      )}
+        && (
+          <TouchableOpacity style={styles.button} activeOpacity={0.5} onPress={() => makePhoneCall(opResponse.member.mobile_phone)}>
+            <Text style={styles.valueText}>{userToString(opResponse.member)}</Text>
+            <Image source={require('@assets/icons/phone.png')} style={styles.iconImage} />
+          </TouchableOpacity>
+        )}
       {!opResponse.member.mobile_phone
-      && <Text style={[styles.valueText, { color: colors.primaryText }]}>{userToString(opResponse.member)}</Text>}
+        && <Text style={[styles.valueText, { color: colors.primaryText }]}>{userToString(opResponse.member)}</Text>}
     </View>
   );
 }

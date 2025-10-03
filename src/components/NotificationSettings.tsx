@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import * as PushNotifications from '@utility/pushNotifications';
+import Checkbox from '@components/inputs/Checkbox';
+import DropdownSelector from '@components/inputs/DropdownSelector';
 import {
   getCriticalForChannel,
   getSoundForChannel,
   storeCriticalForChannel,
   storeSoundForChannel,
 } from '@storage/mmkv';
-import DropdownSelector from '@components/inputs/DropdownSelector';
-import Checkbox from '@components/inputs/Checkbox';
+import * as PushNotifications from '@utility/pushNotifications';
+import React, { useEffect, useState } from 'react';
 
 interface NotificationSettingsProps {
   title: string;

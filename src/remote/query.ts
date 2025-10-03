@@ -1,18 +1,19 @@
 import type { QueryClient } from '@tanstack/react-query';
+import type { Api } from './api';
+import type { calloutResponseAvailable } from '@/types/calloutResponseAvailable';
+import type { calloutSummary } from '@/types/calloutSummary';
+import type { cert, member_cert_summary } from '@/types/cert';
+import type { event } from '@/types/event';
+import type { patrol } from '@/types/patrol';
+import type { member_status_type, user_detail } from '@/types/user';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { formatISO } from 'date-fns';
-import type { Api } from './api';
-import type { calloutSummary } from '@/types/calloutSummary';
-import { calloutSummaryFromResponse } from '@/types/calloutSummary';
-import type { member_status_type, user_detail } from '@/types/user';
-import { memberStatusTypeFromResponse, userDetailsFromResponse } from '@/types/user';
 import useAuth from '@/hooks/useAuth';
-import type { event } from '@/types/event';
-import { eventFromResponse } from '@/types/event';
-import { type patrol, patrolFromResponse } from '@/types/patrol';
-import type { calloutResponseAvailable } from '@/types/calloutResponseAvailable';
-import type { cert, member_cert_summary } from '@/types/cert';
+import { calloutSummaryFromResponse } from '@/types/calloutSummary';
 import { certFromResponse, memberCertSummaryFromResponse } from '@/types/cert';
+import { eventFromResponse } from '@/types/event';
+import { patrolFromResponse } from '@/types/patrol';
+import { memberStatusTypeFromResponse, userDetailsFromResponse } from '@/types/user';
 
 //////////////////////////////////////////////////////////////////////////////
 // React Query

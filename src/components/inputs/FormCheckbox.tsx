@@ -1,6 +1,6 @@
 import type { ReactFormApi } from '@tanstack/react-form';
-import type { DeepKeyValueName } from '@/utility/reactForm';
 import type { CheckboxPropsCommon } from '@/components/inputs/Checkbox';
+import type { DeepKeyValueName } from '@/utility/reactForm';
 import Checkbox from '@/components/inputs/Checkbox';
 
 interface FormCheckboxProps<
@@ -20,7 +20,7 @@ function FormCheckbox<
   return (
     <form.Field<any, any, any>
       name={name}
-      // eslint-disable-next-line react/no-children-prop
+
       children={(field) => {
         return (
           <Checkbox

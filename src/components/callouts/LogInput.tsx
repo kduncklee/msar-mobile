@@ -1,6 +1,6 @@
+import colors from '@styles/colors';
 import React from 'react';
 import { Image, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-import colors from '@styles/colors';
 
 interface LogInputProps {
   text: string;

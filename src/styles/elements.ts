@@ -1,5 +1,5 @@
-import { Dimensions, StyleSheet } from 'react-native';
 import colors from '@styles/colors';
+import { Dimensions, StyleSheet } from 'react-native';
 
 export const {
   fontScale,

@@ -1,28 +1,28 @@
-import { useEffect, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import Toast from 'react-native-root-toast';
-import * as Sentry from '@sentry/react-native';
-import { useMutation, useMutationState, useQueryClient } from '@tanstack/react-query';
-import Header from '@components/Header';
-import colors from '@styles/colors';
-import { elements } from '@styles/elements';
-import { useLocalSearchParams } from 'expo-router';
-import TabSelector from '@components/TabSelector/TabSelector';
+import type { calloutResponse } from '@/types/calloutResponse';
+import type { tabItem } from '@/types/tabItem';
 import CalloutInformationTab from '@components/callouts/CalloutInformationTab';
 import CalloutLogTab from '@components/callouts/CalloutLogTab';
 import CalloutPersonnelTab from '@components/callouts/CalloutPersonnelTab';
 import LogInput from '@components/callouts/LogInput';
-import msarEventEmitter from '@utility/msarEventEmitter';
+import Header from '@components/Header';
 import CalloutRespondModal from '@components/modals/CalloutRespondModal';
+import TabSelector from '@components/TabSelector/TabSelector';
+import * as Sentry from '@sentry/react-native';
+import colors from '@styles/colors';
+import { elements } from '@styles/elements';
+import { useMutation, useMutationState, useQueryClient } from '@tanstack/react-query';
+import msarEventEmitter from '@utility/msarEventEmitter';
 import CalloutFileTab from 'components/callouts/CalloutFileTab';
-import { calloutLogQueryKey, calloutQueryKey, useCalloutLogInfiniteQuery, useCalloutQuery, useCalloutResponsesAvailableMap } from '@/remote/query';
+import { useLocalSearchParams } from 'expo-router';
+import { useEffect, useRef, useState } from 'react';
+import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Toast from 'react-native-root-toast';
+import useAuth from '@/hooks/useAuth';
 import { useCalloutLogMutation } from '@/remote/mutation';
+import { calloutLogQueryKey, calloutQueryKey, useCalloutLogInfiniteQuery, useCalloutQuery, useCalloutResponsesAvailableMap } from '@/remote/query';
 import { calloutResponseBadge } from '@/types/callout';
-import type { tabItem } from '@/types/tabItem';
 import { calloutStatus } from '@/types/enums';
 import { calloutResponseSuccessNotification } from '@/utility/pushNotifications';
-import type { calloutResponse } from '@/types/calloutResponse';
-import useAuth from '@/hooks/useAuth';
 
 enum CalloutTabs { INFO, LOG, PERSONNEL, FILES };
 
@@ -195,66 +195,66 @@ function Page() {
       <SafeAreaView style={styles.container}>
         <Header title={headerTitle} background={headerBackground} backButton timestamp={calloutTimestamp} />
         {!!callout
-        && (
-          <>
-            <TabSelector tabs={tabs} selected={currentTab} onTabChange={tabChanged} />
-            <KeyboardAvoidingView
-              style={styles.contentContainer}
-              behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-              keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -500}
-            >
-              <View style={styles.contentContainer}>
-                {currentTab === CalloutTabs.INFO
-                && (
-                  <ScrollView
-                    ref={scrollViewRef}
-                    style={styles.scrollView}
-                  >
-                    <CalloutInformationTab
-                      callout={callout}
-                    />
-                  </ScrollView>
-                )}
-                {currentTab === CalloutTabs.LOG
-                && (
-                  <CalloutLogTab
-                    id={idInt}
-                    useInfiniteQueryFn={useCalloutLogInfiniteQuery}
-                  />
-                )}
-                {currentTab === CalloutTabs.FILES
-                && <CalloutFileTab callout={callout} />}
-                {currentTab === CalloutTabs.PERSONNEL
-                && (
-                  <ScrollView
-                    ref={scrollViewRef}
-                    style={styles.scrollView}
-                  >
-                    <CalloutPersonnelTab callout={callout} />
-                  </ScrollView>
-                )}
-                {currentTab === CalloutTabs.INFO && isActive
-                && (
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    style={[elements.capsuleButton, styles.respondCalloutButton]}
-                    onPress={() => setModalVisible(true)}
-                  >
-                    <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>{ respondButtonText }</Text>
-                  </TouchableOpacity>
-                )}
-                {currentTab === CalloutTabs.LOG
-                && (
-                  <LogInput
-                    onTextChange={onLogMessageTextChanged}
-                    text={logMessageText}
-                    onSendPress={submitLogMessage}
-                  />
-                )}
-              </View>
-            </KeyboardAvoidingView>
-          </>
-        )}
+          && (
+            <>
+              <TabSelector tabs={tabs} selected={currentTab} onTabChange={tabChanged} />
+              <KeyboardAvoidingView
+                style={styles.contentContainer}
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -500}
+              >
+                <View style={styles.contentContainer}>
+                  {currentTab === CalloutTabs.INFO
+                    && (
+                      <ScrollView
+                        ref={scrollViewRef}
+                        style={styles.scrollView}
+                      >
+                        <CalloutInformationTab
+                          callout={callout}
+                        />
+                      </ScrollView>
+                    )}
+                  {currentTab === CalloutTabs.LOG
+                    && (
+                      <CalloutLogTab
+                        id={idInt}
+                        useInfiniteQueryFn={useCalloutLogInfiniteQuery}
+                      />
+                    )}
+                  {currentTab === CalloutTabs.FILES
+                    && <CalloutFileTab callout={callout} />}
+                  {currentTab === CalloutTabs.PERSONNEL
+                    && (
+                      <ScrollView
+                        ref={scrollViewRef}
+                        style={styles.scrollView}
+                      >
+                        <CalloutPersonnelTab callout={callout} />
+                      </ScrollView>
+                    )}
+                  {currentTab === CalloutTabs.INFO && isActive
+                    && (
+                      <TouchableOpacity
+                        activeOpacity={0.8}
+                        style={[elements.capsuleButton, styles.respondCalloutButton]}
+                        onPress={() => setModalVisible(true)}
+                      >
+                        <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>{ respondButtonText }</Text>
+                      </TouchableOpacity>
+                    )}
+                  {currentTab === CalloutTabs.LOG
+                    && (
+                      <LogInput
+                        onTextChange={onLogMessageTextChanged}
+                        text={logMessageText}
+                        onSendPress={submitLogMessage}
+                      />
+                    )}
+                </View>
+              </KeyboardAvoidingView>
+            </>
+          )}
       </SafeAreaView>
       <CalloutRespondModal
         modalVisible={modalVisible}

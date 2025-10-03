@@ -1,6 +1,6 @@
+import { elements } from '@styles/elements';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { elements } from '@styles/elements';
 
 export interface CheckboxPropsCommon {
   title: string;
@@ -34,7 +34,7 @@ function Checkbox({ title, checked, disabled, onToggle }: CheckboxProps) {
         testID={`${title}-checkbox`}
       >
         {checked
-        && <Image source={require('@assets/icons/check.png')} style={elements.fieldImage} testID={`${title}-checked`} />}
+          && <Image source={require('@assets/icons/check.png')} style={elements.fieldImage} testID={`${title}-checked`} />}
       </TouchableOpacity>
       <Text style={[elements.mediumText, { marginLeft: 10, fontWeight: '600' }]} testID={title}>{title}</Text>
     </View>

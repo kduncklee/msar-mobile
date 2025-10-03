@@ -1,19 +1,19 @@
-import { useEffect, useState } from 'react';
-import { Image, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { router } from 'expo-router';
+import type { IconName } from '@/utility/icon';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import colors from '@styles/colors';
 import { elements, getFontScale } from '@styles/elements';
-import SnoozeModal from 'components/modals/SnoozeModal';
-import { getSnoozeExpires, storeSnoozeExpires, useLastRead } from 'storage/mmkv';
-import { logEntriesFromInfiniteQueryData } from 'types/logEntry';
-import { activeTabStatusQuery } from 'types/calloutSummary';
 import Badge from 'components/Badge';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import SnoozeModal from 'components/modals/SnoozeModal';
+import { router } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Image, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import { useCalloutListQuery, useChatLogInfiniteQuery } from '@/remote/query';
-import type { IconName } from '@/utility/icon';
-import { getTimeString } from '@/utility/dateHelper';
+import { getSnoozeExpires, storeSnoozeExpires, useLastRead } from 'storage/mmkv';
+import { activeTabStatusQuery } from 'types/calloutSummary';
+import { logEntriesFromInfiniteQueryData } from 'types/logEntry';
 import useAuth from '@/hooks/useAuth';
+import { useCalloutListQuery, useChatLogInfiniteQuery } from '@/remote/query';
+import { getTimeString } from '@/utility/dateHelper';
 
 // Warning: this limits at PAGE_SIZE. We should never have that many active.
 function useNumberActiveCallouts(): number {

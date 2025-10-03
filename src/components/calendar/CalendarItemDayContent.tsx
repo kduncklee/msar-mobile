@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native';
-import type { patrol } from '@/types/patrol';
 import type { event } from '@/types/event';
+import type { patrol } from '@/types/patrol';
+import { StyleSheet, Text, View } from 'react-native';
 import colors from '@/styles/colors';
 
 interface CalendarItemDayContentProps {

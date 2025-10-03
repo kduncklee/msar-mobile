@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+import type { MenuDropdownItem } from '@/components/MenuDropdown';
+import type { user_detail } from '@/types/user';
 import Header from '@components/Header';
 import colors from '@styles/colors';
 import { useQueryClient } from '@tanstack/react-query';
-import { memberListQueryKey, useMemberListQuery } from '@/remote/query';
-import UserCell from '@/components/UserCell';
-import type { MenuDropdownItem } from '@/components/MenuDropdown';
+import { useEffect, useState } from 'react';
+import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
 import MenuDropdown from '@/components/MenuDropdown';
-import type { user_detail } from '@/types/user';
 import UserModal from '@/components/modals/UserModal';
+import UserCell from '@/components/UserCell';
 import useStatusBarColor from '@/hooks/useStatusBarColor';
+import { memberListQueryKey, useMemberListQuery } from '@/remote/query';
 
 function Page() {
   const [sortName, setSortName] = useState('Last Name');

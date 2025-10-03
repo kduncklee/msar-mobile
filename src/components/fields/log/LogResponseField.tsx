@@ -1,11 +1,11 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import type { user } from '@/types/user';
 import colors from '@styles/colors';
 import { getConditionalTimeString } from '@utility/dateHelper';
-import { colorForResponseType } from '@/types/calloutSummary';
-import type { user } from '@/types/user';
-import { userToString } from '@/types/user';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { useCalloutResponsesAvailableMap } from '@/remote/query';
+import { colorForResponseType } from '@/types/calloutSummary';
+import { userToString } from '@/types/user';
 
 interface LogResponseFieldProps {
   member: user;

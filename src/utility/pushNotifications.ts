@@ -1,22 +1,22 @@
-import { useEffect } from 'react';
 import type { AppStateStatus } from 'react-native';
-import { AppState, Platform } from 'react-native';
-import { router } from 'expo-router';
-import messaging from '@react-native-firebase/messaging';
+import type { Api } from '@/remote/api';
+import { playNotificationSound } from '@modules/notification-sound-player';
 import notifee, { EventType } from '@notifee/react-native';
+import messaging from '@react-native-firebase/messaging';
 import * as Sentry from '@sentry/react-native';
-import * as Notifications from 'expo-notifications';
 import { getCriticalAlertsVolume, getCriticalForChannel, getIsSnoozing, getSoundForChannel, getSoundOverride, storeBadgeCount, storeCriticalAlertsVolume, storeCriticalForChannel, storeSoundForChannel } from '@storage/mmkv';
 import msarEventEmitter from '@utility/msarEventEmitter';
 import { queryClient } from '@utility/reactQuery';
-import { playNotificationSound } from '@modules/notification-sound-player';
 import { Asset } from 'expo-asset';
-import { updatePushToken } from './pushNotificationToken';
-import { prefetchCalloutListQuery, prefetchCalloutLogQuery, prefetchCalloutQuery, prefetchChatLogQuery } from '@/remote/query';
-import { activeTabStatusQuery } from '@/types/calloutSummary';
-import type { Api } from '@/remote/api';
+import * as Notifications from 'expo-notifications';
+import { router } from 'expo-router';
+import { useEffect } from 'react';
+import { AppState, Platform } from 'react-native';
 import useAuth from '@/hooks/useAuth';
+import { prefetchCalloutListQuery, prefetchCalloutLogQuery, prefetchCalloutQuery, prefetchChatLogQuery } from '@/remote/query';
 import { getCredentials, getServer } from '@/storage/storage';
+import { activeTabStatusQuery } from '@/types/calloutSummary';
+import { updatePushToken } from './pushNotificationToken';
 
 const NO_NOTIFICATION = 'none';
 const SILENT = 'silent2'; // 'silent' was already used with default sound.
@@ -133,7 +133,7 @@ async function setupChannels() {
 
 async function playOverrideSound(sound: string) {
   console.log('test start');
-  // eslint-disable-next-line ts/no-require-imports, ts/no-var-requires
+  // eslint-disable-next-line ts/no-require-imports
   let asset = Asset.fromModule(require('assets/sounds/yucatan_6_times.mp3'));
 
   availableChannels.forEach((element) => {

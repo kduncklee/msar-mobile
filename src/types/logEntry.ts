@@ -1,7 +1,7 @@
 import type { logType } from '@/types/enums';
-import { stringToLogType } from '@/types/enums';
 import type { location } from '@/types/location';
 import type { user } from '@/types/user';
+import { stringToLogType } from '@/types/enums';
 
 export interface logEntry {
   id: string; // numeric if from server, otherwise 'temp_*'
@@ -32,7 +32,7 @@ export function logEntryFromRespsonse(data: any): logEntry {
 export function logEntriesFromInfiniteQueryData(data: any): logEntry[] {
   return data?.pages
     ? data?.pages?.flatMap(page =>
-      page?.results.map(r => logEntryFromRespsonse(r)),
-    )
+        page?.results.map(r => logEntryFromRespsonse(r)),
+      )
     : [];
 }

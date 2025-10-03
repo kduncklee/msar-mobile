@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react';
-import * as Application from 'expo-application';
-import { router } from 'expo-router';
-import { Platform, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Header from '@components/Header';
+import HorrizontalLine from '@components/HorrizontalLine';
+import Checkbox from '@components/inputs/Checkbox';
+import FormSlider from '@components/inputs/FormSlider';
+import NotificationSettings from '@components/NotificationSettings';
+import { getCriticalAlertsVolume, storeCriticalAlertsVolume, useSoundOverride } from '@storage/mmkv';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
-import { getCriticalAlertsVolume, storeCriticalAlertsVolume, useSoundOverride } from '@storage/mmkv';
-import Checkbox from '@components/inputs/Checkbox';
 import * as PushNotifications from '@utility/pushNotifications';
-import NotificationSettings from '@components/NotificationSettings';
-import FormSlider from '@components/inputs/FormSlider';
-import HorrizontalLine from '@components/HorrizontalLine';
-import Header from '@components/Header';
+import * as Application from 'expo-application';
+import { router } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Platform, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import useAuth from '@/hooks/useAuth';
 import { checkPushToken, sendPushToken } from '@/utility/pushNotificationToken';
 

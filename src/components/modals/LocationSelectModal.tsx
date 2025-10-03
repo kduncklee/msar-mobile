@@ -1,7 +1,7 @@
+import type { location } from '@/types/location';
+import { elements } from '@styles/elements';
 import React from 'react';
 import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { elements } from '@styles/elements';
-import type { location } from '@/types/location';
 
 interface LocationSelectionModalProps {
   locations: location[];

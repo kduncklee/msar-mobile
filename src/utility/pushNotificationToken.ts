@@ -1,5 +1,5 @@
-import messaging from '@react-native-firebase/messaging';
 import type { Api } from '@/remote/api';
+import messaging from '@react-native-firebase/messaging';
 
 async function getPushToken() {
   return messaging().getToken();

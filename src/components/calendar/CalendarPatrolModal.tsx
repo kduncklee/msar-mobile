@@ -1,14 +1,14 @@
-import React from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import type { patrol } from '@/types/patrol';
 import { fromDateId } from '@marceloterreiro/flash-calendar';
 import { useForm, useStore } from '@tanstack/react-form';
-import ModalFade from '@/components/modals/common/ModalFade';
-import type { patrol } from '@/types/patrol';
-import { elements } from '@/styles/elements';
-import { usePatrolCreateMutation, usePatrolRemoveMutation, usePatrolUpdateMutation } from '@/remote/mutation';
-import FormTextInput from '@/components/inputs/FormTextInput';
-import FormDateTimePicker from '@/components/inputs/FormDateTimePicker';
+import React from 'react';
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import FormCheckbox from '@/components/inputs/FormCheckbox';
+import FormDateTimePicker from '@/components/inputs/FormDateTimePicker';
+import FormTextInput from '@/components/inputs/FormTextInput';
+import ModalFade from '@/components/modals/common/ModalFade';
+import { usePatrolCreateMutation, usePatrolRemoveMutation, usePatrolUpdateMutation } from '@/remote/mutation';
+import { elements } from '@/styles/elements';
 
 interface CalendarPatrolModalProps {
   dateID: string;

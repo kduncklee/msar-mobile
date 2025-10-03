@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, View } from 'react-native';
-import Header from '@components/Header';
-import colors from '@styles/colors';
 import CalloutLogTab from '@components/callouts/CalloutLogTab';
 import LogInput from '@components/callouts/LogInput';
-import { useChatLogInfiniteQuery } from '@/remote/query';
-import { useChatLogMutation } from '@/remote/mutation';
+import Header from '@components/Header';
+import colors from '@styles/colors';
+import { useState } from 'react';
+import { KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, View } from 'react-native';
 import useStatusBarColor from '@/hooks/useStatusBarColor';
+import { useChatLogMutation } from '@/remote/mutation';
+import { useChatLogInfiniteQuery } from '@/remote/query';
 
 function Page() {
   const [logMessageText, setLogMessageText] = useState('');

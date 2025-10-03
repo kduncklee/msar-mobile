@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { elements } from '@styles/elements';
 import type { ReactFormApi } from '@tanstack/react-form';
 import type { DateTimePickerProps } from 'react-native-modal-datetime-picker';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import { fromDateId } from '@marceloterreiro/flash-calendar';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import type { DeepKeyValueName } from '@/utility/reactForm';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { fromDateId } from '@marceloterreiro/flash-calendar';
+import { elements } from '@styles/elements';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { getFullDateTimeString, getTimeString } from '@/utility/dateHelper';
 
 interface FormDateTimePickerProps<
@@ -39,7 +39,7 @@ function FormDateTimePicker<
   return (
     <form.Field<any, any, any>
       name={name}
-      // eslint-disable-next-line react/no-children-prop
+
       children={(field) => {
         const date: Date = field.state.value;
         let display = 'UNSET';
@@ -50,7 +50,7 @@ function FormDateTimePicker<
         return (
           <View style={styles.container}>
             {!!title
-            && <Text style={elements.fieldTitle} testID={`${title}-label`}>{title}</Text>}
+              && <Text style={elements.fieldTitle} testID={`${title}-label`}>{title}</Text>}
             <View style={[elements.inputContainer, { height: 50 }]}>
               <TextInput
                 style={[elements.fieldText, { flex: 1, padding: 8 }]}

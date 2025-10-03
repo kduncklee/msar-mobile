@@ -1,7 +1,7 @@
+import type { event } from '@/types/event';
 import InformationField from '@/components/fields/InformationField';
 import InformationTray from '@/components/fields/InformationTray';
 import colors from '@/styles/colors';
-import type { event } from '@/types/event';
 import { getDateRangeString, getDateTimeRangeString, getTimeString } from '@/utility/dateHelper';
 
 interface CalendarEventProps {

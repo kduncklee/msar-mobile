@@ -1,16 +1,16 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
-import { FlatList, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import type { display_cert, member_cert_summary_ext } from '@/types/cert';
+import type { user_detail } from '@/types/user';
+import type { LabelValue } from '@/utility/reactForm';
 import Header from '@components/Header';
 import colors, { textColorForBackground } from '@styles/colors';
 import { useQueryClient } from '@tanstack/react-query';
 import _ from 'lodash';
-import { memberListQueryKey, teamCertsQueryKey, useMemberListQuery, useTeamCertsQuery } from '@/remote/query';
-import type { user_detail } from '@/types/user';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { FlatList, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import UserModal from '@/components/modals/UserModal';
 import useStatusBarColor from '@/hooks/useStatusBarColor';
-import type { display_cert, member_cert_summary_ext } from '@/types/cert';
-import type { LabelValue } from '@/utility/reactForm';
+import { memberListQueryKey, teamCertsQueryKey, useMemberListQuery, useTeamCertsQuery } from '@/remote/query';
 import { elements } from '@/styles/elements';
 
 function Page() {

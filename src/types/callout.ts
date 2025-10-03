@@ -1,11 +1,11 @@
+import type { calloutResponseAvailable } from '@/types/calloutResponseAvailable';
+import type { dataFile } from '@/types/dataFile';
 import type { calloutStatus } from '@/types/enums';
-import { stringToCalloutStatus } from '@/types/enums';
 import type { location } from '@/types/location';
 import type { operationalPeriod } from '@/types/operationalPeriod';
 import type { user } from '@/types/user';
-import type { dataFile } from '@/types/dataFile';
 import { dataFileFromResponse } from '@/types/dataFile';
-import type { calloutResponseAvailable } from '@/types/calloutResponseAvailable';
+import { stringToCalloutStatus } from '@/types/enums';
 
 export interface callout {
   id?: number;

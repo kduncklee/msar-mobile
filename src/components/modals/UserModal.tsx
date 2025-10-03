@@ -1,10 +1,10 @@
+import type { user_detail } from '@/types/user';
+import colors from '@styles/colors';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import colors from '@styles/colors';
-import type { user_detail } from '@/types/user';
-import InformationTray from '@/components/fields/InformationTray';
 import InformationField from '@/components/fields/InformationField';
 import InformationPhoneField from '@/components/fields/InformationPhoneField';
+import InformationTray from '@/components/fields/InformationTray';
 import ModalFade from '@/components/modals/common/ModalFade';
 import { useCertsQuery } from '@/remote/query';
 import { getPaddedDateString } from '@/utility/dateHelper';
@@ -56,7 +56,7 @@ function UserModal({ user, onCancel }: UserModalProps) {
                 key={cert.id}
                 title={cert.type_name + (cert.subtype_name ? `: ${cert.subtype_name}` : '')}
                 value={(cert.expires_on ? `Expires: ${getPaddedDateString(cert.expires_on, true)}` : '')
-                + (cert.description ? ` ${cert.description}` : '')}
+                  + (cert.description ? ` ${cert.description}` : '')}
               />
             ))}
           </InformationTray>

@@ -1,14 +1,14 @@
+import type { user } from '@/types/user';
+import colors from '@styles/colors';
+import { elements } from '@styles/elements';
+import { getConditionalTimeString } from '@utility/dateHelper';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Autolink, LatLngMatcher } from 'react-native-autolink';
-import { elements } from '@styles/elements';
-import colors from '@styles/colors';
-import { getConditionalTimeString } from '@utility/dateHelper';
+import useAuth from '@/hooks/useAuth';
 import { useChatOrCalloutLogMutation } from '@/remote/mutation';
 import { logStatusType } from '@/types/enums';
-import type { user } from '@/types/user';
 import { isUserSelf, userToString } from '@/types/user';
-import useAuth from '@/hooks/useAuth';
 
 interface LogMessageFieldProps {
   id: string;
@@ -34,11 +34,11 @@ function LogMessageField({ id, callout_id, member, message, status, timestamp }:
   const contents = (
     <>
       {!isSelf
-      && (
-        <Text style={[styles.messageAuthor]}>
-          {userToString(member)}
-        </Text>
-      )}
+        && (
+          <Text style={[styles.messageAuthor]}>
+            {userToString(member)}
+          </Text>
+        )}
       <Autolink
         style={[styles.messageText, {
           textAlign: isSelf ? 'right' : 'left',

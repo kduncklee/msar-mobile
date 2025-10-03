@@ -1,15 +1,15 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { elements } from '@styles/elements';
-import colors from '@styles/colors';
-import { getConditionalTimeString } from '@utility/dateHelper';
-import { useLastRead } from 'storage/mmkv';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import type { calloutSummary } from '@/types/calloutSummary';
+import type { respondedItem } from '@/types/respondedItem';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import colors from '@styles/colors';
+import { elements } from '@styles/elements';
+import { getConditionalTimeString } from '@utility/dateHelper';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useLastRead } from 'storage/mmkv';
+import { useCalloutResponsesAvailableMap } from '@/remote/query';
 import { colorForResponseType, colorForTypeAndStatus, iconForType } from '@/types/calloutSummary';
 import { calloutStatus } from '@/types/enums';
 import { locationToShortString } from '@/types/location';
-import type { respondedItem } from '@/types/respondedItem';
-import { useCalloutResponsesAvailableMap } from '@/remote/query';
 
 interface CalloutCellProps {
   summary: calloutSummary;

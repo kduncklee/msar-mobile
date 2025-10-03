@@ -1,3 +1,4 @@
+import colors from '@styles/colors';
 import React, { useEffect } from 'react';
 import {
   BackHandler,
@@ -11,7 +12,6 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import colors from '@styles/colors';
 
 interface ModalAnimationProps {
   children: React.ReactElement;

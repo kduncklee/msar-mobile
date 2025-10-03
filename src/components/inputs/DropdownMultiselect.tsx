@@ -1,9 +1,9 @@
+import type { LabelValue } from '@/utility/reactForm';
+import colors from '@styles/colors';
+import { elements } from '@styles/elements';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { MultiSelect } from 'react-native-element-dropdown';
-import { elements } from '@styles/elements';
-import colors from '@styles/colors';
-import type { LabelValue } from '@/utility/reactForm';
 
 export interface DropdownMultiselectCommonProps<
   TOption extends LabelValue,
@@ -26,7 +26,7 @@ function DropdownMultiselect<
   return (
     <View style={styles.container}>
       {!!title
-      && <Text style={elements.fieldTitle}>{title}</Text>}
+        && <Text style={elements.fieldTitle}>{title}</Text>}
       <View style={[elements.inputContainer, { flexDirection: 'column', paddingHorizontal: 8 }]}>
         <MultiSelect
           style={[styles.dropdown]}

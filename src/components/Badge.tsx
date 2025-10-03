@@ -8,16 +8,16 @@
  * Copyright (c) 2016 react-native-component <moonsunfall@aliyun.com>
  */
 
+import colors from '@styles/colors';
+
 import React, {
   Component,
 } from 'react';
-
 import {
   StyleSheet,
   Text,
   View,
 } from 'react-native';
-import colors from '@styles/colors';
 
 const styles = StyleSheet.create({
   container: {

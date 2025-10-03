@@ -1,6 +1,6 @@
 import type { ReactFormApi } from '@tanstack/react-form';
-import type { DeepKeyValueName } from '@/utility/reactForm';
 import type { DropdownSelectorCommonProps } from '@/components/inputs/DropdownSelector';
+import type { DeepKeyValueName } from '@/utility/reactForm';
 import DropdownSelector from '@/components/inputs/DropdownSelector';
 
 interface FormDropdownSelectorProps<
@@ -20,7 +20,7 @@ function FormDropdownSelector<
   return (
     <form.Field<any, any, any>
       name={name}
-      // eslint-disable-next-line react/no-children-prop
+
       children={(field) => {
         return (
           <DropdownSelector

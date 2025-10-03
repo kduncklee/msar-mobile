@@ -1,10 +1,10 @@
-import { createContext, useEffect, useMemo, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { storage } from '@storage/mmkv';
-import * as pushNotificationToken from '@/utility/pushNotificationToken';
-import { Api } from '@/remote/api';
 import type { loginResponse } from '@/remote/responses';
+import { storage } from '@storage/mmkv';
+import { useQueryClient } from '@tanstack/react-query';
+import { createContext, useEffect, useMemo, useState } from 'react';
+import { Api } from '@/remote/api';
 import { clearCredentials, clearServer, getCredentials, getServer, storeCredentials, storeServer } from '@/storage/storage';
+import * as pushNotificationToken from '@/utility/pushNotificationToken';
 
 export interface AuthContextType {
   username: string;
@@ -107,8 +107,8 @@ export function AuthProvider({
     [username, token, server, api, loading],
   );
   return (
-    <AuthContext.Provider value={memoedValue as AuthContextType}>
+    <AuthContext value={memoedValue as AuthContextType}>
       {!loadingInitial && children}
-    </AuthContext.Provider>
+    </AuthContext>
   );
 }

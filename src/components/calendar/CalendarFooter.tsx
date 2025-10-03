@@ -1,9 +1,9 @@
-import { StyleSheet, Text, View } from 'react-native';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import type { patrol } from '@/types/patrol';
 import type { user_detail } from '@/types/user';
-import colors from '@/styles/colors';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { StyleSheet, Text, View } from 'react-native';
 import { useMemberListQuery } from '@/remote/query';
+import colors from '@/styles/colors';
 import { elements } from '@/styles/elements';
 
 interface user_ext extends user_detail {

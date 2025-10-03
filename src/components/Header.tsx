@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { BackHandler, Image, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { router, useFocusEffect } from 'expo-router';
+import type { IconName } from '@/utility/icon';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
 import { getConditionalTimeString } from '@utility/dateHelper';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import type { IconName } from '@/utility/icon';
+import { router, useFocusEffect } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { BackHandler, Image, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface HeaderProps {
   title: string;
@@ -55,11 +55,11 @@ function Header({ title, zeroTopMargin, background, backButton = false, onBackPr
   return (
     <View style={[styles.container, { marginTop: headerMargin }, viewStyle]}>
       {backButton
-      && (
-        <TouchableOpacity activeOpacity={0.2} style={styles.backContainer} onPress={() => backPressed()}>
-          <Image source={require('@assets/icons/back.png')} style={styles.backImage} testID="backButton" />
-        </TouchableOpacity>
-      )}
+        && (
+          <TouchableOpacity activeOpacity={0.2} style={styles.backContainer} onPress={() => backPressed()}>
+            <Image source={require('@assets/icons/back.png')} style={styles.backImage} testID="backButton" />
+          </TouchableOpacity>
+        )}
       <Text
         style={[styles.title, { paddingHorizontal: backButton ? 10 : 20 }]}
         numberOfLines={1}
@@ -73,11 +73,11 @@ function Header({ title, zeroTopMargin, background, backButton = false, onBackPr
         </View>
       )}
       {rightButtonIcon
-      && (
-        <TouchableOpacity activeOpacity={0.2} style={styles.rightContainer} onPress={onRightPressed}>
-          <View style={elements.fieldIcon}><MaterialCommunityIcons name={rightButtonIcon} size={22} color="white" /></View>
-        </TouchableOpacity>
-      )}
+        && (
+          <TouchableOpacity activeOpacity={0.2} style={styles.rightContainer} onPress={onRightPressed}>
+            <View style={elements.fieldIcon}><MaterialCommunityIcons name={rightButtonIcon} size={22} color="white" /></View>
+          </TouchableOpacity>
+        )}
     </View>
   );
 }

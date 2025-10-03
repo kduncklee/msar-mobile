@@ -1,17 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
-import { Alert, Image, Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, View } from 'react-native';
-import colors from '@styles/colors';
-import { elements } from '@styles/elements';
-import { router } from 'expo-router';
 import FormTextInput from '@components/inputs/FormTextInput';
 import SmallButton from '@components/inputs/SmallButton';
 import ActivityModal from '@components/modals/ActivityModal';
+import colors from '@styles/colors';
+import { elements } from '@styles/elements';
 import { useForm, useStore } from '@tanstack/react-form';
 import { zodValidator } from '@tanstack/zod-form-adapter';
+import { router } from 'expo-router';
+import { useEffect, useRef, useState } from 'react';
+import { Alert, Image, Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, View } from 'react-native';
 import { z } from 'zod';
+import FormDropdownSelector from '@/components/inputs/FormDropdownSelector';
 import useAuth from '@/hooks/useAuth';
 import { logo_for_server, server_choices } from '@/remote/api';
-import FormDropdownSelector from '@/components/inputs/FormDropdownSelector';
 
 function Page() {
   const [topMargin, setTopMargin] = useState(0);
@@ -140,7 +140,7 @@ function Page() {
         </KeyboardAvoidingView>
       </SafeAreaView>
       {showSpinner
-      && <ActivityModal message="Logging in..." />}
+        && <ActivityModal message="Logging in..." />}
     </>
   );
 }

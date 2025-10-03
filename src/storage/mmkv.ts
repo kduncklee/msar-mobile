@@ -1,7 +1,7 @@
+import type { location } from '@/types/location';
+import { getData, removeData } from '@storage/storage';
 import * as SecureStore from 'expo-secure-store';
 import { MMKV, useMMKVBoolean, useMMKVNumber, useMMKVObject, useMMKVString } from 'react-native-mmkv';
-import { getData, removeData } from '@storage/storage';
-import type { location } from '@/types/location';
 
 const key_name = 'mmkv_encryption_key';
 const keychainOptions: SecureStore.SecureStoreOptions = {

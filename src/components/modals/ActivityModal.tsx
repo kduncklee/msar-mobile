@@ -1,6 +1,6 @@
+import colors from '@styles/colors';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import colors from '@styles/colors';
 
 interface ActivityModalProps {
   message?: string;
@@ -11,7 +11,7 @@ function ActivityModal({ message }: ActivityModalProps) {
     <View style={styles.container}>
       <ActivityIndicator size="large" color={colors.primaryText} style={styles.spinner} />
       {!!message
-      && <Text style={styles.messageText}>{message}</Text>}
+        && <Text style={styles.messageText}>{message}</Text>}
     </View>
   );
 }

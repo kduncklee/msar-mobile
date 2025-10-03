@@ -1,14 +1,14 @@
+import type { event } from '@/types/event';
+import type { patrol } from '@/types/patrol';
 import React, { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import ModalFade from '@/components/modals/common/ModalFade';
-import type { patrol } from '@/types/patrol';
-import type { event } from '@/types/event';
 import CalendarEvent from '@/components/calendar/CalendarEvent';
-import { elements } from '@/styles/elements';
 import CalendarPatrol from '@/components/calendar/CalendarPatrol';
-import { isUserSelf } from '@/types/user';
-import useAuth from '@/hooks/useAuth';
 import CalendarPatrolModal from '@/components/calendar/CalendarPatrolModal';
+import ModalFade from '@/components/modals/common/ModalFade';
+import useAuth from '@/hooks/useAuth';
+import { elements } from '@/styles/elements';
+import { isUserSelf } from '@/types/user';
 
 interface CalendarDayModalProps {
   dateID: string;

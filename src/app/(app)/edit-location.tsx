@@ -1,23 +1,23 @@
-import { useEffect, useRef, useState } from 'react';
-import { Alert, Image, Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import type { geocodeAddressResponse } from '@remote/responses';
+import type { LatLng, LongPressEvent, MapMarker, Region } from 'react-native-maps';
+import type { location } from '@/types/location';
 import Header from '@components/Header';
+import FormTextInput from '@components/inputs/FormTextInput';
+import ActivityModal from '@components/modals/ActivityModal';
+import LocationSelectionModal from '@components/modals/LocationSelectModal';
+import { geocodeAddress } from '@remote/google-maps';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
-import { router } from 'expo-router';
-import type { LatLng, LongPressEvent, MapMarker, Region } from 'react-native-maps';
-import MapView, { Marker } from 'react-native-maps';
-import { coordinateFromString } from '@utility/locationHeler';
-import FormTextInput from '@components/inputs/FormTextInput';
-import { geocodeAddress } from '@remote/google-maps';
-import ActivityModal from '@components/modals/ActivityModal';
-import type { geocodeAddressResponse } from '@remote/responses';
-import LocationSelectionModal from '@components/modals/LocationSelectModal';
 import { useForm, useStore } from '@tanstack/react-form';
-import type { location } from '@/types/location';
-import { locationToShortString, locationToString } from '@/types/location';
-import { useEditingLocation } from '@/storage/mmkv';
-import { handleBackPressed, useBackHandler } from '@/utility/backHandler';
+import { coordinateFromString } from '@utility/locationHeler';
+import { router } from 'expo-router';
+import { useEffect, useRef, useState } from 'react';
+import { Alert, Image, Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
 import useStatusBarColor from '@/hooks/useStatusBarColor';
+import { useEditingLocation } from '@/storage/mmkv';
+import { locationToShortString, locationToString } from '@/types/location';
+import { handleBackPressed, useBackHandler } from '@/utility/backHandler';
 
 function Page() {
   const markerRef = useRef<MapMarker>();
@@ -195,13 +195,13 @@ function Page() {
               region={defaultRegion}
             >
               {currentLocation && currentCoordinate
-              && (
-                <Marker
-                  ref={markerRef}
-                  coordinate={currentCoordinate}
-                  title={locationToShortString(currentLocation)}
-                />
-              )}
+                && (
+                  <Marker
+                    ref={markerRef}
+                    coordinate={currentCoordinate}
+                    title={locationToShortString(currentLocation)}
+                  />
+                )}
             </MapView>
             <View style={[elements.tray, { margin: 20, position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20, paddingTop: 0 }]}>
               <View style={styles.searchBar}>
@@ -218,37 +218,37 @@ function Page() {
                 </TouchableOpacity>
               </View>
               {!currentCoordinate
-              && (
-                <>
-                  <Text style={styles.selectInstructionText}>Long press on map to a drop pin</Text>
-                  <View style={[styles.selectButton, { backgroundColor: colors.grayText }]}>
-                    <Text style={[elements.buttonText]}>Select Location</Text>
-                  </View>
-                </>
-              )}
+                && (
+                  <>
+                    <Text style={styles.selectInstructionText}>Long press on map to a drop pin</Text>
+                    <View style={[styles.selectButton, { backgroundColor: colors.grayText }]}>
+                      <Text style={[elements.buttonText]}>Select Location</Text>
+                    </View>
+                  </>
+                )}
               {currentCoordinate
-              && (
-                <>
-                  <Text style={styles.coordinateText}>{`${currentCoordinate.latitude}, ${currentCoordinate.longitude}`}</Text>
-                  <TouchableOpacity activeOpacity={0.5} style={styles.selectButton} onPress={onLocationSelect}>
-                    <Text style={[elements.buttonText]}>Select Location</Text>
-                  </TouchableOpacity>
-                </>
-              )}
+                && (
+                  <>
+                    <Text style={styles.coordinateText}>{`${currentCoordinate.latitude}, ${currentCoordinate.longitude}`}</Text>
+                    <TouchableOpacity activeOpacity={0.5} style={styles.selectButton} onPress={onLocationSelect}>
+                      <Text style={[elements.buttonText]}>Select Location</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
             </View>
           </View>
         </SafeAreaView>
       </KeyboardAvoidingView>
       {showSpinner
-      && <ActivityModal message="Searching For Location..." />}
+        && <ActivityModal message="Searching For Location..." />}
       {showSearchResults
-      && (
-        <LocationSelectionModal
-          locations={searchResults}
-          onSelect={searchResultSelected}
-          onClose={onSearchResultClose}
-        />
-      )}
+        && (
+          <LocationSelectionModal
+            locations={searchResults}
+            onSelect={searchResultSelected}
+            onClose={onSearchResultClose}
+          />
+        )}
     </>
   );
 }

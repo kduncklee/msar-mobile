@@ -1,6 +1,7 @@
-import { useContext } from 'react';
-import { AuthContext, type AuthContextType } from '@/components/AuthProvider';
+import type { AuthContextType } from '@/components/AuthProvider';
+import { use } from 'react';
+import { AuthContext } from '@/components/AuthProvider';
 
 export default function useAuth(): AuthContextType {
-  return useContext(AuthContext);
+  return use(AuthContext);
 }

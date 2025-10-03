@@ -1,11 +1,11 @@
-import * as FileSystem from 'expo-file-system';
-import * as Application from 'expo-application';
-import { Platform } from 'react-native';
 import type { LabelValue } from '../utility/reactForm';
 import type { calloutGetLogResponse, loginResponse, tokenValidationResponse } from './responses';
-import { calloutFromResponse } from '@/types/callout';
 import type { callout } from '@/types/callout';
 import type { patrol } from '@/types/patrol';
+import * as Application from 'expo-application';
+import * as FileSystem from 'expo-file-system';
+import { Platform } from 'react-native';
+import { calloutFromResponse } from '@/types/callout';
 
 const scv_server: string = 'https://app.scvrescue.com';
 const countywide_server: string = 'https://countywide.app.malibusarhours.org';
@@ -267,19 +267,19 @@ export class Api {
 
   async apiUpdateCallout(id: number, callout: callout): Promise<any> {
     return this.#fetchJsonWithCredentials(
-    `${(this.#calloutsEndpoint()) + id}/`,
-    'PUT',
-    callout,
+      `${(this.#calloutsEndpoint()) + id}/`,
+      'PUT',
+      callout,
     );
   }
 
   async apiRespondToCallout(id: number, response: string): Promise<any> {
     return this.#fetchJsonWithCredentials(
-    `${(this.#calloutsEndpoint()) + id}/respond/`,
-    'POST',
-    {
-      response,
-    },
+      `${(this.#calloutsEndpoint()) + id}/respond/`,
+      'POST',
+      {
+        response,
+      },
     );
   }
 
@@ -329,17 +329,17 @@ export class Api {
   async apiUpdatePatrol(id: number, patrol: patrol): Promise<any> {
     const modified_patrol = { ...patrol, member: patrol.member?.id };
     return this.#fetchJsonWithCredentials(
-    `${(this.#patrolsEndpoint()) + id}/`,
-    'PUT',
-    modified_patrol,
+      `${(this.#patrolsEndpoint()) + id}/`,
+      'PUT',
+      modified_patrol,
     );
   }
 
   async apiRemovePatrol(id: number) {
     try {
       const data = await this.#fetchWithCredentials(
-      `${this.#patrolsEndpoint() + id}/`,
-      'DELETE',
+        `${this.#patrolsEndpoint() + id}/`,
+        'DELETE',
       );
       console.log(`removed patrol: ${JSON.stringify(data)}`);
     }
@@ -392,8 +392,8 @@ export class Api {
   async apiRemoveDeviceId(token: string) {
     try {
       const data = await this.#fetchWithCredentials(
-      `${this.#devicesEndpoint() + token}/`,
-      'DELETE',
+        `${this.#devicesEndpoint() + token}/`,
+        'DELETE',
       );
       console.log(`removed push token: ${JSON.stringify(data)}`);
     }
@@ -409,8 +409,8 @@ export class Api {
       return Promise.reject(new Error('No token'));
     try {
       const data = await this.#fetchJsonWithCredentials(
-      `${this.#devicesEndpoint() + token}/`,
-      'GET',
+        `${this.#devicesEndpoint() + token}/`,
+        'GET',
       );
       console.log(`get push token: ${JSON.stringify(data)}`);
       return data;

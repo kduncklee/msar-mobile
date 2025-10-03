@@ -1,7 +1,7 @@
-import React from 'react';
 import type { ImageRequireSource } from 'react-native';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { elements } from '@styles/elements';
+import React from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface SmallButtonProps {
   title?: string;
@@ -21,9 +21,9 @@ function SmallButton({ title, icon, backgroundColor, textColor, onPress }: Small
     <TouchableOpacity activeOpacity={0.5} onPress={onPress}>
       <View style={[styles.container, { backgroundColor, justifyContent: 'center' }]}>
         {!!icon
-        && <Image source={icon} style={[elements.buttonIcon]} />}
+          && <Image source={icon} style={[elements.buttonIcon]} />}
         {!!title
-        && <Text style={[elements.fieldText, { color: textColor, paddingVertical: 8, paddingLeft: titlePaddingLeft, paddingRight: 12, fontWeight: '400' }]}>{title}</Text>}
+          && <Text style={[elements.fieldText, { color: textColor, paddingVertical: 8, paddingLeft: titlePaddingLeft, paddingRight: 12, fontWeight: '400' }]}>{title}</Text>}
       </View>
     </TouchableOpacity>
 

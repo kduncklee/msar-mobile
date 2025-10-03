@@ -1,11 +1,11 @@
+import type { patrol } from '@/types/patrol';
 import { toDateId } from '@marceloterreiro/flash-calendar';
 import InformationField from '@/components/fields/InformationField';
 import InformationTray from '@/components/fields/InformationTray';
-import type { patrol } from '@/types/patrol';
-import { isUserSelf, userToString } from '@/types/user';
-import { getDateTimeRangeString } from '@/utility/dateHelper';
 import useAuth from '@/hooks/useAuth';
 import { textColorForBackground } from '@/styles/colors';
+import { isUserSelf, userToString } from '@/types/user';
+import { getDateTimeRangeString } from '@/utility/dateHelper';
 
 interface CalendarPatrolProps {
   patrol: patrol;

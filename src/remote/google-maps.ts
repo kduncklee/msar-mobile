@@ -1,6 +1,6 @@
-import { GoogleAPIKey } from '@utility/constants';
 import type { geocodeAddressResponse } from '@remote/responses';
 import type { location } from '@/types/location';
+import { GoogleAPIKey } from '@utility/constants';
 
 const geocodingEndpoint = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
 const keyParam = `&key=${GoogleAPIKey}`;

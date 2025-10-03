@@ -1,9 +1,9 @@
 import type { CalendarItemDayWithContainerProps } from '@marceloterreiro/flash-calendar';
-import { Calendar, useOptimizedDayMetadata } from '@marceloterreiro/flash-calendar';
-import { Pressable, StyleSheet, Text } from 'react-native';
-import { useCallback } from 'react';
-import type { patrol } from '@/types/patrol';
 import type { event } from '@/types/event';
+import type { patrol } from '@/types/patrol';
+import { Calendar, useOptimizedDayMetadata } from '@marceloterreiro/flash-calendar';
+import { useCallback } from 'react';
+import { Pressable, StyleSheet, Text } from 'react-native';
 import { CalendarItemDayContent } from '@/components/calendar/CalendarItemDayContent';
 
 interface CustomCalendarItemDayWithContainerProps extends CalendarItemDayWithContainerProps {

@@ -1,17 +1,17 @@
 import type { CalendarTheme } from '@marceloterreiro/flash-calendar';
+import type { event } from '@/types/event';
+import type { patrol } from '@/types/patrol';
 import { toDateId } from '@marceloterreiro/flash-calendar';
+import { add, endOfMonth, startOfMonth, sub } from 'date-fns';
 import { useCallback, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
-import { add, endOfMonth, startOfMonth, sub } from 'date-fns';
-import Header from '@/components/Header';
-import colors from '@/styles/colors';
-import { CustomCalendar } from '@/components/calendar/CustomCalendar';
-import { useEventListQuery, usePatrolListQuery } from '@/remote/query';
 import CalendarDayModal from '@/components/calendar/CalendarDayModal';
-import type { patrol } from '@/types/patrol';
-import type { event } from '@/types/event';
-import { compareUsername } from '@/types/user';
 import CalendarFooter from '@/components/calendar/CalendarFooter';
+import { CustomCalendar } from '@/components/calendar/CustomCalendar';
+import Header from '@/components/Header';
+import { useEventListQuery, usePatrolListQuery } from '@/remote/query';
+import colors from '@/styles/colors';
+import { compareUsername } from '@/types/user';
 
 const linearAccent = '#585ABF';
 const calendarFontSize = 20;
@@ -86,7 +86,8 @@ const linearTheme: CalendarTheme = {
 
 function Page() {
   const [selectedDate, setSelectedDate] = useState<string>(null);
-  const [currentCalendarMonth, setCurrentCalendarMonth] = useState(new Date());
+
+  const [currentCalendarMonth, setCurrentCalendarMonth] = useState(() => new Date());
   const startDate = startOfMonth(currentCalendarMonth);
   const endDate = endOfMonth(currentCalendarMonth);
 

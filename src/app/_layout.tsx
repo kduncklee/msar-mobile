@@ -1,11 +1,11 @@
 /* eslint-disable react-refresh/only-export-components */
 import * as Sentry from '@sentry/react-native';
-import { RootSiblingParent } from 'react-native-root-siblings';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { Slot, useNavigationContainerRef } from 'expo-router';
 import { SentryDsn } from '@utility/constants';
 import { usePushNotificationsOuter } from '@utility/pushNotifications';
+import { Slot, useNavigationContainerRef } from 'expo-router';
 import { useEffect } from 'react';
+import { RootSiblingParent } from 'react-native-root-siblings';
 import { queryClient, useReactQueryAppStateRefresh } from 'utility/reactQuery';
 import { AuthProvider } from '@/components/AuthProvider';
 

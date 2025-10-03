@@ -1,13 +1,13 @@
-import { useEffect } from 'react';
-import { FlatList } from 'react-native';
-import LogResponseField from '@components/fields/log/LogResponseField';
+import type { logEntry } from '@/types/logEntry';
 import LogMessageField from '@components/fields/log/LogMessageField';
+import LogResponseField from '@components/fields/log/LogResponseField';
 import LogSystemField from '@components/fields/log/LogUpdateField';
 import TextAreaField from '@components/fields/TextAreaField';
+import { useEffect } from 'react';
+import { FlatList } from 'react-native';
 import { storeLastRead } from 'storage/mmkv';
-import { logEntriesFromInfiniteQueryData } from '@/types/logEntry';
-import type { logEntry } from '@/types/logEntry';
 import { logType } from '@/types/enums';
+import { logEntriesFromInfiniteQueryData } from '@/types/logEntry';
 
 interface CalloutLogTabProps {
   id: number;

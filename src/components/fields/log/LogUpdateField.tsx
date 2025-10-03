@@ -1,9 +1,9 @@
+import type { user } from '@/types/user';
+import colors from '@styles/colors';
+import { elements } from '@styles/elements';
+import { getConditionalTimeString } from '@utility/dateHelper';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { elements } from '@styles/elements';
-import colors from '@styles/colors';
-import { getConditionalTimeString } from '@utility/dateHelper';
-import type { user } from '@/types/user';
 import { userToString } from '@/types/user';
 
 interface LogSystemFieldProps {

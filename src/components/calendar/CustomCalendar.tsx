@@ -1,15 +1,15 @@
 import type { CalendarProps } from '@marceloterreiro/flash-calendar';
+import type { event } from '@/types/event';
+import type { patrol } from '@/types/patrol';
 import {
   Calendar,
   useCalendar,
 } from '@marceloterreiro/flash-calendar';
-import { memo } from 'react';
 import { uppercaseFirstLetter } from '@marceloterreiro/flash-calendar/src/helpers/strings';
+import { memo } from 'react';
 import { Text } from 'react-native';
-import { CustomCalendarItemDay } from './CustomCalendarItemDay';
-import type { patrol } from '@/types/patrol';
-import type { event } from '@/types/event';
 import { CustomCalendarButton } from '@/components/calendar/CustomCalendarButton';
+import { CustomCalendarItemDay } from './CustomCalendarItemDay';
 
 interface CustomCalendarProps extends CalendarProps {
   events: Map<string, event[]>;

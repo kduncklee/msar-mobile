@@ -1,8 +1,8 @@
+import * as Sentry from '@sentry/react-native';
+import { usePushNotificationsInner } from '@utility/pushNotifications';
 import { Redirect, Stack } from 'expo-router';
 import { useEffect } from 'react';
-import * as Sentry from '@sentry/react-native';
 import { migrateSharedStorage } from 'storage/mmkv';
-import { usePushNotificationsInner } from '@utility/pushNotifications';
 import useAuth from '@/hooks/useAuth';
 
 export default function AppLayout() {

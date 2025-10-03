@@ -1,6 +1,6 @@
+import colors from '@styles/colors';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import colors from '@styles/colors';
 
 interface TextAreaFieldProps {
   title?: string;
@@ -14,7 +14,7 @@ function TextAreaField({ title, value, valueColor }: TextAreaFieldProps) {
   return (
     <View style={styles.container}>
       {!!title
-      && <Text style={styles.titleText}>{title}</Text>}
+        && <Text style={styles.titleText}>{title}</Text>}
       <View style={styles.valueContainer}>
         <Text
           style={[styles.valueText, { color: textColor }]}

@@ -1,18 +1,18 @@
-import { View } from 'react-native';
-import InformationTray from '@components/fields/InformationTray';
+import type { callout } from '@/types/callout';
 import InformationField from '@components/fields/InformationField';
-import TextAreaField from '@components/fields/TextAreaField';
+import InformationTray from '@components/fields/InformationTray';
 import LocationField from '@components/fields/LocationField';
+import TextAreaField from '@components/fields/TextAreaField';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
 import { getFullDateTimeString } from '@utility/dateHelper';
 import { router } from 'expo-router';
-import type { callout } from '@/types/callout';
+import { View } from 'react-native';
+import InformationPhoneField from '@/components/fields/InformationPhoneField';
+import { useCalloutResponsesAvailableMap } from '@/remote/query';
 import { colorForResponseType, textForCalloutStatus } from '@/types/calloutSummary';
 import { calloutStatus } from '@/types/enums';
 import { locationIsSet } from '@/types/location';
-import InformationPhoneField from '@/components/fields/InformationPhoneField';
-import { useCalloutResponsesAvailableMap } from '@/remote/query';
 
 interface CalloutInformationTabProps {
   callout: callout;
@@ -37,14 +37,14 @@ function CalloutInformationTab({ callout }: CalloutInformationTabProps) {
       >
         <View style={{ marginTop: 8 }} />
         {!!callout.title
-        && <TextAreaField value={callout.title} valueColor={colors.secondaryYellow} />}
+          && <TextAreaField value={callout.title} valueColor={colors.secondaryYellow} />}
         {!!callout.created_at
-        && (
-          <InformationField
-            title="Time of Dispatch"
-            value={getFullDateTimeString(callout.created_at)}
-          />
-        )}
+          && (
+            <InformationField
+              title="Time of Dispatch"
+              value={getFullDateTimeString(callout.created_at)}
+            />
+          )}
         <View style={elements.informationDiv} />
         <InformationField
           title="Type"
@@ -52,63 +52,63 @@ function CalloutInformationTab({ callout }: CalloutInformationTabProps) {
         />
         <View style={elements.informationDiv} />
         {!!callout.subject
-        && (
-          <InformationField
-            title="Subject"
-            value={callout.subject}
-          />
-        )}
+          && (
+            <InformationField
+              title="Subject"
+              value={callout.subject}
+            />
+          )}
         {!!callout.subject_contact
-        && (
-          <InformationPhoneField
-            value={callout.subject_contact}
-          />
-        )}
+          && (
+            <InformationPhoneField
+              value={callout.subject_contact}
+            />
+          )}
         {(!!callout.subject || !!callout.subject_contact)
-        && <View style={elements.informationDiv} />}
+          && <View style={elements.informationDiv} />}
         {!!callout.informant
-        && (
-          <InformationField
-            title="Informant"
-            value={callout.informant}
-          />
-        )}
+          && (
+            <InformationField
+              title="Informant"
+              value={callout.informant}
+            />
+          )}
         {!!callout.informant_contact
-        && (
-          <InformationPhoneField
-            value={callout.informant_contact}
-          />
-        )}
+          && (
+            <InformationPhoneField
+              value={callout.informant_contact}
+            />
+          )}
         {(!!callout.informant || !!callout.informant_contact)
-        && <View style={elements.informationDiv} />}
+          && <View style={elements.informationDiv} />}
         {!!callout.radio_channel
-        && (
-          <InformationField
-            title="Tactical Talkgroup"
-            value={callout.radio_channel}
-          />
-        )}
+          && (
+            <InformationField
+              title="Tactical Talkgroup"
+              value={callout.radio_channel}
+            />
+          )}
         {!!callout.additional_radio_channels?.length
-        && (
-          <InformationField
-            title="Other Radio Channels"
-            value={callout.additional_radio_channels.join(', ')}
-          />
-        )}
+          && (
+            <InformationField
+              title="Other Radio Channels"
+              value={callout.additional_radio_channels.join(', ')}
+            />
+          )}
         {!!callout.notifications_made?.length
-        && (
-          <InformationField
-            title="Notifications Made"
-            value={callout.notifications_made.join(', ')}
-          />
-        )}
+          && (
+            <InformationField
+              title="Notifications Made"
+              value={callout.notifications_made.join(', ')}
+            />
+          )}
         {!!callout.handling_unit
-        && (
-          <InformationField
-            title="Handling Unit / Tag #"
-            value={callout.handling_unit}
-          />
-        )}
+          && (
+            <InformationField
+              title="Handling Unit / Tag #"
+              value={callout.handling_unit}
+            />
+          )}
         {!!callout.description && (
           <>
             <View style={elements.informationDiv} />
@@ -132,16 +132,16 @@ function CalloutInformationTab({ callout }: CalloutInformationTabProps) {
         <View style={{ height: 10 }} />
       </InformationTray>
       {(locationIsSet(callout.location) || callout.location?.text)
-      && (
-        <InformationTray
-          title="Location"
-          titleBarColor={colors.blue}
-          editButton={showEdit}
-          onEditPress={editDetailsPressed}
-        >
-          <LocationField location={callout.location} />
-        </InformationTray>
-      )}
+        && (
+          <InformationTray
+            title="Location"
+            titleBarColor={colors.blue}
+            editButton={showEdit}
+            onEditPress={editDetailsPressed}
+          >
+            <LocationField location={callout.location} />
+          </InformationTray>
+        )}
       <InformationTray
         title="Additional Information"
         titleBarColor={colors.secondaryYellow}
@@ -156,24 +156,24 @@ function CalloutInformationTab({ callout }: CalloutInformationTabProps) {
         />
         <View style={elements.informationDiv} />
         {!!callout.my_response
-        && (
-          <>
-            <InformationField
-              title="My Response"
-              value={callout.my_response}
-              valueColor={colorForResponseType(callout.my_response, calloutResponseMap)}
-            />
+          && (
+            <>
+              <InformationField
+                title="My Response"
+                value={callout.my_response}
+                valueColor={colorForResponseType(callout.my_response, calloutResponseMap)}
+              />
 
-            <View style={elements.informationDiv} />
-          </>
-        )}
+              <View style={elements.informationDiv} />
+            </>
+          )}
         {!!callout.created_by
-        && (
-          <InformationField
-            title="Callout Created by"
-            value={callout.created_by.full_name}
-          />
-        )}
+          && (
+            <InformationField
+              title="Callout Created by"
+              value={callout.created_by.full_name}
+            />
+          )}
         <View style={{ height: 10 }} />
       </InformationTray>
 

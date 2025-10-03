@@ -1,13 +1,13 @@
+import type { callout } from '@/types/callout';
+import type { patrol } from '@/types/patrol';
+import * as Sentry from '@sentry/react-native';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Toast from 'react-native-root-toast';
-import * as Sentry from '@sentry/react-native';
 import useAuth from '@/hooks/useAuth';
+import { invalidatePatrolListQuery } from '@/remote/query';
 import { logStatusType, logType } from '@/types/enums';
 import { logEntryFromRespsonse } from '@/types/logEntry';
 import { messageSuccessNotification } from '@/utility/pushNotifications';
-import type { callout } from '@/types/callout';
-import type { patrol } from '@/types/patrol';
-import { invalidatePatrolListQuery } from '@/remote/query';
 
 //////////////////////////////////////////////////////////////////////////////
 // React Query Mutations

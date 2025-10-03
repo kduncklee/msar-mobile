@@ -1,7 +1,7 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { elements } from '@styles/elements';
-import colors, { textColorForBackground } from '@styles/colors';
 import type { user_detail } from '@/types/user';
+import colors, { textColorForBackground } from '@styles/colors';
+import { elements } from '@styles/elements';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { makePhoneCall } from '@/utility/phone';
 
 interface UserCellProps {

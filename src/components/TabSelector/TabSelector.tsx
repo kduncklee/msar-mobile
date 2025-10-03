@@ -1,8 +1,8 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useState } from 'react';
+import type { tabItem } from '@/types/tabItem';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
-import type { tabItem } from '@/types/tabItem';
+import { useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface TabSelectorProps {
   tabs: tabItem[];
@@ -47,11 +47,11 @@ function TabSelector({ tabs, selected, onTabChange }: TabSelectorProps) {
             >
               <Text style={[styles.buttonLabel, { color: textColor }]}>{tab.title}</Text>
               {!!tab.badge
-              && (
-                <View style={[elements.tabBadge, { backgroundColor: badgeColor }]}>
-                  <Text style={[elements.tabBadgeText, { color: badgeTextColor }]} testID={`${tab.title}-badge`}>{tab.badge}</Text>
-                </View>
-              )}
+                && (
+                  <View style={[elements.tabBadge, { backgroundColor: badgeColor }]}>
+                    <Text style={[elements.tabBadgeText, { color: badgeTextColor }]} testID={`${tab.title}-badge`}>{tab.badge}</Text>
+                  </View>
+                )}
             </TouchableOpacity>
           );
         })

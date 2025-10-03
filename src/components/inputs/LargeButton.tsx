@@ -1,6 +1,6 @@
+import { elements } from '@styles/elements';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { elements } from '@styles/elements';
 
 interface LargeButtonProps {
   title: string;

@@ -1,19 +1,19 @@
+import type { calloutSummary } from '@/types/calloutSummary';
+import type { tabItem } from '@/types/tabItem';
+import CalloutCell from '@components/callouts/CalloutCell';
+import Header from '@components/Header';
+import ActivityModal from '@components/modals/ActivityModal';
+import TabSelector from '@components/TabSelector/TabSelector';
+import colors from '@styles/colors';
+import { elements } from '@styles/elements';
+import { useQueryClient } from '@tanstack/react-query';
+import msarEventEmitter from '@utility/msarEventEmitter';
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useQueryClient } from '@tanstack/react-query';
-import Header from '@components/Header';
-import CalloutCell from '@components/callouts/CalloutCell';
-import colors from '@styles/colors';
-import TabSelector from '@components/TabSelector/TabSelector';
-import { elements } from '@styles/elements';
-import { router } from 'expo-router';
-import ActivityModal from '@components/modals/ActivityModal';
-import msarEventEmitter from '@utility/msarEventEmitter';
-import { useCalloutListQuery } from '@/remote/query';
-import type { tabItem } from '@/types/tabItem';
-import { activeTabStatusQuery, archivedTabStatusQuery } from '@/types/calloutSummary';
-import type { calloutSummary } from '@/types/calloutSummary';
 import useStatusBarColor from '@/hooks/useStatusBarColor';
+import { useCalloutListQuery } from '@/remote/query';
+import { activeTabStatusQuery, archivedTabStatusQuery } from '@/types/calloutSummary';
 
 function Page() {
   const [showSpinner, _setShowSpinner] = useState(false);
@@ -113,7 +113,7 @@ function Page() {
         </View>
       </SafeAreaView>
       {showSpinner
-      && <ActivityModal message="Loading Callouts..." />}
+        && <ActivityModal message="Loading Callouts..." />}
     </>
   );
 }

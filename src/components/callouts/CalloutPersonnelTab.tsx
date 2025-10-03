@@ -1,11 +1,11 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import type { callout } from '@/types/callout';
+import type { opResponse } from '@/types/operationalPeriod';
 import InformationTray from '@components/fields/InformationTray';
 import PersonnelField from '@components/fields/PersonnelField';
 import colors, { textColorForBackground } from '@styles/colors';
 import { elements } from '@styles/elements';
-import type { opResponse } from '@/types/operationalPeriod';
-import type { callout } from '@/types/callout';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { useCalloutResponsesAvailableQuery } from '@/remote/query';
 
 interface CalloutPersonnelTabProps {
@@ -46,7 +46,7 @@ function CalloutPersonnelTab({ callout }: CalloutPersonnelTabProps) {
   return (
     <>
       {empty
-      && <Text style={[elements.mediumText, styles.noResponses]}>No Responses</Text>}
+        && <Text style={[elements.mediumText, styles.noResponses]}>No Responses</Text>}
       {responseMap.map((responseType) => {
         if (responseType.responses.length === 0)
           return null;
@@ -67,7 +67,7 @@ function CalloutPersonnelTab({ callout }: CalloutPersonnelTabProps) {
                   <React.Fragment key={opResponse.member.id}>
                     <PersonnelField key={opResponse.member.id} opResponse={opResponse} />
                     {addDiv
-                    && <View style={elements.informationDiv} />}
+                      && <View style={elements.informationDiv} />}
                   </React.Fragment>
                 );
               })

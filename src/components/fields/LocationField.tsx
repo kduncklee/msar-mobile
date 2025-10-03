@@ -1,15 +1,15 @@
-import React from 'react';
-import { Linking, Platform, StyleSheet, Text, View } from 'react-native';
-import { elements } from '@styles/elements';
-import colors from '@styles/colors';
 import type { LatLng, Region } from 'react-native-maps';
-import MapView, { Marker } from 'react-native-maps';
+import type { location } from '@/types/location';
+import colors from '@styles/colors';
+import { elements } from '@styles/elements';
 import { coordinateFromString } from '@utility/locationHeler';
 import * as Clipboard from 'expo-clipboard';
-import SmallButton from '../inputs/SmallButton';
-import { locationCoordinatesToString, locationToShortString, locationToString } from '@/types/location';
-import type { location } from '@/types/location';
+import React from 'react';
+import { Linking, Platform, StyleSheet, Text, View } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
 import { locationType } from '@/types/enums';
+import { locationCoordinatesToString, locationToShortString, locationToString } from '@/types/location';
+import SmallButton from '../inputs/SmallButton';
 
 interface LocationFieldProps {
   location: location;
@@ -59,56 +59,56 @@ function LocationField({ location }: LocationFieldProps) {
   return (
     <View style={styles.container}>
       {locType === locationType.DESCRIPTION
-      && <Text style={[elements.mediumText, { padding: 8 }]}>{location.text}</Text>}
+        && <Text style={[elements.mediumText, { padding: 8 }]}>{location.text}</Text>}
 
       {(locType === locationType.COORDINATES || locType === locationType.ADDRESS)
-      && (
-        <>
-          <MapView style={styles.mapContainer} region={defaultRegion}>
-            {coordinates
-            && (
-              <Marker
-                coordinate={coordinates}
-                title={(locType === locationType.ADDRESS)
-                  ? locationToShortString(location)
-                  : 'Location'}
+        && (
+          <>
+            <MapView style={styles.mapContainer} region={defaultRegion}>
+              {coordinates
+                && (
+                  <Marker
+                    coordinate={coordinates}
+                    title={(locType === locationType.ADDRESS)
+                      ? locationToShortString(location)
+                      : 'Location'}
+                  />
+                )}
+            </MapView>
+            <Text style={[elements.smallText, { margin: 16 }]} selectable>
+              {locationToString(location)}
+            </Text>
+            {(locType === locationType.ADDRESS) && coordinates.latitude
+              && (
+                <Text style={[elements.smallText, { marginHorizontal: 16, marginBottom: 16 }]} selectable>
+                  {locationCoordinatesToString(location)}
+                </Text>
+              )}
+            {location.text
+              && (
+                <Text style={[elements.smallText, { marginHorizontal: 16, marginBottom: 16 }]} selectable>
+                  {location.text}
+                </Text>
+              )}
+            <View style={styles.buttonTray}>
+              <SmallButton
+                title="Open Map"
+                icon={require('@assets/icons/navigation.png')}
+                backgroundColor={colors.blue}
+                textColor={colors.primaryText}
+                onPress={() => openMapPressed()}
               />
-            )}
-          </MapView>
-          <Text style={[elements.smallText, { margin: 16 }]} selectable>
-            {locationToString(location)}
-          </Text>
-          {(locType === locationType.ADDRESS) && coordinates.latitude
-          && (
-            <Text style={[elements.smallText, { marginHorizontal: 16, marginBottom: 16 }]} selectable>
-              {locationCoordinatesToString(location)}
-            </Text>
-          )}
-          {location.text
-          && (
-            <Text style={[elements.smallText, { marginHorizontal: 16, marginBottom: 16 }]} selectable>
-              {location.text}
-            </Text>
-          )}
-          <View style={styles.buttonTray}>
-            <SmallButton
-              title="Open Map"
-              icon={require('@assets/icons/navigation.png')}
-              backgroundColor={colors.blue}
-              textColor={colors.primaryText}
-              onPress={() => openMapPressed()}
-            />
-            <View style={{ width: 12 }} />
-            <SmallButton
-              title="Copy"
-              icon={require('@assets/icons/copy.png')}
-              backgroundColor={colors.darkBlue}
-              textColor={colors.primaryText}
-              onPress={() => copyPressed()}
-            />
-          </View>
-        </>
-      )}
+              <View style={{ width: 12 }} />
+              <SmallButton
+                title="Copy"
+                icon={require('@assets/icons/copy.png')}
+                backgroundColor={colors.darkBlue}
+                textColor={colors.primaryText}
+                onPress={() => copyPressed()}
+              />
+            </View>
+          </>
+        )}
     </View>
   );
 }

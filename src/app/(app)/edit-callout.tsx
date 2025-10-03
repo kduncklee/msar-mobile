@@ -1,29 +1,29 @@
+import type { callout } from '@/types/callout';
+import type { location } from '@/types/location';
+import type { LabelValue } from '@/utility/reactForm';
+import Header from '@components/Header';
+import FormCheckbox from '@components/inputs/FormCheckbox';
+import FormTextArea from '@components/inputs/FormTextArea';
+import FormTextInput from '@components/inputs/FormTextInput';
+import ActivityModal from '@components/modals/ActivityModal';
+import * as Sentry from '@sentry/react-native';
+import colors from '@styles/colors';
+import { elements } from '@styles/elements';
+import { useForm, useStore } from '@tanstack/react-form';
+import msarEventEmitter from '@utility/msarEventEmitter';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-root-toast';
-import * as Sentry from '@sentry/react-native';
-import Header from '@components/Header';
-import colors from '@styles/colors';
-import { elements } from '@styles/elements';
-import { router, useLocalSearchParams } from 'expo-router';
-import FormTextInput from '@components/inputs/FormTextInput';
-import FormTextArea from '@components/inputs/FormTextArea';
-import FormCheckbox from '@components/inputs/FormCheckbox';
-import ActivityModal from '@components/modals/ActivityModal';
-import msarEventEmitter from '@utility/msarEventEmitter';
-import { useForm, useStore } from '@tanstack/react-form';
-import { useCalloutQuery, useNotificationsAvailableQuery, useOperationTypesAvailableQuery, useRadioChannelsAvailableQuery } from '@/remote/query';
-import type { callout } from '@/types/callout';
-import type { location } from '@/types/location';
-import { locationToString } from '@/types/location';
-import { calloutStatus } from '@/types/enums';
-import { useEditingLocation } from '@/storage/mmkv';
-import { handleBackPressed, useBackHandler } from '@/utility/backHandler';
-import { useCalloutCreateMutation, useCalloutUpdateMutation } from '@/remote/mutation';
-import useStatusBarColor from '@/hooks/useStatusBarColor';
-import FormDropdownSelector from '@/components/inputs/FormDropdownSelector';
 import FormDropdownMultiselect from '@/components/inputs/FormDropdownMultiselect';
-import type { LabelValue } from '@/utility/reactForm';
+import FormDropdownSelector from '@/components/inputs/FormDropdownSelector';
+import useStatusBarColor from '@/hooks/useStatusBarColor';
+import { useCalloutCreateMutation, useCalloutUpdateMutation } from '@/remote/mutation';
+import { useCalloutQuery, useNotificationsAvailableQuery, useOperationTypesAvailableQuery, useRadioChannelsAvailableQuery } from '@/remote/query';
+import { useEditingLocation } from '@/storage/mmkv';
+import { calloutStatus } from '@/types/enums';
+import { locationToString } from '@/types/location';
+import { handleBackPressed, useBackHandler } from '@/utility/backHandler';
 import { labelValueItem } from '@/utility/reactForm';
 
 function Page() {
@@ -403,22 +403,22 @@ function Page() {
               title="10-22"
             />
             {ten22
-            && (
-              <FormTextArea
-                form={form}
-                name="resolutionNotes"
-                height={100}
-                placeholder="Resolution Notes"
-              />
-            )}
+              && (
+                <FormTextArea
+                  form={form}
+                  name="resolutionNotes"
+                  height={100}
+                  placeholder="Resolution Notes"
+                />
+              )}
             {ten22
-            && (
-              <FormCheckbox
-                form={form}
-                name="archived"
-                title="Archive"
-              />
-            )}
+              && (
+                <FormCheckbox
+                  form={form}
+                  name="archived"
+                  title="Archive"
+                />
+              )}
             <TouchableOpacity
               activeOpacity={0.8}
               style={[elements.capsuleButton, styles.submitCalloutButton]}
@@ -431,7 +431,7 @@ function Page() {
         </KeyboardAvoidingView>
       </SafeAreaView>
       {showSpinner
-      && <ActivityModal message={spinnerMessage} />}
+        && <ActivityModal message={spinnerMessage} />}
     </>
   );
 }

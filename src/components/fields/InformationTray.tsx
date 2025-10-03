@@ -1,7 +1,7 @@
+import colors from '@styles/colors';
+import { elements } from '@styles/elements';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { elements } from '@styles/elements';
-import colors from '@styles/colors';
 
 interface InformationTrayProps {
   title: string;
@@ -23,13 +23,13 @@ function InformationTray({ title, titleBarColor, titleTextColor, editButton, onE
           {title}
         </Text>
         {(onEditPress && editButton)
-        && (
-          <TouchableOpacity activeOpacity={0.5} style={styles.editButton} onPress={onEditPress}>
-            <Image source={require('@assets/icons/pencil.png')} style={styles.editImage} />
-          </TouchableOpacity>
-        )}
+          && (
+            <TouchableOpacity activeOpacity={0.5} style={styles.editButton} onPress={onEditPress}>
+              <Image source={require('@assets/icons/pencil.png')} style={styles.editImage} />
+            </TouchableOpacity>
+          )}
         {count
-        && <Text style={{ color: titleColor, fontSize: 16, fontWeight: '500', marginRight: 8 }}>{count}</Text>}
+          && <Text style={{ color: titleColor, fontSize: 16, fontWeight: '500', marginRight: 8 }}>{count}</Text>}
       </View>
       {children}
     </View>

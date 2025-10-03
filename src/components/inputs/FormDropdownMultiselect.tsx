@@ -1,6 +1,6 @@
 import type { ReactFormApi } from '@tanstack/react-form';
-import type { DeepKeyValueName, LabelValue } from '@/utility/reactForm';
 import type { DropdownMultiselectCommonProps } from '@/components/inputs/DropdownMultiselect';
+import type { DeepKeyValueName, LabelValue } from '@/utility/reactForm';
 import DropdownMultiselect from '@/components/inputs/DropdownMultiselect';
 
 interface FormDropdownMultiselectProps<
@@ -23,7 +23,7 @@ function FormDropdownSelector<
     <form.Field<any, any, any>
       name={name}
       mode="array"
-      // eslint-disable-next-line react/no-children-prop
+
       children={(field) => {
         return (
           <DropdownMultiselect

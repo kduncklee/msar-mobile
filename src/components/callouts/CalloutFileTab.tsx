@@ -1,12 +1,12 @@
-import React from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import * as DocumentPicker from 'expo-document-picker';
-import * as ImagePicker from 'expo-image-picker';
+import type { Api } from 'remote/api';
+import type { callout } from '@/types/callout';
 import FileField from '@components/fields/FileField';
 import { elements } from '@styles/elements';
-import type { Api } from 'remote/api';
+import * as DocumentPicker from 'expo-document-picker';
+import * as ImagePicker from 'expo-image-picker';
+import React from 'react';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import msarEventEmitter from 'utility/msarEventEmitter';
-import type { callout } from '@/types/callout';
 import useAuth from '@/hooks/useAuth';
 
 async function uploadFile(api: Api, file: object, id: number) {

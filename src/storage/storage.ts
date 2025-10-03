@@ -4,7 +4,7 @@ async function storeData(key: string, value: string) {
   try {
     await AsyncStorage.setItem(key, value);
   }
-  catch (e) {
+  catch {
     // saving error
     console.log(`error storing to: ${key}`);
   }
@@ -15,7 +15,7 @@ export async function getData(key: string) {
     const value = await AsyncStorage.getItem(key);
     return value;
   }
-  catch (e) {
+  catch {
     // error reading value
     console.log(`error retrieving value: ${key}`);
     return null;
@@ -26,7 +26,7 @@ export async function removeData(key: string) {
   try {
     await AsyncStorage.removeItem(key);
   }
-  catch (e) {
+  catch {
     // remove error
     console.log(`Problem removing key: ${key}`);
   }
