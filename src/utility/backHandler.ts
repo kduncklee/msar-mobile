@@ -35,9 +35,12 @@ export function handleBackPressed(pendingChanges: boolean): boolean {
 
 export function useBackHandler(pendingChanges: boolean) {
   useEffect(() => {
+    const handleBackPressedPendingChanges = () => handleBackPressed(pendingChanges);
+
+    // eslint-disable-next-line react-web-api/no-leaked-event-listener
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
-      () => handleBackPressed(pendingChanges),
+      handleBackPressedPendingChanges,
     );
     return () => backHandler.remove();
   }, [pendingChanges]);

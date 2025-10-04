@@ -397,6 +397,7 @@ export function usePushNotificationsOuter() {
       = notifee.onForegroundEvent(notifeeOnEvent);
     notifee.onBackgroundEvent(notifeeOnEvent);
 
+    // eslint-disable-next-line react-web-api/no-leaked-event-listener
     const appStateSubscription = AppState.addEventListener('change', onAppStateChange);
 
     if (Platform.OS === 'android') {

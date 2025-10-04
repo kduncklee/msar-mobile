@@ -34,15 +34,14 @@ function ModalAnimation({
   const safeAreaInsets = useSafeAreaInsets();
 
   useEffect(() => {
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      () => {
-        if (modalVisible) {
-          onCancel();
-        }
-        return modalVisible;
-      },
-    );
+    const backHandlerFunction = () => {
+      if (modalVisible) {
+        onCancel();
+      }
+      return modalVisible;
+    };
+    // eslint-disable-next-line react-web-api/no-leaked-event-listener
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backHandlerFunction);
     return () => backHandler.remove();
   }, [modalVisible, onCancel]);
 

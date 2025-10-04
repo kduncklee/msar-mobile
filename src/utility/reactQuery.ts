@@ -48,6 +48,7 @@ function onAppStateChange(status: AppStateStatus) {
 
 export function useReactQueryAppStateRefresh() {
   useEffect(() => {
+    // eslint-disable-next-line react-web-api/no-leaked-event-listener
     const subscription = AppState.addEventListener('change', onAppStateChange);
     return () => subscription.remove();
   }, []);

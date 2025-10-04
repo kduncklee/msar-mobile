@@ -32,6 +32,7 @@ function Header({ title, zeroTopMargin, background, backButton = false, onBackPr
 
   useFocusEffect(() => {
     // console.log('added back handler: ' + pathname)
+    // eslint-disable-next-line react-web-api/no-leaked-event-listener
     const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackButton);
     return () => backHandler.remove();
   });
