@@ -1,12 +1,10 @@
 import type { patrol } from '@/types/patrol';
 import { fromDateId } from '@marceloterreiro/flash-calendar';
-import { useForm, useStore } from '@tanstack/react-form';
+import { useStore } from '@tanstack/react-form';
 import React from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import FormCheckbox from '@/components/inputs/FormCheckbox';
-import FormDateTimePicker from '@/components/inputs/FormDateTimePicker';
-import FormTextInput from '@/components/inputs/FormTextInput';
 import ModalFade from '@/components/modals/common/ModalFade';
+import { useAppForm } from '@/hooks/form';
 import { usePatrolCreateMutation, usePatrolRemoveMutation, usePatrolUpdateMutation } from '@/remote/mutation';
 import { elements } from '@/styles/elements';
 
@@ -23,7 +21,7 @@ function CalendarPatrolModal({ dateID, patrol, onCancel }: CalendarPatrolModalPr
 
   console.log('CalendarPatrolModal', dateID, patrol);
 
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
       id: patrol?.id,
       all_day: !patrol?.finish_at,
@@ -90,36 +88,48 @@ function CalendarPatrolModal({ dateID, patrol, onCancel }: CalendarPatrolModalPr
     >
       <ScrollView style={styles.dataContainer}>
 
-        <FormCheckbox
-          form={form}
+        <form.AppField
           name="all_day"
-          title="Default time period"
+          children={field => (
+            <field.FormCheckbox
+              title="Default time period"
+            />
+          )}
         />
 
         {!all_day && (
           <>
-            <FormDateTimePicker
-              form={form}
+            <form.AppField
               name="start_at"
-              title="Start At"
-              dateId={dateID}
-              mode="time"
+              children={field => (
+                <field.FormDateTimePicker
+                  title="Start At"
+                  dateId={dateID}
+                  mode="time"
+                />
+              )}
             />
-            <FormDateTimePicker
-              form={form}
+            <form.AppField
               name="finish_at"
-              title="Finish At"
-              dateId={dateID}
-              mode="time"
+              children={field => (
+                <field.FormDateTimePicker
+                  title="Finish At"
+                  dateId={dateID}
+                  mode="time"
+                />
+              )}
             />
           </>
         )}
 
-        <FormTextInput
-          form={form}
+        <form.AppField
           name="description"
-          title="Comment"
-          placeholder="Optional: extra information about the patrol"
+          children={field => (
+            <field.FormTextInput
+              title="Comment"
+              placeholder="Optional: extra information about the patrol"
+            />
+          )}
         />
 
       </ScrollView>

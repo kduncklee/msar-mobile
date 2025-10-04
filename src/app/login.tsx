@@ -1,15 +1,13 @@
-import FormTextInput from '@components/inputs/FormTextInput';
 import SmallButton from '@components/inputs/SmallButton';
 import ActivityModal from '@components/modals/ActivityModal';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
-import { useForm, useStore } from '@tanstack/react-form';
-import { zodValidator } from '@tanstack/zod-form-adapter';
+import { useStore } from '@tanstack/react-form';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Alert, Image, Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, View } from 'react-native';
 import { z } from 'zod';
-import FormDropdownSelector from '@/components/inputs/FormDropdownSelector';
+import { useAppForm } from '@/hooks/form';
 import useAuth from '@/hooks/useAuth';
 import { logo_for_server, server_choices } from '@/remote/api';
 
@@ -29,17 +27,16 @@ function Page() {
       server: z.literal(''),
       custom_server: z.string().startsWith('http', 'Must start with http or https').url('Malformed URL'),
     }),
-    z.object({ server: z.string().min(1) }),
+    z.object({ server: z.string().min(1), custom_server: z.string() }),
   ]).and(baseSchema);
 
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
       username: '',
       password: '',
       server: server_choices[0].value,
       custom_server: '',
-    },
-    validatorAdapter: zodValidator(),
+    } as z.infer<typeof schema>,
     validators: {
       onSubmit: schema,
     },
@@ -97,35 +94,46 @@ function Page() {
           >
             <Image source={logo_for_server(serverSelected)} style={[styles.logoImage, { marginTop: topMargin }]} />
             <View style={[elements.tray, { padding: 20, margin: 20 }]}>
-              <FormDropdownSelector
-                form={form}
+              <form.AppField
                 name="server"
-                title="Team"
-                placeholder="Select a team"
-                options={server_choices}
+                children={field => (
+                  <field.FormDropdownSelector
+                    title="Team"
+                    placeholder="Select a team"
+                    options={server_choices}
+                  />
+                )}
               />
               {use_custom_server && (
-                <FormTextInput
-                  form={form}
+                <form.AppField
                   name="custom_server"
-                  title="Custom Server"
+                  children={field => (
+                    <field.FormTextInput
+                      title="Custom Server"
+                    />
+                  )}
                 />
               )}
-              <FormTextInput
-                form={form}
+              <form.AppField
                 name="username"
-                title="Username"
-                icon="account-outline"
+                children={field => (
+                  <field.FormTextInput
+                    title="Username"
+                    icon="account-outline"
+                  />
+                )}
               />
-
-              <FormTextInput
-                form={form}
+              <form.AppField
                 name="password"
-                title="Password"
-                icon="lock-outline"
-                secureTextEntry
-                autoCorrect={false}
-                autoCapitalize="none"
+                children={field => (
+                  <field.FormTextInput
+                    title="Password"
+                    icon="lock-outline"
+                    secureTextEntry
+                    autoCorrect={false}
+                    autoCapitalize="none"
+                  />
+                )}
               />
               <View style={styles.buttonTray}>
                 <SmallButton

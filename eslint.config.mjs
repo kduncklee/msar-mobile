@@ -12,6 +12,7 @@ export default antfu({
 }, {
   rules: {
     'no-console': 'off',
+    'react/no-children-prop': 'off', // Needed for forms
     '@typescript-eslint/no-require-imports': ['error', { allow: ['^@assets/'] }],
     '@typescript-eslint/no-use-before-define': 'off', // allow styles at bottom of JSX component
   },

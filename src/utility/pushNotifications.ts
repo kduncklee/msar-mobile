@@ -1,5 +1,4 @@
 import type { AppStateStatus } from 'react-native';
-import type { Api } from '@/remote/api';
 import { playNotificationSound } from '@modules/notification-sound-player';
 import notifee, { EventType } from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
@@ -13,6 +12,7 @@ import { router } from 'expo-router';
 import { useEffect } from 'react';
 import { AppState, Platform } from 'react-native';
 import useAuth from '@/hooks/useAuth';
+import { Api } from '@/remote/api';
 import { prefetchCalloutListQuery, prefetchCalloutLogQuery, prefetchCalloutQuery, prefetchChatLogQuery } from '@/remote/query';
 import { getCredentials, getServer } from '@/storage/storage';
 import { activeTabStatusQuery } from '@/types/calloutSummary';

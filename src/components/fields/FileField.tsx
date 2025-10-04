@@ -5,7 +5,8 @@ import { useLocalDataFilePath } from '@storage/mmkv';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
 import { getConditionalTimeString } from '@utility/dateHelper';
-import * as FileSystem from 'expo-file-system';
+import { Paths } from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import * as IntentLauncher from 'expo-intent-launcher';
 import * as Sharing from 'expo-sharing';
 import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -54,7 +55,7 @@ function FileField({ file }: FileFieldProps) {
   const size_mb = file.size / 1024 / 1024;
   const size_text = `${size_mb.toFixed(3)} MB`;
   const localFilename = `${file.id}_${file.name}`;
-  const localFullUri = `${FileSystem.documentDirectory}${localFilename}`;
+  const localFullUri = `${Paths.document}${localFilename}`;
 
   const [storedUri, setStoredUri] = useLocalDataFilePath(file.id);
 
@@ -144,7 +145,6 @@ function FileField({ file }: FileFieldProps) {
         </TouchableOpacity>
       </ContextMenu.Trigger>
 
-      {/* @ts-expect-error Library uses Pick, should probably be Partial<Pick> */}
       <ContextMenu.Content>
         <ContextMenu.Item key="download" onSelect={downloadPressed}>
           <ContextMenu.ItemTitle>Download</ContextMenu.ItemTitle>

@@ -2,21 +2,17 @@ import type { callout } from '@/types/callout';
 import type { location } from '@/types/location';
 import type { LabelValue } from '@/utility/reactForm';
 import Header from '@components/Header';
-import FormCheckbox from '@components/inputs/FormCheckbox';
-import FormTextArea from '@components/inputs/FormTextArea';
-import FormTextInput from '@components/inputs/FormTextInput';
 import ActivityModal from '@components/modals/ActivityModal';
 import * as Sentry from '@sentry/react-native';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
-import { useForm, useStore } from '@tanstack/react-form';
+import { useStore } from '@tanstack/react-form';
 import msarEventEmitter from '@utility/msarEventEmitter';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-root-toast';
-import FormDropdownMultiselect from '@/components/inputs/FormDropdownMultiselect';
-import FormDropdownSelector from '@/components/inputs/FormDropdownSelector';
+import { useAppForm } from '@/hooks/form';
 import useStatusBarColor from '@/hooks/useStatusBarColor';
 import { useCalloutCreateMutation, useCalloutUpdateMutation } from '@/remote/mutation';
 import { useCalloutQuery, useNotificationsAvailableQuery, useOperationTypesAvailableQuery, useRadioChannelsAvailableQuery } from '@/remote/query';
@@ -46,7 +42,7 @@ function Page() {
   const calloutCreateMutation = useCalloutCreateMutation();
   const calloutUpdateMutation = useCalloutUpdateMutation();
 
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
       title: existingData?.title ?? '',
       operationType: existingData?.operation_type,
@@ -314,109 +310,158 @@ function Page() {
           keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -500} // Adjust the offset as needed
         >
           <ScrollView style={styles.scrollView}>
-            <FormDropdownSelector
-              form={form}
+            <form.AppField
               name="operationType"
-              title="Callout Type"
-              options={operationTypesAvailable}
-              placeholder="Select type"
+              children={field => (
+                <field.FormDropdownSelector
+                  title="Callout Type"
+                  options={operationTypesAvailable}
+                  placeholder="Select type"
+                />
+              )}
             />
-            <FormTextInput
-              form={form}
+            <form.AppField
               name="title"
-              title="Title"
-              placeholder="Title - Few Word Summary"
+              children={field => (
+                <field.FormTextInput
+                  title="Title"
+                  placeholder="Title - Few Word Summary"
+                />
+              )}
             />
-            <FormTextArea
-              form={form}
+            <form.AppField
               name="circumstances"
-              title="Circumstances / Call Details"
-              height={100}
-              placeholder="Call Details - Full Description"
+              children={field => (
+                <field.FormTextArea
+                  title="Circumstances / Call Details"
+                  height={100}
+                  placeholder="Call Details - Full Description"
+                />
+              )}
             />
-            <FormTextInput
-              form={form}
+            <form.AppField
               name="locationText"
-              title="Location"
-              rightButton="map-search-outline"
-              onRightPress={locationButtonPressed}
-              editable={false}
+              children={field => (
+                <field.FormTextInput
+                  title="Location"
+                  rightButton="map-search-outline"
+                  onRightPress={locationButtonPressed}
+                  editable={false}
+                />
+              )}
             />
-            <FormTextInput
-              form={form}
+            <form.AppField
               name="locationDescText"
-              placeholder="Location Description"
+              children={field => (
+                <field.FormTextInput
+                  placeholder="Location Description"
+                />
+              )}
             />
-            <FormTextInput
-              form={form}
+            <form.AppField
               name="subject"
-              title="Subject / Victim / Missing Person"
-              placeholder="Subject"
+              children={field => (
+                <field.FormTextInput
+                  title="Subject / Victim / Missing Person"
+                  placeholder="Subject"
+                />
+              )}
             />
-            <FormTextInput
-              form={form}
+            <form.AppField
               name="subjectContact"
-              icon="phone"
-              placeholder="Subject Contact"
+              children={field => (
+                <field.FormTextInput
+                  icon="phone"
+                  placeholder="Subject Contact"
+                />
+              )}
             />
-            <FormTextInput
-              form={form}
+            <form.AppField
               name="informant"
-              title="Informant / Reporting Party"
-              placeholder="Informant"
+              children={field => (
+                <field.FormTextInput
+                  title="Informant / Reporting Party"
+                  placeholder="Informant"
+                />
+              )}
             />
-            <FormTextInput
-              form={form}
+            <form.AppField
               name="informantContact"
-              icon="phone"
-              placeholder="Informant Contact"
+              children={field => (
+                <field.FormTextInput
+                  icon="phone"
+                  placeholder="Informant Contact"
+                />
+              )}
             />
-            <FormDropdownSelector
-              form={form}
+            <form.AppField
               name="radioFrequency"
-              title="Tactical Talkgroup"
-              options={primaryRadioChannelsAvailable}
-              placeholder="Select Frequency"
+              children={field => (
+                <field.FormDropdownSelector
+                  title="Tactical Talkgroup"
+                  options={primaryRadioChannelsAvailable}
+                  placeholder="Select Frequency"
+                />
+              )}
             />
-            <FormDropdownMultiselect
-              form={form}
+            <form.AppField
               name="additionalRadioFrequencies"
-              title="Other Radio Channels"
-              options={additionalRadioChannelsAvailable}
-              placeholder="Select Frequencies"
+              mode="array"
+              children={field => (
+                <field.FormDropdownMultiselect
+                  title="Other Radio Channels"
+                  options={additionalRadioChannelsAvailable}
+                  placeholder="Select Frequencies"
+                />
+              )}
             />
-            <FormDropdownMultiselect
-              form={form}
+            <form.AppField
               name="notificationsMade"
-              title="Notifications Made"
-              options={notificationsAvailable}
-              placeholder="Select Notifications"
+              children={field => (
+                <field.FormDropdownMultiselect
+                  title="Notifications Made"
+                  options={notificationsAvailable}
+                  placeholder="Select Notifications"
+                />
+              )}
             />
-            <FormTextInput
-              form={form}
+            <form.AppField
               name="handlingUnit"
-              title="Handling Unit / Tag #"
+              children={field => (
+                <field.FormTextInput
+                  title="Handling Unit / Tag #"
+                />
+              )}
             />
-            <FormCheckbox
-              form={form}
+            <form.AppField
               name="ten22"
-              title="10-22"
+              children={field => (
+                <field.FormCheckbox
+                  title="10-22"
+                />
+              )}
             />
             {ten22
               && (
-                <FormTextArea
-                  form={form}
+                <form.AppField
                   name="resolutionNotes"
-                  height={100}
-                  placeholder="Resolution Notes"
+                  children={field => (
+                    <field.FormTextArea
+                      height={100}
+                      placeholder="Resolution Notes"
+                    />
+                  )}
                 />
               )}
             {ten22
               && (
-                <FormCheckbox
-                  form={form}
+                <form.AppField
                   name="archived"
-                  title="Archive"
+                  children={field => (
+                    <field.FormCheckbox
+                      title="Archive"
+                    />
+                  )}
                 />
               )}
             <TouchableOpacity

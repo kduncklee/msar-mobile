@@ -2,25 +2,25 @@ import type { geocodeAddressResponse } from '@remote/responses';
 import type { LatLng, LongPressEvent, MapMarker, Region } from 'react-native-maps';
 import type { location } from '@/types/location';
 import Header from '@components/Header';
-import FormTextInput from '@components/inputs/FormTextInput';
 import ActivityModal from '@components/modals/ActivityModal';
 import LocationSelectionModal from '@components/modals/LocationSelectModal';
 import { geocodeAddress } from '@remote/google-maps';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
-import { useForm, useStore } from '@tanstack/react-form';
+import { useStore } from '@tanstack/react-form';
 import { coordinateFromString } from '@utility/locationHeler';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Alert, Image, Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import { useAppForm } from '@/hooks/form';
 import useStatusBarColor from '@/hooks/useStatusBarColor';
 import { useEditingLocation } from '@/storage/mmkv';
 import { locationToShortString, locationToString } from '@/types/location';
 import { handleBackPressed, useBackHandler } from '@/utility/backHandler';
 
 function Page() {
-  const markerRef = useRef<MapMarker>();
+  const markerRef = useRef<MapMarker>(null);
   const [showSpinner, setShowSpinner] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [editingLocation, setEditingLocation] = useEditingLocation();
@@ -37,7 +37,7 @@ function Page() {
     || (editingLocation.coordinates.lat !== currentLocation.coordinates.lat)
     || (editingLocation.coordinates.long !== currentLocation.coordinates.long)
   );
-  const form = useForm({
+  const form = useAppForm({
     defaultValues: {
       address: '',
     },
@@ -205,13 +205,16 @@ function Page() {
             </MapView>
             <View style={[elements.tray, { margin: 20, position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20, paddingTop: 0 }]}>
               <View style={styles.searchBar}>
-                <FormTextInput
-                  form={form}
+                <form.AppField
                   name="address"
-                  placeholder="Search..."
-                  returnKey="search"
-                  onSubmit={performAddressSearch}
-                  autoCorrect={false}
+                  children={field => (
+                    <field.FormTextInput
+                      placeholder="Search..."
+                      returnKey="search"
+                      onSubmit={performAddressSearch}
+                      autoCorrect={false}
+                    />
+                  )}
                 />
                 <TouchableOpacity activeOpacity={0.5} style={[styles.button, { backgroundColor: colors.blue }]} onPress={searchPressed}>
                   <Image source={require('@assets/icons/location_search.png')} style={styles.buttonImage} testID="search-button" />

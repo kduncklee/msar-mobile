@@ -16,7 +16,6 @@ function MenuDropdown({ children, items }: MenuDropdownProps) {
         {children}
       </DropdownMenu.Trigger>
 
-      {/* @ts-expect-error Library uses Pick, should probably be Partial<Pick> */}
       <DropdownMenu.Content>
         <>
           {items.map(item => (
