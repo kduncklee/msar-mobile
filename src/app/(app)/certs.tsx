@@ -1,4 +1,3 @@
-import type { LayoutChangeEvent } from 'react-native';
 import type { display_cert, member_cert_summary_ext } from '@/types/cert';
 import type { user_detail } from '@/types/user';
 import type { LabelValue } from '@/utility/reactForm';
@@ -6,7 +5,7 @@ import Header from '@components/Header';
 import colors, { textColorForBackground } from '@styles/colors';
 import { useQueryClient } from '@tanstack/react-query';
 import _ from 'lodash';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import UserModal from '@/components/modals/UserModal';
 import useStatusBarColor from '@/hooks/useStatusBarColor';
@@ -32,9 +31,9 @@ function Page() {
   const certColumns = useMemo(() => certQuery.data?.at(0)?.certs?.map(cert => cert.type_display || cert.type), [certQuery.data]);
   const fixedColumns = fixedColumnMap.map(item => item.label);
   const allColumns = useMemo(() => fixedColumns.concat(certColumns), [certColumns, fixedColumns]);
-  const columnWidthExtra = 5;
   const minColumnWidth = 15;
-  const [columnWidths, setColumnWidths] = useState(allColumns.map(_ => minColumnWidth));
+  const [columnWidths, setColumnWidths] = useState(() => allColumns.map(_ => minColumnWidth));
+  const cellRefs = useRef([]);
 
   useEffect(() => {
     const data = [];
@@ -48,6 +47,7 @@ function Page() {
     setTableData(data);
   }, [certQuery.data, memberQuery.data]);
 
+  console.log('columns', allColumns, columnWidths);
   // console.log('tableData', tableData);
   // console.log('tableData[0]', tableData?.at(0));
 
@@ -88,15 +88,38 @@ function Page() {
     setSelectedUser(null);
   };
 
-  const updateMaxWidth = useCallback((index: number, event: LayoutChangeEvent) => {
-    const width = event?.nativeEvent?.layout?.width;
-    if (!columnWidths[index] || (width > columnWidths[index] + columnWidthExtra)) {
-      const copy = [...columnWidths];
-      copy[index] = width;
-      console.log('update', index, width, columnWidths[index] + columnWidthExtra, columnWidths[index]);
-      setColumnWidths(copy);
+  useLayoutEffect(() => {
+    const widths = [...columnWidths]; // allColumns.map(_ => minColumnWidth);
+    let updated = false;
+    console.log('useLayoutEffect', widths, cellRefs.current.length);
+
+    for (let rowIndex = 0; rowIndex < cellRefs.current.length; rowIndex++) {
+      const row = cellRefs.current[rowIndex];
+      for (let columnIndex = 0; columnIndex < row.length; columnIndex++) {
+        const cell = row[columnIndex];
+        if (cell) {
+          cell.measureInWindow((_x, _y, width, _height) => {
+            if (width > widths[columnIndex]) {
+              console.log(columnIndex, widths[columnIndex], width);
+              widths[columnIndex] = width;
+              updated = true;
+            }
+          });
+        }
+      }
     }
-  }, [columnWidths]);
+    if (updated) {
+      console.log('updating', columnWidths, widths);
+      setColumnWidths(widths);
+    }
+  }, [allColumns, columnWidths, setColumnWidths]);
+
+  const updateRef = (el, rowIndex, columnIndex) => {
+    if (!cellRefs.current[rowIndex]) {
+      cellRefs.current[rowIndex] = [];
+    }
+    cellRefs.current[rowIndex][columnIndex] = el;
+  };
 
   const renderTableHeader = useCallback(
     columns => (
@@ -105,8 +128,8 @@ function Page() {
           <TouchableOpacity
             key={column}
             style={[styles.columnHeader, { minWidth: columnWidths[index] }]}
-            onLayout={event => updateMaxWidth(index, event)}
             onPress={() => sortTable(column)}
+            ref={el => updateRef(el, 0, index)}
           >
             <View style={{ flexDirection: 'row' }}>
               <Text style={styles.columnHeaderTxt}>{`${column} `}</Text>
@@ -121,59 +144,60 @@ function Page() {
         ))}
       </View>
     ),
-    [arrowRotation, columnWidths, selectedColumn, sortTable, updateMaxWidth],
+    [arrowRotation, columnWidths, selectedColumn, sortTable],
   );
 
   const renderCert = useCallback(
-    (certs, type, index) => {
+    (certs, type, rowIndex, index) => {
       const cert: display_cert = certs.find(c => c.type === type);
       const columnIndex = fixedColumns.length + index;
       return (
         <Text
           key={type}
+          ref={el => updateRef(el, rowIndex, columnIndex)}
           style={[styles.columnRowTxt, {
             backgroundColor: cert?.color,
             color: textColorForBackground(cert?.color),
             minWidth: columnWidths[columnIndex],
           }]}
-          onLayout={event => updateMaxWidth(columnIndex, event)}
         >
           {cert?.description}
         </Text>
       );
     },
-    [columnWidths, fixedColumns.length, updateMaxWidth],
+    [columnWidths, fixedColumns.length],
   );
 
   const renderRow = useCallback(
-    ({ item }) => {
+    ({ item, index }) => {
+      const rowIndex = index + 1; // add 1 for header row
       return (
         <View style={styles.rowContainer}>
           <TouchableOpacity
             activeOpacity={0.5}
             onPress={() => setSelectedUser(item.user)}
             style={[styles.columnRowTxt, { minWidth: columnWidths[0] }]}
-            onLayout={event => updateMaxWidth(0, event)}
+            ref={el => updateRef(el, rowIndex, 0)}
           >
             <Text style={[styles.columnFirstTxt]}>{item.full_name}</Text>
           </TouchableOpacity>
           <Text
             style={[styles.columnRowTxt, { minWidth: columnWidths[1] }]}
-            onLayout={event => updateMaxWidth(1, event)}
+            ref={el => updateRef(el, rowIndex, 1)}
           >
             {item.username}
           </Text>
           <Text
             style={[styles.columnRowTxt, { minWidth: columnWidths[2] }]}
-            onLayout={event => updateMaxWidth(2, event)}
+            ref={el => updateRef(el, rowIndex, 2)}
           >
             {item.status}
           </Text>
-          {certColumns?.map((cert, index) => renderCert(item.certs, cert, index))}
+          {certColumns?.map((cert, columnIndex) => renderCert(item.certs, cert, rowIndex, columnIndex))}
         </View>
       );
     },
-    [certColumns, columnWidths, renderCert, updateMaxWidth],
+    [certColumns, columnWidths, renderCert],
   );
 
   if (!tableData.length) {
