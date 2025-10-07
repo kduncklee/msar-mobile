@@ -1,22 +1,12 @@
+import type { AuthContextType } from '@/hooks/authContext';
 import type { loginResponse } from '@/remote/responses';
 import { storage } from '@storage/mmkv';
 import { useQueryClient } from '@tanstack/react-query';
-import { createContext, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { AuthContext } from '@/hooks/authContext';
 import { Api } from '@/remote/api';
 import { clearCredentials, clearServer, getCredentials, getServer, storeCredentials, storeServer } from '@/storage/storage';
 import * as pushNotificationToken from '@/utility/pushNotificationToken';
-
-export interface AuthContextType {
-  username: string;
-  token: string;
-  server: string;
-  api: Api;
-  loading: boolean;
-  login: (username: string, password: string, server?: string) => Promise<string>;
-  logout: () => void;
-}
-
-export const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export function AuthProvider({
   children,

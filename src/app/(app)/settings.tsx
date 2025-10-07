@@ -18,7 +18,7 @@ function Page() {
   const [notificationLoading, setNotificationLoading] = useState('Loading...');
   const [pushEnabled, setPushEnabled] = useState(null);
   const [expandNotificationSounds, setExpandNotificationSounds] = useState(false);
-  const [criticalAlertsVolume, setCriticalAlertsVolume] = useState(null);
+  const [criticalAlertsVolume, setCriticalAlertsVolume] = useState(() => getCriticalAlertsVolume());
   const { username, server, api, logout } = useAuth();
   const [soundOverride, setSoundOverride] = useSoundOverride();
 
@@ -27,10 +27,7 @@ function Page() {
       setPushEnabled,
       () => setNotificationLoading('Unable to connect'),
     );
-
-    setCriticalAlertsVolume(getCriticalAlertsVolume());
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [api]);
 
   const onPushToggle = async () => {
     const pushStatus = !pushEnabled;

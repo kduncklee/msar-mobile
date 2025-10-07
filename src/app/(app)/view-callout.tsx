@@ -15,8 +15,9 @@ import msarEventEmitter from '@utility/msarEventEmitter';
 import CalloutFileTab from 'components/callouts/CalloutFileTab';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-root-toast';
+import KeyboardAvoidingCustomView from '@/components/KeyboardAvoidingCustomView';
 import useAuth from '@/hooks/useAuth';
 import { useCalloutLogMutation } from '@/remote/mutation';
 import { calloutLogQueryKey, calloutQueryKey, useCalloutLogInfiniteQuery, useCalloutQuery, useCalloutResponsesAvailableMap } from '@/remote/query';
@@ -26,11 +27,17 @@ import { calloutResponseSuccessNotification } from '@/utility/pushNotifications'
 
 enum CalloutTabs { INFO, LOG, PERSONNEL, FILES };
 
+function badgeString(badge: number) {
+  if (badge) {
+    return `${badge}`;
+  }
+  return null;
+}
+
 function Page() {
   const { id, title, type } = useLocalSearchParams<{ id: string; title: string; type?: string }>();
   const { api } = useAuth();
   const calloutResponseMap = useCalloutResponsesAvailableMap();
-  const [headerTitle, setHeaderTitle] = useState(title);
   const scrollViewRef = useRef(null);
 
   const [modalVisible, setModalVisible] = useState(false);
@@ -41,14 +48,7 @@ function Page() {
     }
   }
   const [currentTab, setCurrentTab] = useState(defaultTab);
-  const [logBadge, setLogBadge] = useState(null);
-  const [fileBadge, setFileBadge] = useState(null);
-  const [personnelBadge, setPersonnelBadge] = useState(null);
-  const [calloutTimestamp, setCalloutTimestamp] = useState<Date>(null);
   const [logMessageText, setLogMessageText] = useState('');
-  const [isActive, setIsActive] = useState(false);
-  const [isResolved, setIsResolved] = useState(false);
-  const headerBackground = isResolved ? colors.green : colors.primaryBg;
 
   const idInt: number = Number.parseInt(id);
 
@@ -80,6 +80,14 @@ function Page() {
   const calloutLogMutation = useCalloutLogMutation(idInt);
 
   const callout = calloutQuery.data;
+  const headerTitle = callout ? callout.title : title;
+  const logBadge = badgeString(callout?.log_count);
+  const fileBadge = badgeString(callout?.files?.length);
+  const personnelBadge = calloutResponseBadge(callout, calloutResponseMap);
+  const calloutTimestamp = callout?.created_at;
+  const isActive = callout?.status === calloutStatus.ACTIVE;
+  const isResolved = callout?.status === calloutStatus.RESOLVED;
+  const headerBackground = isResolved ? colors.green : colors.primaryBg;
 
   console.log('view-callout modalVisible =', modalVisible);
 
@@ -129,20 +137,6 @@ function Page() {
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    if (callout) {
-      const numberOfFiles = callout.files?.length;
-      setHeaderTitle(callout.title);
-      setPersonnelBadge(calloutResponseBadge(callout, calloutResponseMap));
-      setLogBadge(callout.log_count);
-      setFileBadge(numberOfFiles || null);
-      setCalloutTimestamp(callout.created_at);
-
-      setIsActive(callout.status === calloutStatus.ACTIVE);
-      setIsResolved(callout.status === calloutStatus.RESOLVED);
-    }
-  }, [callout, calloutResponseMap]);
 
   const refreshCallout = () => {
     console.log('refreshCallout');
@@ -198,11 +192,7 @@ function Page() {
           && (
             <>
               <TabSelector tabs={tabs} selected={currentTab} onTabChange={tabChanged} />
-              <KeyboardAvoidingView
-                style={styles.contentContainer}
-                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -500}
-              >
+              <KeyboardAvoidingCustomView>
                 <View style={styles.contentContainer}>
                   {currentTab === CalloutTabs.INFO
                     && (
@@ -252,7 +242,7 @@ function Page() {
                       />
                     )}
                 </View>
-              </KeyboardAvoidingView>
+              </KeyboardAvoidingCustomView>
             </>
           )}
       </SafeAreaView>

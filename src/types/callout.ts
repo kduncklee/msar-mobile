@@ -63,7 +63,7 @@ export function calloutResponseBadge(
   callout: callout,
   calloutResponsesAvailableMap: Map<string, calloutResponseAvailable>,
 ): string | null {
-  if (callout.operational_periods[0]) {
+  if (callout?.operational_periods[0]) {
     const responses = callout.operational_periods[0].responses;
     let badgeCount = 0;
     responses.forEach((response) => {

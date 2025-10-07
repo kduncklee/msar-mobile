@@ -5,17 +5,18 @@ import { elements } from '@styles/elements';
 import { useStore } from '@tanstack/react-form';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Image, Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, View } from 'react-native';
+import { Alert, Image, Keyboard, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, View } from 'react-native';
 import { z } from 'zod';
+import KeyboardAvoidingCustomView from '@/components/KeyboardAvoidingCustomView';
 import { useAppForm } from '@/hooks/form';
 import useAuth from '@/hooks/useAuth';
 import { logo_for_server, server_choices } from '@/remote/api';
 
 function Page() {
-  const [topMargin, setTopMargin] = useState(0);
   const scrollViewRef = useRef(null);
   const [showSpinner, setShowSpinner] = useState(false);
   const { login } = useAuth();
+  let topMargin = 0;
 
   const baseSchema = z.object({
     username: z.string().min(1, 'Username is required.'),
@@ -58,17 +59,16 @@ function Page() {
   const serverSelected = useStore(form.store, state => state.values.server);
   const use_custom_server = !serverSelected;
 
-  useEffect(() => {
-    if (Platform.OS === 'ios') {
-      StatusBar.setBarStyle('dark-content');
-      setTopMargin(0);
-    }
-    else if (Platform.OS === 'android') {
-      StatusBar.setBackgroundColor(colors.primaryBg);
-      StatusBar.setBarStyle('light-content');
-      setTopMargin(StatusBar.currentHeight + 20);
-    }
+  if (Platform.OS === 'ios') {
+    StatusBar.setBarStyle('dark-content');
+  }
+  else if (Platform.OS === 'android') {
+    StatusBar.setBackgroundColor(colors.primaryBg);
+    StatusBar.setBarStyle('light-content');
+    topMargin = (StatusBar.currentHeight + 20);
+  }
 
+  useEffect(() => {
     const _keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
       () => {
@@ -83,11 +83,7 @@ function Page() {
     <>
       <Image source={require('@assets/background.png')} style={styles.backgroundImage} />
       <SafeAreaView style={styles.container}>
-        <KeyboardAvoidingView
-          style={styles.contentContainer}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -500} // Adjust the offset as needed
-        >
+        <KeyboardAvoidingCustomView>
           <ScrollView
             style={styles.scrollView}
             ref={scrollViewRef}
@@ -145,7 +141,7 @@ function Page() {
               </View>
             </View>
           </ScrollView>
-        </KeyboardAvoidingView>
+        </KeyboardAvoidingCustomView>
       </SafeAreaView>
       {showSpinner
         && <ActivityModal message="Logging in..." />}

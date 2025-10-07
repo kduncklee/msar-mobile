@@ -15,7 +15,6 @@ import { elements } from '@/styles/elements';
 function Page() {
   const [direction, setDirection] = useState(null);
   const [selectedColumn, setSelectedColumn] = useState(null);
-  const [tableData, setTableData] = useState([]);
   const [selectedUser, setSelectedUser] = useState<user_detail>(null);
   useStatusBarColor();
 
@@ -35,17 +34,29 @@ function Page() {
   const [columnWidths, setColumnWidths] = useState(() => allColumns.map(_ => minColumnWidth));
   const cellRefs = useRef([]);
 
-  useEffect(() => {
-    const data = [];
-    certQuery.data?.forEach((item) => {
-      const combined: member_cert_summary_ext = { ...item };
-      const user = memberQuery.data?.find(user => user.id === item.id);
-      combined.user = user;
-      combined.username = user?.username;
-      data.push(combined);
-    });
-    setTableData(data);
-  }, [certQuery.data, memberQuery.data]);
+  const unsortedData = [];
+  certQuery.data?.forEach((item) => {
+    const combined: member_cert_summary_ext = { ...item };
+    const user = memberQuery.data?.find(user => user.id === item.id);
+    combined.user = user;
+    combined.username = user?.username;
+    unsortedData.push(combined);
+  });
+
+  let sortedData = unsortedData;
+  if (selectedColumn && direction) {
+    const fixedKey = fixedColumnMap.find(item => item.label === selectedColumn)?.value;
+    const certSort = function (o) {
+      return o?.certs?.find(c => c.type === selectedColumn)?.description;
+    };
+    // console.log('sort', column, fixedKey, certSort, fixedKey || certSort, certSort(tableData[0]));
+    sortedData = _.orderBy(
+      unsortedData,
+      [fixedKey || certSort],
+      [direction],
+    );
+  }
+  const tableData = sortedData;
 
   console.log('columns', allColumns, columnWidths);
   // console.log('tableData', tableData);
@@ -53,22 +64,16 @@ function Page() {
 
   const sortTable = useCallback(
     (column) => {
-      const newDirection = direction === 'desc' ? 'asc' : 'desc';
-      const fixedKey = fixedColumnMap.find(item => item.label === column)?.value;
-      const certSort = function (o) {
-        return o?.certs?.find(c => c.type === column)?.description;
-      };
-      console.log('sort', column, fixedKey, certSort, fixedKey || certSort, certSort(tableData[0]));
-      const sortedData = _.orderBy(
-        tableData,
-        [fixedKey || certSort],
-        [newDirection],
-      );
+      if (column === selectedColumn) {
+        const newDirection = direction === 'desc' ? 'asc' : 'desc';
+        setDirection(newDirection);
+      }
+      else {
+        setDirection('asc');
+      }
       setSelectedColumn(column);
-      setDirection(newDirection);
-      setTableData(sortedData);
     },
-    [direction, fixedColumnMap, tableData],
+    [direction, selectedColumn],
   );
 
   const arrowRotation = useMemo(

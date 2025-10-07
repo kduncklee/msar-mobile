@@ -4,7 +4,7 @@ import colors from '@styles/colors';
 import { elements } from '@styles/elements';
 import { getConditionalTimeString } from '@utility/dateHelper';
 import { router, useFocusEffect } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { BackHandler, Image, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface HeaderProps {
@@ -19,16 +19,13 @@ interface HeaderProps {
 };
 
 function Header({ title, zeroTopMargin, background, backButton = false, onBackPressed, rightButtonIcon, onRightPressed, timestamp = null }: HeaderProps) {
-  const [headerMargin, setHeaderMargin] = useState(0);
-
-  useEffect(() => {
-    if (zeroTopMargin || (Platform.OS === 'ios')) {
-      setHeaderMargin(0);
-    }
-    else if (Platform.OS === 'android') {
-      setHeaderMargin(StatusBar.currentHeight);
-    }
-  }, [zeroTopMargin]);
+  let headerMargin = 0;
+  if (zeroTopMargin || (Platform.OS === 'ios')) {
+    headerMargin = 0;
+  }
+  else if (Platform.OS === 'android') {
+    headerMargin = (StatusBar.currentHeight);
+  }
 
   useFocusEffect(() => {
     // console.log('added back handler: ' + pathname)

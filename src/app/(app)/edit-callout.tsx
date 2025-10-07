@@ -10,8 +10,9 @@ import { useStore } from '@tanstack/react-form';
 import msarEventEmitter from '@utility/msarEventEmitter';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-root-toast';
+import KeyboardAvoidingCustomView from '@/components/KeyboardAvoidingCustomView';
 import { useAppForm } from '@/hooks/form';
 import useStatusBarColor from '@/hooks/useStatusBarColor';
 import { useCalloutCreateMutation, useCalloutUpdateMutation } from '@/remote/mutation';
@@ -304,11 +305,7 @@ function Page() {
     <>
       <SafeAreaView style={styles.container}>
         <Header title={headerTitle} backButton onBackPressed={backPressed} timestamp={new Date()} />
-        <KeyboardAvoidingView
-          style={styles.contentContainer}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -500} // Adjust the offset as needed
-        >
+        <KeyboardAvoidingCustomView>
           <ScrollView style={styles.scrollView}>
             <form.AppField
               name="operationType"
@@ -473,7 +470,7 @@ function Page() {
             </TouchableOpacity>
             <View style={{ height: 40 }} />
           </ScrollView>
-        </KeyboardAvoidingView>
+        </KeyboardAvoidingCustomView>
       </SafeAreaView>
       {showSpinner
         && <ActivityModal message={spinnerMessage} />}

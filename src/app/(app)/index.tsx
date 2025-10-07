@@ -34,6 +34,18 @@ function useChatUnread(): boolean {
   return hasUnread;
 }
 
+const dateDisplayMs = 23 * 60 * 60 * 1000; // Show date until 23 hours prior.
+function getSnoozeTitle(snoozeExpireTime: number): string {
+  const snoozeRemaining = snoozeExpireTime - new Date().getTime();
+  if (snoozeRemaining > dateDisplayMs) {
+    return `Snoozing until ${new Date(snoozeExpireTime).toLocaleString()}`;
+  }
+  else if (snoozeRemaining > 0) {
+    return `Snoozing until ${new Date(snoozeExpireTime).toLocaleTimeString()}`;
+  }
+  return 'Snooze';
+}
+
 interface Items {
   text: string;
   icon?: IconName;
@@ -44,15 +56,16 @@ interface Items {
 }
 
 function Page() {
-  const [topMargin, setTopMargin] = useState(0);
   const [snoozeModalVisible, setSnoozeModalVisible] = useState(false);
   const [snoozeDatePickerVisible, setSnoozeDatePickerVisible] = useState(false);
-  const [snoozeExpireTime, setSnoozeExpireTime] = useState(0);
-  const [snoozeTitle, setSnoozeTitle] = useState('Snooze');
+  const [snoozeExpireTime, setSnoozeExpireTime] = useState(() => getSnoozeExpires());
   const chatHasUnread = useChatUnread();
   const numberActiveCallouts = useNumberActiveCallouts();
   const { api } = useAuth();
   const fontScale = getFontScale();
+  const snoozeTitle = getSnoozeTitle(snoozeExpireTime);
+  let topMargin = 0;
+  console.log('index', numberActiveCallouts);
 
   const iconSize = 30 * fontScale;
   const items: Items[] = [
@@ -66,41 +79,33 @@ function Page() {
   ];
   console.log('fontScale', fontScale, getFontScale());
 
-  useEffect(() => {
-    if (Platform.OS === 'ios') {
-      StatusBar.setBarStyle('dark-content');
-      setTopMargin(0);
-    }
-    else if (Platform.OS === 'android') {
-      StatusBar.setBackgroundColor(colors.primaryBg);
-      StatusBar.setBarStyle('light-content');
-      setTopMargin(StatusBar.currentHeight + 20);
-    }
-  }, []);
+  if (Platform.OS === 'ios') {
+    StatusBar.setBarStyle('dark-content');
+  }
+  else if (Platform.OS === 'android') {
+    StatusBar.setBackgroundColor(colors.primaryBg);
+    StatusBar.setBarStyle('light-content');
+    topMargin = (StatusBar.currentHeight + 20);
+  }
 
   useEffect(() => {
-    setSnoozeExpireTime(getSnoozeExpires());
-  }, []);
-
-  useEffect(() => {
-    const updateSnooze = () => {
-      const one_day = 24 * 60 * 60 * 1000;
+    const getSnoozeUpdateTimeout = () => {
       let snoozeRemaining = snoozeExpireTime - new Date().getTime();
-      let title = 'Snooze';
-      if (snoozeRemaining > one_day) {
-        title = `Snoozing until ${new Date(snoozeExpireTime).toLocaleString()}`;
-        snoozeRemaining -= one_day; // Update text when 24h remains
+      if (snoozeRemaining > dateDisplayMs) {
+        snoozeRemaining -= dateDisplayMs; // Update text when 23h remains
       }
-      else if (snoozeRemaining > 0) {
-        title = `Snoozing until ${new Date(snoozeExpireTime).toLocaleTimeString()}`;
-      }
-      setSnoozeTitle(title);
+      console.log('getSnoozeUpdateInterval', snoozeRemaining);
       return snoozeRemaining;
     };
 
-    const snoozeRemaining = updateSnooze();
-    const interval = setInterval(updateSnooze, snoozeRemaining);
-    return () => clearInterval(interval);
+    const timeout = setTimeout(
+      () => {
+        setSnoozeExpireTime(() => getSnoozeExpires() - 1);
+        console.log(snoozeExpireTime, getSnoozeExpires());
+      },
+      getSnoozeUpdateTimeout(),
+    );
+    return () => clearTimeout(timeout);
   }, [snoozeExpireTime]);
 
   const updateSnoozeExpireTime = (ms: number) => {
@@ -148,7 +153,6 @@ function Page() {
                 <View style={[elements.tray, styles.contentTray]}>
                   {item.icon && <View style={styles.buttonIcon}><MaterialCommunityIcons name={item.icon} size={iconSize} color="white" /></View>}
                   <Text style={styles.buttonText}>{item.text}</Text>
-                  {/* @ts-expect-error Badge has typescript errors. */}
                   {!!item.badge && <Badge style={styles.badge}>{item.badge}</Badge>}
                 </View>
               </TouchableOpacity>

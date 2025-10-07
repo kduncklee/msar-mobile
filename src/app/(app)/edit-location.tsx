@@ -11,8 +11,9 @@ import { useStore } from '@tanstack/react-form';
 import { coordinateFromString } from '@utility/locationHeler';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Image, Keyboard, KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, Keyboard, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import KeyboardAvoidingCustomView from '@/components/KeyboardAvoidingCustomView';
 import { useAppForm } from '@/hooks/form';
 import useStatusBarColor from '@/hooks/useStatusBarColor';
 import { useEditingLocation } from '@/storage/mmkv';
@@ -25,12 +26,12 @@ function Page() {
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [editingLocation, setEditingLocation] = useEditingLocation();
   const [currentLocation, setCurrentLocation] = useState<location>(null);
-  const [defaultRegion, setDefaultRegion] = useState<Region>({
+  let defaultRegion = {
     latitude: 34.050783236893395,
     longitude: -118.83192890478199,
     latitudeDelta: 0.9091139902085246,
     longitudeDelta: 0.5355799588636216,
-  });
+  };
   const [searchResults, setSearchResults] = useState<location[]>([]);
   const locationChanged = (currentLocation?.coordinates != null) && (
     (editingLocation == null) || (editingLocation.coordinates == null)
@@ -51,19 +52,17 @@ function Page() {
     setLocation(editingLocation);
   }, [editingLocation]);
 
-  useEffect(() => {
-    if (currentLocation?.coordinates != null
-      && !!currentLocation.coordinates.lat
-      && !!currentLocation.coordinates.long) {
-      const coordinate = coordinateFromString(`${currentLocation.coordinates.lat}, ${currentLocation.coordinates.long}`);
-      setDefaultRegion({
-        latitude: coordinate.latitude,
-        longitude: coordinate.longitude,
-        latitudeDelta: 0.4,
-        longitudeDelta: 0.2,
-      });
-    }
-  }, [currentLocation]);
+  if (currentLocation?.coordinates != null
+    && !!currentLocation.coordinates.lat
+    && !!currentLocation.coordinates.long) {
+    const coordinate = coordinateFromString(`${currentLocation.coordinates.lat}, ${currentLocation.coordinates.long}`);
+    defaultRegion = ({
+      latitude: coordinate.latitude,
+      longitude: coordinate.longitude,
+      latitudeDelta: 0.4,
+      longitudeDelta: 0.2,
+    });
+  }
 
   const backPressed = () => {
     handleBackPressed(locationChanged);
@@ -158,6 +157,8 @@ function Page() {
   };
 
   const setLocation = (location: location) => {
+    // TODO: Clean this up:
+    // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
     setCurrentLocation(location);
     if (markerRef.current != null) {
       markerRef.current.showCallout();
@@ -180,10 +181,7 @@ function Page() {
 
   return (
     <>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
+      <KeyboardAvoidingCustomView>
         <SafeAreaView style={styles.container}>
           <Header title="Select Location" backButton onBackPressed={backPressed} />
           <View style={styles.contentContainer}>
@@ -241,7 +239,7 @@ function Page() {
             </View>
           </View>
         </SafeAreaView>
-      </KeyboardAvoidingView>
+      </KeyboardAvoidingCustomView>
       {showSpinner
         && <ActivityModal message="Searching For Location..." />}
       {showSearchResults

@@ -3,7 +3,8 @@ import LogInput from '@components/callouts/LogInput';
 import Header from '@components/Header';
 import colors from '@styles/colors';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, View } from 'react-native';
+import { SafeAreaView, StyleSheet, View } from 'react-native';
+import KeyboardAvoidingCustomView from '@/components/KeyboardAvoidingCustomView';
 import useStatusBarColor from '@/hooks/useStatusBarColor';
 import { useChatLogMutation } from '@/remote/mutation';
 import { useChatLogInfiniteQuery } from '@/remote/query';
@@ -26,11 +27,7 @@ function Page() {
   return (
     <SafeAreaView style={styles.container}>
       <Header title="Messages" backButton />
-      <KeyboardAvoidingView
-        style={styles.contentContainer}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -500}
-      >
+      <KeyboardAvoidingCustomView>
         <View style={styles.contentContainer}>
           <CalloutLogTab id={0} useInfiniteQueryFn={useChatLogInfiniteQuery} />
           <LogInput
@@ -39,7 +36,7 @@ function Page() {
             onSendPress={submitLogMessage}
           />
         </View>
-      </KeyboardAvoidingView>
+      </KeyboardAvoidingCustomView>
     </SafeAreaView>
   );
 }
