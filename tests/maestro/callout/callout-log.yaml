@@ -27,7 +27,7 @@ appId: org.malibusar.app
       - assertVisible:
           id: Log-badge
           text: ${output.new_log_count}
-      - tapOn: Personnel.*
+      - tapOn: Response.*
       - assertVisible:
           id: Log-badge
           text: ${output.new_log_count}

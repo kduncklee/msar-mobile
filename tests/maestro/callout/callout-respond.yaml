@@ -1,42 +1,31 @@
 appId: org.malibusar.app
 ---
 - tapOn: Respond
-- assertVisible:
-    text: 10-19
-    index: 1
-- assertVisible:
-    text: 10-8
-    index: 1
-- assertVisible:
-    text: 10-7
-    index: 1
-- tapOn:
-    text: 10-8
-    index: 1
+- assertVisible: 10-19
+- assertVisible: 10-8
+- assertVisible: 10-7
+- tapOn: 10-8
 - assertVisible: Responded 10-8
-- tapOn: Personnel.*
+- tapOn: Response
 - assertVisible: 10-8
 - assertNotVisible: 10-7
 - assertNotVisible: 10-19
 
 - tapOn: Info
 - tapOn: Responded 10-8
-- tapOn:
-    text: 10-7
-    index: 1
+- tapOn: 10-7
 - assertVisible: Responded 10-7
-- tapOn: Personnel.*
+- tapOn: Response
 - assertVisible: 10-7
 - assertNotVisible: 10-8
 - assertNotVisible: 10-19
 
 - tapOn: Info
 - tapOn: Responded 10-7
-- tapOn:
-    text: 10-19
-    index: 1
+- tapOn: 10-19
 - assertVisible: Responded 10-19
-- tapOn: Personnel.*
+- assertVisible: Response
+- tapOn: Response
 - assertVisible: 10-19
 - assertNotVisible: 10-8
 - assertNotVisible: 10-7

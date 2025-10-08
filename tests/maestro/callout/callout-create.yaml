@@ -27,12 +27,8 @@ TEST_VALIDATION: true
       platform: Android
     commands:
       - tapOn: Select type
-      - assertVisible:
-          text: Search
-          index: 1
-      - tapOn:
-          text: Rescue
-          index: 1
+      - assertVisible: Search
+      - tapOn: Rescue
 - tapOn: Title - Few Word Summary
 - inputText: '${TITLE}'
 - tapOn: Call Details - Full Description
@@ -83,22 +79,14 @@ TEST_VALIDATION: true
     commands:
       - tapOn:
           id: Tactical Talkgroup
-      - tapOn:
-          text: MAL SAR
-          index: 1
+      - tapOn: MAL SAR
       - tapOn: Select Frequencies
-      - tapOn:
-          text: C41
-          index: 1
-      - tapOn:
-          text: C42
-          index: 1
+      - tapOn: C41
+      - tapOn: C42
       - tapOn:
           id: 'android:id/content'
       - tapOn: Select Notifications
-      - tapOn:
-          text: SP
-          index: 1
+      - tapOn: SP
       - tapOn:
           id: 'android:id/content'
 - scrollUntilVisible:
@@ -113,7 +101,5 @@ TEST_VALIDATION: true
 - tapOn:
     text: 'Handling Unit / Tag #'
     index: 0
-    label: Click on 'Handling Unit / Tag # ' to hide keyboard.
-- tapOn:
-    text: Create Callout
-    index: 1
+    label: Click on 'Handling Unit / Tag # ' label to hide keyboard.
+- tapOn: Create Callout
