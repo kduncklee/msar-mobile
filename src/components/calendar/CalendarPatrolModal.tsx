@@ -3,6 +3,7 @@ import { fromDateId } from '@marceloterreiro/flash-calendar';
 import { useStore } from '@tanstack/react-form';
 import React from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import KeyboardAvoidingCustomView from '@/components/KeyboardAvoidingCustomView';
 import ModalFade from '@/components/modals/common/ModalFade';
 import { useAppForm } from '@/hooks/form';
 import { usePatrolCreateMutation, usePatrolRemoveMutation, usePatrolUpdateMutation } from '@/remote/mutation';
@@ -86,64 +87,66 @@ function CalendarPatrolModal({ dateID, patrol, onCancel }: CalendarPatrolModalPr
       headerRightIcon="delete-outline"
       onHeaderRight={deletePatrol}
     >
-      <ScrollView style={styles.dataContainer}>
+      <KeyboardAvoidingCustomView>
+        <ScrollView style={styles.dataContainer}>
 
-        <form.AppField
-          name="all_day"
-          children={field => (
-            <field.FormCheckbox
-              title="Default time period"
-            />
+          <form.AppField
+            name="all_day"
+            children={field => (
+              <field.FormCheckbox
+                title="Default time period"
+              />
+            )}
+          />
+
+          {!all_day && (
+            <>
+              <form.AppField
+                name="start_at"
+                children={field => (
+                  <field.FormDateTimePicker
+                    title="Start At"
+                    dateId={dateID}
+                    mode="time"
+                  />
+                )}
+              />
+              <form.AppField
+                name="finish_at"
+                children={field => (
+                  <field.FormDateTimePicker
+                    title="Finish At"
+                    dateId={dateID}
+                    mode="time"
+                  />
+                )}
+              />
+            </>
           )}
-        />
 
-        {!all_day && (
-          <>
-            <form.AppField
-              name="start_at"
-              children={field => (
-                <field.FormDateTimePicker
-                  title="Start At"
-                  dateId={dateID}
-                  mode="time"
-                />
-              )}
-            />
-            <form.AppField
-              name="finish_at"
-              children={field => (
-                <field.FormDateTimePicker
-                  title="Finish At"
-                  dateId={dateID}
-                  mode="time"
-                />
-              )}
-            />
-          </>
-        )}
+          <form.AppField
+            name="description"
+            children={field => (
+              <field.FormTextInput
+                title="Comment"
+                placeholder="Optional: extra information about the patrol"
+              />
+            )}
+          />
 
-        <form.AppField
-          name="description"
-          children={field => (
-            <field.FormTextInput
-              title="Comment"
-              placeholder="Optional: extra information about the patrol"
-            />
-          )}
-        />
-
-      </ScrollView>
-      <View style={elements.buttonContainer}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          style={[elements.capsuleButton, elements.splitButton]}
-          onPress={form.handleSubmit}
-        >
-          <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>
-            {patrol?.id ? 'Update patrol' : 'Create Patrol'}
-          </Text>
-        </TouchableOpacity>
-      </View>
+        </ScrollView>
+        <View style={elements.buttonContainer}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={[elements.capsuleButton, elements.splitButton]}
+            onPress={form.handleSubmit}
+          >
+            <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>
+              {patrol?.id ? 'Update patrol' : 'Create Patrol'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingCustomView>
     </ModalFade>
   );
 }
