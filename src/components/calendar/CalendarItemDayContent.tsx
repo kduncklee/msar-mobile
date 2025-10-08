@@ -35,6 +35,7 @@ export const CalendarItemDayContent = ({
           style={[styles.common, styles.patrol, { backgroundColor: patrol.color }]}
         >
           {patrol.member.username}
+          {patrol.description ? '*' : ''}
         </Text>
       ))}
 
