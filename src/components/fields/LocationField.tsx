@@ -78,7 +78,7 @@ function LocationField({ location }: LocationFieldProps) {
             <Text style={[elements.smallText, { margin: 16 }]} selectable>
               {locationToString(location)}
             </Text>
-            {(locType === locationType.ADDRESS) && coordinates.latitude
+            {(locType === locationType.ADDRESS) && !!coordinates.latitude
               && (
                 <Text style={[elements.smallText, { marginHorizontal: 16, marginBottom: 16 }]} selectable>
                   {locationCoordinatesToString(location)}

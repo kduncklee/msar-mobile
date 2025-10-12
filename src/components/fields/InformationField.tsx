@@ -24,14 +24,14 @@ function InformationField({ title, value, valueColor, icon, onIconPress, seconda
         {onSecondaryIconPress
           && (
             <TouchableOpacity activeOpacity={0.5} onPress={onSecondaryIconPress} style={styles.button}>
-              {secondaryIcon
+              {!!secondaryIcon
                 && <Image source={secondaryIcon} style={styles.iconImage} />}
             </TouchableOpacity>
           )}
         {onIconPress
           && (
             <TouchableOpacity activeOpacity={0.5} onPress={onIconPress} style={styles.button}>
-              {icon
+              {!!icon
                 && <Image source={icon} style={styles.iconImage} />}
               <Text style={[styles.valueText, { color: textColor }]}>{value}</Text>
             </TouchableOpacity>

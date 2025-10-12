@@ -28,7 +28,7 @@ function InformationTray({ title, titleBarColor, titleTextColor, editButton, onE
               <Image source={require('@assets/icons/pencil.png')} style={styles.editImage} />
             </TouchableOpacity>
           )}
-        {count
+        {!!count
           && <Text style={{ color: titleColor, fontSize: 16, fontWeight: '500', marginRight: 8 }}>{count}</Text>}
       </View>
       {children}

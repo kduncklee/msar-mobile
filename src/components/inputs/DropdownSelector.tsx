@@ -42,13 +42,13 @@ function DropdownSelector({ title, options, placeholder, selectedValue, rightBut
           onChange={onSelect}
           testID={title}
         />
-        {onRightPress
+        {!!onRightPress
           && (
             <TouchableOpacity
               activeOpacity={0.8}
               onPress={onRightPress}
             >
-              {rightButton
+              {!!rightButton
                 && <Image source={rightButton} style={elements.fieldImage} />}
             </TouchableOpacity>
           )}

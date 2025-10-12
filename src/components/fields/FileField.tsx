@@ -55,7 +55,7 @@ function FileField({ file }: FileFieldProps) {
   const size_mb = file.size / 1024 / 1024;
   const size_text = `${size_mb.toFixed(3)} MB`;
   const localFilename = `${file.id}_${file.name}`;
-  const localFullUri = `${Paths.document}${localFilename}`;
+  const localFullUri = `${Paths.document.uri}${localFilename}`;
 
   const [storedUri, setStoredUri] = useLocalDataFilePath(file.id);
 
