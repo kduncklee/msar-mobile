@@ -44,6 +44,23 @@
     },
     "plugins": [
       [
+        "expo-build-properties",
+        {
+          "android": {
+            "extraMavenRepos": [
+              "../../node_modules/@notifee/react-native/android/libs"
+            ]
+          },
+          "ios": {
+            "useFrameworks": "static",
+            "deploymentTarget": "15.1",
+            "forceStaticLinking": ["RNFBApp", "RNFBMessaging"],
+            // temporary workaround: https://github.com/expo/expo/issues/39607
+            "buildReactNativeFromSource": true
+          }
+        }
+      ],
+      [
         "notification-service-expo-plugin",
         {
           "devTeam": "UJDB5NH948",
@@ -53,19 +70,6 @@
       "expo-router",
       "@react-native-firebase/app",
       "@react-native-firebase/messaging",
-      [
-        "expo-build-properties",
-        {
-          "android": {
-            "extraMavenRepos": [
-              "../../node_modules/@notifee/react-native/android/libs"
-            ]
-          },
-          "ios": {
-            "useFrameworks": "static"
-          }
-        }
-      ],
       [
         "expo-notifications",
         {
