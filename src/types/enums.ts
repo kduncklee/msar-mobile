@@ -15,6 +15,7 @@ export enum logType {
   RESPONSE = 'response',
   SYSTEM = 'system',
   MESSAGE = 'message',
+  INVALID = 'invalid',
 }
 
 export enum logStatusType {
@@ -22,7 +23,7 @@ export enum logStatusType {
   PENDING = 'Sending ...',
 }
 
-export function stringToLogType(value: string): logType | undefined {
+export function stringToLogType(value: string): logType {
   switch (value) {
     case 'response':
       return logType.RESPONSE;
@@ -32,16 +33,17 @@ export function stringToLogType(value: string): logType | undefined {
       return logType.MESSAGE;
   }
 
-  return undefined;
+  return logType.INVALID;
 }
 
 export enum calloutStatus {
   ACTIVE = 'active',
   RESOLVED = 'resolved',
   ARCHIVED = 'archived',
+  INVALID = 'invalid',
 }
 
-export function stringToCalloutStatus(value: string): calloutStatus | undefined {
+export function stringToCalloutStatus(value: string): calloutStatus {
   switch (value) {
     case 'active':
       return calloutStatus.ACTIVE;
@@ -51,7 +53,8 @@ export function stringToCalloutStatus(value: string): calloutStatus | undefined 
       return calloutStatus.ARCHIVED;
   }
 
-  return undefined;
+  console.error('Undefined callout status', value);
+  return calloutStatus.INVALID;
 }
 
 export function isLogType(object: any): boolean {

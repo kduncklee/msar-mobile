@@ -25,8 +25,8 @@ function NotificationSettings({
 
   useEffect(() => {
     async function getFromStorage() {
-      setSound(await getSoundForChannel(channel));
-      setCritical(await getCriticalForChannel(channel));
+      setSound(await getSoundForChannel(channel) ?? '');
+      setCritical(await getCriticalForChannel(channel) ?? false);
     }
     getFromStorage();
   }, [channel]);

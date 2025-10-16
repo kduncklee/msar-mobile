@@ -18,7 +18,7 @@ interface CalendarDayModalProps {
 };
 
 function CalendarDayModal({ dateID, events, patrols, onCancel }: CalendarDayModalProps) {
-  const [selectedPatrolDate, setSelectedPatrolDate] = useState<string>(null);
+  const [selectedPatrolDate, setSelectedPatrolDate] = useState<string | null>(null);
   const { username } = useAuth();
 
   const userPatrol = patrols?.find(p => isUserSelf(p.member, username));

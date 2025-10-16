@@ -23,7 +23,11 @@ export function getPaddedDateString(date: Date, includeYear: boolean = false): s
 }
 
 /** Format the components as "HH:mm aa" or "H:mm aa" */
-export function getTimeString(date: Date, padHours: boolean = false): string {
+export function getTimeString(date?: Date, padHours: boolean = false): string {
+  if (!date) {
+    return 'unknown';
+  }
+
   const hours = date.getHours();
   const minutes = date.getMinutes();
 
@@ -47,7 +51,7 @@ export function getFullDateTimeString(date: Date): string {
   return `${getPaddedDateString(date, true)} - ${getTimeString(date, true)}`;
 }
 
-export function getConditionalTimeString(date: Date): string {
+export function getConditionalTimeString(date?: Date): string {
   if (!date?.getMonth) {
     return 'unknown';
   }
@@ -60,7 +64,7 @@ export function getConditionalTimeString(date: Date): string {
   }
 }
 
-export function getDateRangeString(a: Date, b: Date): string {
+export function getDateRangeString(a?: Date, b?: Date): string {
   if (!a || !b) {
     return '';
   }
@@ -70,7 +74,7 @@ export function getDateRangeString(a: Date, b: Date): string {
   return `${getDateString(a)} - ${getDateString(b)}`;
 }
 
-export function getDateTimeRangeString(a: Date, b: Date): string {
+export function getDateTimeRangeString(a?: Date, b?: Date): string {
   if (!a || !b) {
     return '';
   }

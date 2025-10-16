@@ -16,7 +16,7 @@ import { checkPushToken, sendPushToken } from '@/utility/pushNotificationToken';
 
 function Page() {
   const [notificationLoading, setNotificationLoading] = useState('Loading...');
-  const [pushEnabled, setPushEnabled] = useState(null);
+  const [pushEnabled, setPushEnabled] = useState<boolean | null>(null);
   const [expandNotificationSounds, setExpandNotificationSounds] = useState(false);
   const [criticalAlertsVolume, setCriticalAlertsVolume] = useState(() => getCriticalAlertsVolume());
   const { username, server, api, logout } = useAuth();
@@ -63,15 +63,15 @@ function Page() {
     <>
       <Checkbox
         title="Notifications"
-        checked={pushEnabled}
+        checked={!!pushEnabled}
         onToggle={onPushToggle}
       />
-      {pushEnabled && (
+      {!!pushEnabled && (
         <>
           {Platform.OS === 'android' && (
             <Checkbox
               title="Override critical notification sounds"
-              checked={soundOverride}
+              checked={!!soundOverride}
               onToggle={onSoundOverrideToggle}
             />
           )}

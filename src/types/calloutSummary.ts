@@ -61,6 +61,8 @@ export function textForCalloutStatus(type: calloutStatus): string {
       return 'Resolved';
     case calloutStatus.ARCHIVED:
       return 'Archived';
+    case calloutStatus.INVALID:
+      return 'Invalid';
   }
 }
 
@@ -76,12 +78,14 @@ export function iconForType(callout: calloutSummary): any {
 }
 
 export function colorForResponseType(
-  type: string,
+  type: string | undefined,
   calloutResponsesAvailableMap: Map<string, calloutResponseAvailable>,
 ): string {
-  const t = calloutResponsesAvailableMap?.get(type);
-  if (t && t.color) {
-    return t.color;
+  if (type) {
+    const t = calloutResponsesAvailableMap?.get(type);
+    if (t && t.color) {
+      return t.color;
+    }
   }
   return colors.grayText;
 }

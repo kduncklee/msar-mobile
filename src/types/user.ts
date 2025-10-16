@@ -37,7 +37,7 @@ export interface member_status_type {
   is_display: boolean;
 }
 
-export function userToString(user: user): string {
+export function userToString(user?: user): string {
   if (!user)
     return 'System';
   return `${user.username} - ${user.full_name}`;
@@ -51,7 +51,7 @@ export function compareUsername(a: user, b: user) {
   return stringCompareIgnoreCase(a.username, b.username);
 }
 
-export function isUserSelf(user: user, self_username: string): boolean {
+export function isUserSelf(user?: user, self_username?: string): boolean {
   if (!user)
     return false;
 

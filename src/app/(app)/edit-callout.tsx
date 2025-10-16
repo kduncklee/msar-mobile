@@ -32,7 +32,7 @@ function Page() {
   useStatusBarColor();
 
   const calloutQuery = useCalloutQuery(id);
-  let existingData: callout;
+  let existingData: callout | undefined;
   if (id) {
     existingData = calloutQuery.data;
   }
@@ -46,7 +46,7 @@ function Page() {
   const form = useAppForm({
     defaultValues: {
       title: existingData?.title ?? '',
-      operationType: existingData?.operation_type,
+      operationType: existingData?.operation_type ?? '',
       locationText: locationToString(existingData?.location),
       locationDescText: existingData?.location?.text,
       subject: existingData?.subject,
@@ -102,7 +102,7 @@ function Page() {
   });
   const ten22 = useStore(form.store, state => state.values.ten22);
 
-  const locationChanged = (editingLocation && (JSON.stringify(existingData?.location) !== JSON.stringify(editingLocation)));
+  const locationChanged = !!(editingLocation && (JSON.stringify(existingData?.location) !== JSON.stringify(editingLocation)));
   const calloutChanged = form.state.isDirty || locationChanged;
   useBackHandler(calloutChanged);
   const backPressed = () => {

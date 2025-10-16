@@ -12,7 +12,8 @@
       "@storage/*": ["./storage/*"],
       "@styles/*": ["./styles/*"],
       "@utility/*": ["./utility/*"]
-    }
+    },
+    "strictNullChecks": true
   },
   "exclude": [
     "packages/notification-service-expo-plugin/examples",

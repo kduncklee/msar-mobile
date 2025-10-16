@@ -10,7 +10,7 @@ import { useCertsQuery } from '@/remote/query';
 import { getPaddedDateString } from '@/utility/dateHelper';
 
 interface UserModalProps {
-  user?: user_detail;
+  user: user_detail;
   onCancel: () => void;
 };
 

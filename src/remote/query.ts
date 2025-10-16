@@ -80,7 +80,7 @@ export function useCalloutResponsesAvailableMap(): Map<string, calloutResponseAv
 
 /// /// Events List
 
-function argsStartAtFinishAt(startAt: Date, finishAt: Date, isEvent: boolean) {
+function argsStartAtFinishAt(startAt: Date | undefined, finishAt: Date | undefined, isEvent: boolean) {
   // TODO: This should be finish_at to handle multi-day patrols, but that doesn't work if finish_at is null.
   const finish_filter = isEvent ? 'finish_at' : 'start_at';
   let args = isEvent ? '&' : '?';

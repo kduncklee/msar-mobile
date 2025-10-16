@@ -17,7 +17,7 @@ import { activeTabStatusQuery, archivedTabStatusQuery } from '@/types/calloutSum
 
 function Page() {
   const [showSpinner, _setShowSpinner] = useState(false);
-  const [archiveCount, _setArchiveCount] = useState(null);
+  const [archiveCount, _setArchiveCount] = useState(undefined);
   const [status, setStatus] = useState(activeTabStatusQuery);
   const queryClient = useQueryClient();
   const query = useCalloutListQuery(status);

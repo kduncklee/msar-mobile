@@ -42,7 +42,7 @@ function CalendarPatrolModal({ dateID, patrol, onCancel }: CalendarPatrolModalPr
       console.log('form submit', value);
       const updated_patrol: patrol = {
         start_at: value.start_at,
-        finish_at: value.all_day ? null : value.finish_at,
+        finish_at: value.all_day ? undefined : value.finish_at,
         description: value.description,
       };
 
@@ -66,7 +66,7 @@ function CalendarPatrolModal({ dateID, patrol, onCancel }: CalendarPatrolModalPr
       {
         text: 'Yes',
         onPress: () => {
-          if (patrol) {
+          if (patrol?.id) {
             patrolRemoveMutation.mutate(patrol.id);
           }
           onCancel();

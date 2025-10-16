@@ -16,11 +16,11 @@ function CalloutPersonnelTab({ callout }: CalloutPersonnelTabProps) {
   const calloutResponesQuery = useCalloutResponsesAvailableQuery();
 
   let responses: opResponse[] = [];
-  if (callout.operational_periods[0]) {
+  if (callout.operational_periods && callout.operational_periods[0]) {
     responses = callout.operational_periods[0].responses;
   }
 
-  const responseMap = [];
+  const responseMap: any = [];
   let empty = true;
 
   if (calloutResponesQuery.data) {

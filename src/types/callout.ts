@@ -60,10 +60,10 @@ export function calloutFromResponse(data: any): callout {
 }
 
 export function calloutResponseBadge(
-  callout: callout,
+  callout: callout | undefined,
   calloutResponsesAvailableMap: Map<string, calloutResponseAvailable>,
-): string | null {
-  if (callout?.operational_periods[0]) {
+): string | undefined {
+  if (callout?.operational_periods && callout.operational_periods[0]) {
     const responses = callout.operational_periods[0].responses;
     let badgeCount = 0;
     responses.forEach((response) => {
@@ -77,5 +77,5 @@ export function calloutResponseBadge(
     }
   }
 
-  return null;
+  return undefined;
 }

@@ -70,7 +70,7 @@ function Page() {
   const iconSize = 30 * fontScale;
   const items: Items[] = [
     { text: 'Callouts', icon: 'car-emergency', url: '/callout-list', badge: numberActiveCallouts },
-    { text: 'Messages', icon: 'forum-outline', url: '/chat', badge: chatHasUnread && '!' },
+    { text: 'Messages', icon: 'forum-outline', url: '/chat', badge: chatHasUnread ? '!' : undefined },
     { text: 'Roster', icon: 'account-multiple-outline', url: '/roster' },
     { text: 'Certs', icon: 'certificate', url: '/certs' },
     { text: 'Calendar', icon: 'calendar', url: '/calendar' },
@@ -85,7 +85,7 @@ function Page() {
   else if (Platform.OS === 'android') {
     StatusBar.setBackgroundColor(colors.primaryBg);
     StatusBar.setBarStyle('light-content');
-    topMargin = (StatusBar.currentHeight + 20);
+    topMargin = (StatusBar.currentHeight ?? 0) + 20;
   }
 
   useEffect(() => {
@@ -142,7 +142,13 @@ function Page() {
             {items.map(item => (
               <TouchableOpacity
                 activeOpacity={0.5}
-                onPress={item.onPress ? item.onPress : () => router.push(item.url)}
+                onPress={item.onPress
+                  ? item.onPress
+                  : () => {
+                      if (item.url) {
+                        router.push(item.url);
+                      }
+                    }}
                 testID={item.text}
                 key={item.text}
                 style={[{

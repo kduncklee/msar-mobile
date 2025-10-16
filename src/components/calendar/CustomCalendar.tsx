@@ -42,11 +42,11 @@ export const CustomCalendar = memo(
         <Calendar.HStack
           alignItems="center"
           justifyContent="space-around"
-          style={theme.rowMonth?.container}
+          style={theme?.rowMonth?.container}
           width="100%"
         >
           <CustomCalendarButton onPress={onPreviousMonthPress}>{'<<'}</CustomCalendarButton>
-          <Text style={theme.rowMonth?.content}>
+          <Text style={theme?.rowMonth?.content}>
             {uppercaseFirstLetter(calendarRowMonth)}
           </Text>
           <CustomCalendarButton onPress={onNextMonthPress}>{'>>'}</CustomCalendarButton>

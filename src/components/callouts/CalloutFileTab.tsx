@@ -18,7 +18,10 @@ async function uploadFile(api: Api, file: object, id: number) {
   msarEventEmitter.emit('refreshCallout', { id });
 }
 
-async function pickUploadPhoto(api: Api, id: number) {
+async function pickUploadPhoto(api: Api, id?: number) {
+  if (!id) {
+    return;
+  }
   const picker = await ImagePicker.launchImageLibraryAsync({
     quality: 1,
   });
@@ -39,7 +42,10 @@ async function pickUploadPhoto(api: Api, id: number) {
   uploadFile(api, file, id);
 }
 
-async function pickUploadFile(api: Api, id: number) {
+async function pickUploadFile(api: Api, id?: number) {
+  if (!id) {
+    return;
+  }
   const document = await DocumentPicker.getDocumentAsync();
   if (document.canceled) {
     console.log('No document selected.');

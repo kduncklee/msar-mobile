@@ -85,7 +85,7 @@ const linearTheme: CalendarTheme = {
 };
 
 function Page() {
-  const [selectedDate, setSelectedDate] = useState<string>(null);
+  const [selectedDate, setSelectedDate] = useState<string>('');
 
   const [currentCalendarMonth, setCurrentCalendarMonth] = useState(() => new Date());
   const startDate = startOfMonth(currentCalendarMonth);
@@ -95,12 +95,14 @@ function Page() {
   const events = new Map<string, event[]>();
   if (eventQuery.isSuccess) {
     eventQuery.data.forEach((e) => {
-      const dateId = toDateId(e.start_at);
-      if (!events[dateId]) {
-        events[dateId] = [e];
-      }
-      else {
-        events[dateId].push(e);
+      if (e.start_at) {
+        const dateId = toDateId(e.start_at);
+        if (!events[dateId]) {
+          events[dateId] = [e];
+        }
+        else {
+          events[dateId].push(e);
+        }
       }
     });
   }
@@ -134,7 +136,7 @@ function Page() {
   }, [currentCalendarMonth]);
 
   const onClose = () => {
-    setSelectedDate(null);
+    setSelectedDate('');
   };
 
   return (
@@ -146,7 +148,7 @@ function Page() {
           events={events}
           patrols={patrols}
           calendarFirstDayOfWeek="monday"
-          calendarDayHeight={null}
+          calendarDayHeight={undefined}
           theme={linearTheme}
           onCalendarDayPress={onCalendarDayPress}
           onPreviousMonthPress={handlePreviousMonth}

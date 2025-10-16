@@ -27,11 +27,11 @@ import { calloutResponseSuccessNotification } from '@/utility/pushNotifications'
 
 enum CalloutTabs { INFO, LOG, PERSONNEL, FILES };
 
-function badgeString(badge: number) {
+function badgeString(badge?: number) {
   if (badge) {
     return `${badge}`;
   }
-  return null;
+  return undefined;
 }
 
 function Page() {

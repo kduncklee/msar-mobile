@@ -5,7 +5,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface InformationTrayProps {
   title: string;
-  titleBarColor: string;
+  titleBarColor?: string;
   titleTextColor?: string;
   editButton?: boolean;
   onEditPress?: () => void;

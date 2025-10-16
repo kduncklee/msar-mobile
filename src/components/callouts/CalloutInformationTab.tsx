@@ -24,7 +24,7 @@ function CalloutInformationTab({ callout }: CalloutInformationTabProps) {
 
   const editDetailsPressed = () => {
     console.log('edit details');
-    router.push({ pathname: 'edit-callout', params: { id: callout.id.toString() } });
+    router.push({ pathname: 'edit-callout', params: { id: callout.id?.toString() } });
   };
 
   return (
@@ -131,7 +131,7 @@ function CalloutInformationTab({ callout }: CalloutInformationTabProps) {
         )}
         <View style={{ height: 10 }} />
       </InformationTray>
-      {(locationIsSet(callout.location) || callout.location?.text)
+      {!!callout.location && (locationIsSet(callout.location) || callout.location?.text)
         && (
           <InformationTray
             title="Location"

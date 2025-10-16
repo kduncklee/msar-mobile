@@ -19,7 +19,7 @@ function generateEncryptionKey() {
 }
 
 function getEncryptionKey() {
-  let key: string = SecureStore.getItem(key_name);
+  let key: string | null = SecureStore.getItem(key_name);
   if (!key) {
     key = generateEncryptionKey();
     SecureStore.setItem(key_name, key, keychainOptions);
@@ -64,7 +64,7 @@ export function useLastRead(id: number) {
   return useMMKVNumber(`last-read-${id.toString()}`, storage);
 }
 
-export function getLastLogRead(id: number): number {
+export function getLastLogRead(id: number): number | undefined {
   return storage.getNumber(`last-read-${id.toString()}`);
 }
 
@@ -83,20 +83,19 @@ export function useSoundOverride() {
   return useMMKVBoolean('sound-override', storage);
 }
 
-export function getSoundOverride(): boolean {
+export function getSoundOverride(): boolean | undefined {
   return storage.getBoolean('sound-override');
 }
 
 export function getCriticalAlertsVolume(): number {
-  const key = 'critical-alert-volume';
-  return sharedStorage.contains(key) ? sharedStorage.getNumber(key) : 1.0;
+  return sharedStorage.getNumber('critical-alert-volume') ?? 1.0;
 }
 
 export function storeCriticalAlertsVolume(value: number) {
   sharedStorage.set('critical-alert-volume', value);
 }
 
-export function getSoundForChannel(channel: string): string {
+export function getSoundForChannel(channel: string): string | undefined {
   return sharedStorage.getString(`sound-${channel}`);
 }
 
@@ -104,7 +103,7 @@ export function storeSoundForChannel(channel: string, sound: string) {
   sharedStorage.set(`sound-${channel}`, sound);
 }
 
-export function getCriticalForChannel(channel: string): boolean {
+export function getCriticalForChannel(channel: string): boolean | undefined {
   return sharedStorage.getBoolean(`critical-${channel}`);
 }
 
@@ -117,8 +116,7 @@ export function storeSnoozeExpires(value: number) {
 }
 
 export function getSnoozeExpires(): number {
-  const key = 'snoozeExpires';
-  return sharedStorage.contains(key) ? sharedStorage.getNumber(key) : 0;
+  return sharedStorage.getNumber('snoozeExpires') ?? 0;
 }
 
 export function getIsSnoozing(): boolean {

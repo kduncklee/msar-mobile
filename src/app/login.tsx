@@ -13,7 +13,7 @@ import useAuth from '@/hooks/useAuth';
 import { logo_for_server, server_choices } from '@/remote/api';
 
 function Page() {
-  const scrollViewRef = useRef(null);
+  const scrollViewRef = useRef<ScrollView>(null);
   const [showSpinner, setShowSpinner] = useState(false);
   const { login } = useAuth();
   let topMargin = 0;
@@ -65,7 +65,7 @@ function Page() {
   else if (Platform.OS === 'android') {
     StatusBar.setBackgroundColor(colors.primaryBg);
     StatusBar.setBarStyle('light-content');
-    topMargin = (StatusBar.currentHeight + 20);
+    topMargin = (StatusBar.currentHeight ?? 0) + 20;
   }
 
   useEffect(() => {

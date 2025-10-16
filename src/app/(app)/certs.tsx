@@ -13,9 +13,9 @@ import { memberListQueryKey, teamCertsQueryKey, useMemberListQuery, useTeamCerts
 import { elements } from '@/styles/elements';
 
 function Page() {
-  const [direction, setDirection] = useState(null);
+  const [direction, setDirection] = useState<string>('');
   const [selectedColumn, setSelectedColumn] = useState(null);
-  const [selectedUser, setSelectedUser] = useState<user_detail>(null);
+  const [selectedUser, setSelectedUser] = useState<user_detail | null>(null);
   useStatusBarColor();
 
   const queryClient = useQueryClient();
@@ -29,12 +29,12 @@ function Page() {
   ], []);
   const certColumns = useMemo(() => certQuery.data?.at(0)?.certs?.map(cert => cert.type_display || cert.type), [certQuery.data]);
   const fixedColumns = fixedColumnMap.map(item => item.label);
-  const allColumns = useMemo(() => fixedColumns.concat(certColumns), [certColumns, fixedColumns]);
+  const allColumns = useMemo(() => certColumns ? fixedColumns.concat(certColumns) : fixedColumns, [certColumns, fixedColumns]);
   const minColumnWidth = 15;
   const [columnWidths, setColumnWidths] = useState(() => allColumns.map(_ => minColumnWidth));
-  const cellRefs = useRef([]);
+  const cellRefs = useRef<(Text | View)[][]>([]);
 
-  const unsortedData = [];
+  const unsortedData: member_cert_summary_ext[] = [];
   certQuery.data?.forEach((item) => {
     const combined: member_cert_summary_ext = { ...item };
     const user = memberQuery.data?.find(user => user.id === item.id);
@@ -119,11 +119,13 @@ function Page() {
     }
   }, [allColumns, columnWidths, setColumnWidths]);
 
-  const updateRef = (el, rowIndex, columnIndex) => {
+  const updateRef = (el: Text | View | null, rowIndex, columnIndex) => {
     if (!cellRefs.current[rowIndex]) {
       cellRefs.current[rowIndex] = [];
     }
-    cellRefs.current[rowIndex][columnIndex] = el;
+    if (el) {
+      cellRefs.current[rowIndex][columnIndex] = el;
+    }
   };
 
   const renderTableHeader = useCallback(
@@ -132,11 +134,12 @@ function Page() {
         {columns.map((column, index) => (
           <TouchableOpacity
             key={column}
-            style={[styles.columnHeader, { minWidth: columnWidths[index] }]}
             onPress={() => sortTable(column)}
-            ref={el => updateRef(el, 0, index)}
           >
-            <View style={{ flexDirection: 'row' }}>
+            <View
+              style={[styles.columnHeader, { flexDirection: 'row', minWidth: columnWidths[index] }]}
+              ref={el => updateRef(el, 0, index)}
+            >
               <Text style={styles.columnHeaderTxt}>{`${column} `}</Text>
               {selectedColumn === column && (
                 <Image

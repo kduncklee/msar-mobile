@@ -13,8 +13,8 @@ export function AuthProvider({
 }: {
   children: React.ReactElement;
 }) {
-  const [username, setUsername] = useState<string>('');
-  const [token, setToken] = useState<string>('');
+  const [username, setUsername] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [server, setServer] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingInitial, setLoadingInitial] = useState<boolean>(true);
@@ -74,7 +74,7 @@ export function AuthProvider({
 
     setUsername(null);
     setToken(null);
-    setServer(null);
+    setServer('');
 
     clearCredentials();
     clearServer();

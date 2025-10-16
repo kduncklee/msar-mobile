@@ -36,13 +36,13 @@ const server_all_choices: Server[] = [
 
 export function logo_for_server(server: string) {
   const logo = server_all_choices.find(item => item.value === server)?.logo;
-  return logo || require('@assets/logos/custom.png');
+  return logo ?? require('@assets/logos/custom.png');
 }
 
 export class Api {
   #_server = '';
-  #token = '';
-  constructor(server: string, token: string) {
+  #token: string | null = '';
+  constructor(server: string, token: string | null) {
     this.#_server = server;
     this.#token = token;
   }

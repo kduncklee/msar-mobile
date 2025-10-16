@@ -18,13 +18,13 @@ interface HeaderProps {
   timestamp?: Date;
 };
 
-function Header({ title, zeroTopMargin, background, backButton = false, onBackPressed, rightButtonIcon, onRightPressed, timestamp = null }: HeaderProps) {
+function Header({ title, zeroTopMargin, background, backButton = false, onBackPressed, rightButtonIcon, onRightPressed, timestamp = undefined }: HeaderProps) {
   let headerMargin = 0;
   if (zeroTopMargin || (Platform.OS === 'ios')) {
     headerMargin = 0;
   }
   else if (Platform.OS === 'android') {
-    headerMargin = (StatusBar.currentHeight);
+    headerMargin = (StatusBar.currentHeight ?? 0);
   }
 
   useFocusEffect(() => {

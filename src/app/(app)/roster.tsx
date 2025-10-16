@@ -15,7 +15,7 @@ function Page() {
   const [sortName, setSortName] = useState('Last Name');
   const [sortKey, setSortKey] = useState('last_name');
   const [reversed, setReversed] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<user_detail>(null);
+  const [selectedUser, setSelectedUser] = useState<user_detail | null>(null);
   useStatusBarColor();
   const queryClient = useQueryClient();
   const query = useMemberListQuery();

@@ -16,7 +16,7 @@ function CalloutRespondModal({
   const title = 'Respond:';
   const calloutResponesQuery = useCalloutResponsesAvailableQuery();
 
-  const buttons = [];
+  const buttons: any = [];
   if (calloutResponesQuery.data) {
     calloutResponesQuery.data.results.forEach((data: any) => {
       const backgroundColor: string = data.color ?? colors.white;

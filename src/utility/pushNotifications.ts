@@ -148,6 +148,10 @@ async function playOverrideSound(sound: string) {
     await asset.downloadAsync();
   }
   console.log('sound2', asset, asset?.localUri);
+  if (!asset.localUri) {
+    console.error('sound does not have a localUri', asset);
+    return;
+  }
   playNotificationSound(asset.localUri).then(
     (value: any) => {
       console.log('test ok', value);
@@ -284,10 +288,12 @@ function checkNotificationDefaults() {
     // Copy from log - keeps same behavior as before update.
     const sound = getSoundForChannel('log');
     const critical = getCriticalForChannel('log');
-    storeSoundForChannel('callout-response-no', sound);
-    storeCriticalForChannel('callout-response-no', critical);
-    storeSoundForChannel('callout-response-yes', sound);
-    storeCriticalForChannel('callout-response-yes', critical);
+    if (sound && critical) {
+      storeSoundForChannel('callout-response-no', sound);
+      storeCriticalForChannel('callout-response-no', critical);
+      storeSoundForChannel('callout-response-yes', sound);
+      storeCriticalForChannel('callout-response-yes', critical);
+    }
   }
   // These were added even later, check separately:
   if (getSoundForChannel('sent') === undefined) {

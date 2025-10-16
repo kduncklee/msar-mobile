@@ -25,7 +25,7 @@ function Page() {
   const [showSpinner, setShowSpinner] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [editingLocation, setEditingLocation] = useEditingLocation();
-  const [currentLocation, setCurrentLocation] = useState<location>(null);
+  const [currentLocation, setCurrentLocation] = useState<location | undefined>(undefined);
   let defaultRegion = {
     latitude: 34.050783236893395,
     longitude: -118.83192890478199,
@@ -156,7 +156,7 @@ function Page() {
     }
   };
 
-  const setLocation = (location: location) => {
+  const setLocation = (location?: location) => {
     // TODO: Clean this up:
     // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
     setCurrentLocation(location);
@@ -174,7 +174,7 @@ function Page() {
     setShowSearchResults(false);
   };
 
-  let currentCoordinate: LatLng = null;
+  let currentCoordinate: LatLng | null = null;
   if (currentLocation?.coordinates != null) {
     currentCoordinate = coordinateFromString(`${currentLocation.coordinates.lat}, ${currentLocation.coordinates.long}`);
   }
@@ -192,7 +192,7 @@ function Page() {
               initialRegion={defaultRegion}
               region={defaultRegion}
             >
-              {currentLocation && currentCoordinate
+              {!!currentLocation && !!currentCoordinate
                 && (
                   <Marker
                     ref={markerRef}
@@ -227,7 +227,7 @@ function Page() {
                     </View>
                   </>
                 )}
-              {currentCoordinate
+              {!!currentCoordinate
                 && (
                   <>
                     <Text style={styles.coordinateText}>{`${currentCoordinate.latitude}, ${currentCoordinate.longitude}`}</Text>

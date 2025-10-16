@@ -17,7 +17,7 @@ const colors = {
 };
 
 // Modified from https://stackoverflow.com/questions/3942878/how-to-decide-font-color-in-white-or-black-depending-on-background-color
-export function colorIsDark(bgColor: string) {
+export function colorIsDark(bgColor?: string) {
   if (!bgColor) {
     return false;
   }
@@ -28,7 +28,7 @@ export function colorIsDark(bgColor: string) {
   return ((r * 0.299) + (g * 0.587) + (b * 0.114)) <= 186;
 }
 
-export function textColorForBackground(bgColor: string) {
+export function textColorForBackground(bgColor?: string) {
   return colorIsDark(bgColor) ? colors.white : colors.black;
 }
 

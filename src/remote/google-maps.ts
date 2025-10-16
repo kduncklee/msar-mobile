@@ -55,8 +55,8 @@ function convertGeocodeToLocation(result: any): location {
   let state: string = '';
   let zip: string = '';
 
-  let latitude: number = null;
-  let longitude: number = null;
+  let latitude: number | null = null;
+  let longitude: number | null = null;
 
   if (result.geometry.location.lat && typeof result.geometry.location.lat === 'number'
     && result.geometry.location.lng && typeof result.geometry.location.lng === 'number') {

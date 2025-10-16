@@ -34,7 +34,7 @@ export const queryClient = new QueryClient({
 // React query: Online status management
 onlineManager.setEventListener((setOnline) => {
   return NetInfo.addEventListener((state) => {
-    setOnline(state.isConnected);
+    setOnline(!!state.isConnected);
   });
 });
 

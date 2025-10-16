@@ -87,7 +87,7 @@ export function usePatrolRemoveMutation() {
 
 /// /// Chat / Callout Log Mutations
 // Combination hook needed for shared component.
-export function useChatOrCalloutLogMutation(idInt: number) {
+export function useChatOrCalloutLogMutation(idInt?: number) {
   const { api } = useAuth();
   let mutationFn;
   let queryKey;
@@ -201,8 +201,8 @@ export function useLogMutation(mutationFn, queryKey) {
     onError: (_error, _variables, context) => {
       // Remove optimistic message from the list
       queryClient.setQueryData(queryKey, (old) => {
-        console.log('e id, old', context.id, old);
-        return updateItemStatus(old, context.id, logStatusType.ERROR);
+        console.log('e id, old', context?.id, old);
+        return updateItemStatus(old, context?.id, logStatusType.ERROR);
       });
     },
 

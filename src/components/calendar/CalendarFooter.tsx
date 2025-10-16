@@ -11,7 +11,7 @@ interface user_ext extends user_detail {
 }
 
 interface CalendarFooterProps {
-  patrols: patrol[];
+  patrols?: patrol[];
 }
 
 function FooterRow({ user }: { user: user_ext }) {
@@ -42,7 +42,9 @@ function CalendarFooter({ patrols }: CalendarFooterProps) {
 
   const memberPatrols = new Map<string, boolean>();
   patrols?.forEach((patrol) => {
-    memberPatrols[patrol.member.username] = true;
+    if (patrol.member) {
+      memberPatrols[patrol.member.username] = true;
+    }
   });
 
   const sorted: user_ext[] = memberQuery.data

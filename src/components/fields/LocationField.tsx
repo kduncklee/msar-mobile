@@ -2,7 +2,7 @@ import type { LatLng, Region } from 'react-native-maps';
 import type { location } from '@/types/location';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
-import { coordinateFromString } from '@utility/locationHeler';
+import { coordinateFromString, nullCoordinate } from '@utility/locationHeler';
 import * as Clipboard from 'expo-clipboard';
 import React from 'react';
 import { Linking, Platform, StyleSheet, Text, View } from 'react-native';
@@ -16,8 +16,8 @@ interface LocationFieldProps {
 };
 
 function LocationField({ location }: LocationFieldProps) {
-  let locType: locationType = null;
-  let coordinates: LatLng = { latitude: 0, longitude: 0 };
+  let locType: locationType | null = null;
+  let coordinates: LatLng = nullCoordinate;
 
   const defaultRegion: Region = {
     latitude: 34.050783236893395,
@@ -35,7 +35,7 @@ function LocationField({ location }: LocationFieldProps) {
     const mapUrl = Platform.select({
       ios: `maps:0,0?q=${encodeURIComponent(address)}`,
       android: `geo:0,0?q=${encodeURIComponent(address)}`,
-    });
+    }) ?? '';
 
     Linking.openURL(mapUrl).catch(err => console.error('An error occurred', err));
   };

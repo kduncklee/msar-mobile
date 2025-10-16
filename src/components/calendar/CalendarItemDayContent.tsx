@@ -31,10 +31,10 @@ export const CalendarItemDayContent = ({
           numberOfLines={1}
           ellipsizeMode="clip"
           allowFontScaling={false}
-          key={patrol.member.username}
+          key={patrol.member?.username}
           style={[styles.common, styles.patrol, { backgroundColor: patrol.color }]}
         >
-          {patrol.member.username}
+          {patrol.member?.username}
           {patrol.description ? '*' : ''}
         </Text>
       ))}
