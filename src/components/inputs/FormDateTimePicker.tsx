@@ -63,7 +63,6 @@ function FormDateTimePicker({ title, dateId, mode, ...inputProps }: FormDateTime
         mode={mode}
         date={date ?? fromDateId(dateId)}
         onConfirm={(date) => {
-          console.log('DateTimePickerModal', name, getTimeString(date));
           field.handleChange(date);
           hideDatePicker();
         }}
