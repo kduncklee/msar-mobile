@@ -20,8 +20,11 @@
   // the group dir that can be accessed by App & extensions
   NSString *groupDir = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:myGroupID].path;
   [MMKV initializeMMKV:nil groupDir:groupDir logLevel:MMKVLogError];
-  
-  MMKV *mmkv = [MMKV mmkvWithID:@"mmkv.shared" mode:MMKVMultiProcess];
+
+  // Override the rootPath here to match the one used by react-native-mmkv.
+  // Was: MMKV *mmkv = [MMKV mmkvWithID:@"mmkv.shared" mode:MMKVMultiProcess];
+  // Without the override, it was using ${groupDir}/mmkv/mmkv.shared.
+  MMKV *mmkv = [MMKV mmkvWithID:@"mmkv.shared" cryptKey:nil rootPath:groupDir mode:MMKVMultiProcess expectedCapacity:0];
   double badgeCount = [mmkv getDoubleForKey:@"badgeCount"] + 1;
   [mmkv setDouble:badgeCount forKey:@"badgeCount"];
   NSString *channel = self.bestAttemptContent.userInfo[@"channel"];

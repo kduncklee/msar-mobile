@@ -1,7 +1,7 @@
 import type { location } from '@/types/location';
 import { getData, removeData } from '@storage/storage';
 import * as SecureStore from 'expo-secure-store';
-import { MMKV, useMMKVBoolean, useMMKVNumber, useMMKVObject, useMMKVString } from 'react-native-mmkv';
+import { createMMKV, useMMKVBoolean, useMMKVNumber, useMMKVObject, useMMKVString } from 'react-native-mmkv';
 
 const key_name = 'mmkv_encryption_key';
 const keychainOptions: SecureStore.SecureStoreOptions = {
@@ -27,13 +27,14 @@ function getEncryptionKey() {
   return key;
 }
 
-export const storage = new MMKV({
+export const storage = createMMKV({
   id: 'mmkv.secure',
   encryptionKey: getEncryptionKey(),
 });
 
-export const sharedStorage = new MMKV({
+export const sharedStorage = createMMKV({
   id: 'mmkv.shared',
+  mode: 'multi-process',
 });
 
 export const clientStorage = {
@@ -48,7 +49,7 @@ export const clientStorage = {
   },
   removeItem: (key: string) => {
     console.log('mmkv delete', key);
-    storage.delete(key);
+    storage.remove(key);
   },
 };
 
@@ -126,6 +127,10 @@ export function getIsSnoozing(): boolean {
 
 export function clearSnoozeExpires() {
   return storeSnoozeExpires(0);
+}
+
+export function getBadgeCount() {
+  return sharedStorage.getNumber('badgeCount');
 }
 
 export function storeBadgeCount(value: number) {
