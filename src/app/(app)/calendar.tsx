@@ -148,7 +148,8 @@ function Page() {
           events={events}
           patrols={patrols}
           calendarFirstDayOfWeek="monday"
-          calendarDayHeight={undefined}
+          // @ts-expect-error: force null to float height
+          calendarDayHeight={null}
           theme={linearTheme}
           onCalendarDayPress={onCalendarDayPress}
           onPreviousMonthPress={handlePreviousMonth}
