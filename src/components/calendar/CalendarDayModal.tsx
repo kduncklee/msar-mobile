@@ -18,7 +18,7 @@ interface CalendarDayModalProps {
 };
 
 function CalendarDayModal({ dateID, events, patrols, onCancel }: CalendarDayModalProps) {
-  const [selectedPatrolDate, setSelectedPatrolDate] = useState<string | null>(null);
+  const [selectedPatrolDate, setSelectedPatrolDate] = useState<string>('');
   const { username } = useAuth();
 
   const userPatrol = patrols?.find(p => isUserSelf(p.member, username));
@@ -38,7 +38,7 @@ function CalendarDayModal({ dateID, events, patrols, onCancel }: CalendarDayModa
   }
 
   const closePatrolModal = () => {
-    setSelectedPatrolDate(null);
+    setSelectedPatrolDate('');
   };
 
   return (
@@ -50,14 +50,14 @@ function CalendarDayModal({ dateID, events, patrols, onCancel }: CalendarDayModa
       <ScrollView style={styles.dataContainer}>
 
         <Text style={[elements.mediumText, styles.sectionHeader]}>
-          {events ? 'Events:' : 'No events for this day.'}
+          {events?.length ? 'Events:' : 'No events for this day.'}
         </Text>
         {events?.map(event => (
           <CalendarEvent event={event} key={event.id} />
         ))}
 
         <Text style={[elements.mediumText, styles.sectionHeader]}>
-          {patrols ? 'Patrols:' : 'No patrols for this day.'}
+          {patrols?.length ? 'Patrols:' : 'No patrols for this day.'}
         </Text>
         {patrols?.map(patrol => (
           <CalendarPatrol patrol={patrol} key={patrol.id} onEditPress={createOrEditPatrol} />

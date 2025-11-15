@@ -15,8 +15,7 @@ function ModalFade({ children, headerTitle, headerRightIcon, onHeaderRight, moda
   return (
     <Modal
       visible={modalVisible}
-      animationType="fade"
-      transparent
+      animationType="slide"
       onRequestClose={onCancel}
     >
       <TouchableWithoutFeedback onPress={onCancel}>

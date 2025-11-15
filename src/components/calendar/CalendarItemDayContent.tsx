@@ -39,7 +39,7 @@ export const CalendarItemDayContent = ({
         </Text>
       ))}
 
-      {!events && !patrols && <View style={styles.spacer} />}
+      {!events?.length && !patrols?.length && <View style={styles.spacer} />}
     </>
   );
 };

@@ -19,7 +19,7 @@ async function uploadFile(api: Api, file: object, id: number) {
 }
 
 async function pickUploadPhoto(api: Api, id?: number) {
-  if (!id) {
+  if (id == null) {
     return;
   }
   const picker = await ImagePicker.launchImageLibraryAsync({
@@ -43,7 +43,7 @@ async function pickUploadPhoto(api: Api, id?: number) {
 }
 
 async function pickUploadFile(api: Api, id?: number) {
-  if (!id) {
+  if (id == null) {
     return;
   }
   const document = await DocumentPicker.getDocumentAsync();

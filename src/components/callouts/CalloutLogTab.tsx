@@ -28,7 +28,7 @@ function CalloutLogTab({ id, useInfiniteQueryFn }: CalloutLogTabProps) {
   const logList: logEntry[] = logEntriesFromInfiniteQueryData(data);
 
   useEffect(() => {
-    if (!isLoading && logList) {
+    if (!isLoading && logList != null) {
       if (logList?.length) {
         const lastId = Number.parseInt(logList[0].id);
         if (!Number.isNaN(lastId)) {
