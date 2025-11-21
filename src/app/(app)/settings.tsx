@@ -10,7 +10,8 @@ import * as PushNotifications from '@utility/pushNotifications';
 import * as Application from 'expo-application';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Platform, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import useAuth from '@/hooks/useAuth';
 import { checkPushToken, sendPushToken } from '@/utility/pushNotificationToken';
 

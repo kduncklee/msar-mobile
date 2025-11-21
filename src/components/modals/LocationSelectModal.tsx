@@ -1,7 +1,8 @@
 import type { location } from '@/types/location';
 import { elements } from '@styles/elements';
 import React from 'react';
-import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface LocationSelectionModalProps {
   locations: location[];
