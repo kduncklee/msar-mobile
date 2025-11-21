@@ -65,7 +65,6 @@ function Page() {
   const { api } = useAuth();
   const fontScale = getFontScale();
   const snoozeTitle = getSnoozeTitle(snoozeExpireTime);
-  let topMargin = 0;
   console.log('index', numberActiveCallouts);
 
   const iconSize = 30 * fontScale;
@@ -86,7 +85,6 @@ function Page() {
   else if (Platform.OS === 'android') {
     StatusBar.setBackgroundColor(colors.primaryBg);
     StatusBar.setBarStyle('light-content');
-    topMargin = (StatusBar.currentHeight ?? 0) + 20;
   }
 
   useEffect(() => {
@@ -138,7 +136,7 @@ function Page() {
       <Image source={require('@assets/background.png')} style={styles.backgroundImage} />
       <SafeAreaView style={styles.container}>
         <ScrollView style={styles.scrollView}>
-          <Image source={api.logo()} style={[styles.logoImage, { marginTop: topMargin }]} />
+          <Image source={api.logo()} style={styles.logoImage} />
           <View style={styles.buttonSectionContainer}>
             {items.map(item => (
               <TouchableOpacity

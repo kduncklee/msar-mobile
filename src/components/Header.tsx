@@ -5,11 +5,10 @@ import { elements } from '@styles/elements';
 import { getConditionalTimeString } from '@utility/dateHelper';
 import { router, useFocusEffect } from 'expo-router';
 import React from 'react';
-import { BackHandler, Image, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { BackHandler, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface HeaderProps {
   title: string;
-  zeroTopMargin?: boolean;
   background?: any;
   backButton?: boolean;
   onBackPressed?: () => void;
@@ -18,15 +17,7 @@ interface HeaderProps {
   timestamp?: Date;
 };
 
-function Header({ title, zeroTopMargin, background, backButton = false, onBackPressed, rightButtonIcon, onRightPressed, timestamp = undefined }: HeaderProps) {
-  let headerMargin = 0;
-  if (zeroTopMargin || (Platform.OS === 'ios')) {
-    headerMargin = 0;
-  }
-  else if (Platform.OS === 'android') {
-    headerMargin = (StatusBar.currentHeight ?? 0);
-  }
-
+function Header({ title, background, backButton = false, onBackPressed, rightButtonIcon, onRightPressed, timestamp = undefined }: HeaderProps) {
   useFocusEffect(() => {
     // console.log('added back handler: ' + pathname)
     // eslint-disable-next-line react-web-api/no-leaked-event-listener
@@ -51,7 +42,7 @@ function Header({ title, zeroTopMargin, background, backButton = false, onBackPr
   const viewStyle = background ? { backgroundColor: background } : {};
 
   return (
-    <View style={[styles.container, { marginTop: headerMargin }, viewStyle]}>
+    <View style={[styles.container, viewStyle]}>
       {backButton
         && (
           <TouchableOpacity activeOpacity={0.2} style={styles.backContainer} onPress={() => backPressed()}>
