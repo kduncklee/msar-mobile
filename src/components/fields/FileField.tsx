@@ -13,6 +13,18 @@ import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react
 import FileViewer from 'react-native-file-viewer';
 import * as ContextMenu from 'zeego/context-menu';
 import useAuth from '@/hooks/useAuth';
+import { isUserSelf } from '@/types/user';
+
+async function deleteFile(api: Api, id: number) {
+  return api.apiRemoveFile(id)
+    .then(() => {
+      console.log(id, 'deleted.');
+    })
+    .catch((error) => {
+      console.error('deleteFile Error', error);
+      throw error;
+    });
+}
 
 async function downloadFile(api: Api, id: number, destination: string) {
   return api.apiDownloadFile(id, destination)
@@ -50,7 +62,7 @@ interface FileFieldProps {
 }
 
 function FileField({ file }: FileFieldProps) {
-  const { api } = useAuth();
+  const { api, username } = useAuth();
 
   const size_mb = file.size / 1024 / 1024;
   const size_text = `${size_mb.toFixed(3)} MB`;
@@ -98,6 +110,10 @@ function FileField({ file }: FileFieldProps) {
 
   const cellPressed = () => {
     openPressed();
+  };
+
+  const deletePressed = () => {
+    deleteFile(api, file.id);
   };
 
   const cellLongPressed = () => {
@@ -155,6 +171,11 @@ function FileField({ file }: FileFieldProps) {
         <ContextMenu.Item key="share" onSelect={sharePressed}>
           <ContextMenu.ItemTitle>Share</ContextMenu.ItemTitle>
         </ContextMenu.Item>
+        {isUserSelf(file.member, username) && (
+          <ContextMenu.Item key="delete" onSelect={deletePressed}>
+            <ContextMenu.ItemTitle>Delete</ContextMenu.ItemTitle>
+          </ContextMenu.Item>
+        )}
       </ContextMenu.Content>
 
     </ContextMenu.Root>

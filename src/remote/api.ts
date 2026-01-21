@@ -457,4 +457,19 @@ export class Api {
   async apiDownloadFile(id: number, destination: string) {
     return this.downloadWithCredentials(this.#apiGetDownloadFileUrl(id), destination);
   }
+
+  async apiRemoveFile(id: number) {
+    try {
+      const data = await this.#fetchWithCredentials(
+        `${this.#filesEndpoint() + id}/`,
+        'DELETE',
+      );
+      console.log(`removed file: ${JSON.stringify(data)}`);
+    }
+    catch (error) {
+      console.log(error);
+      // eslint-disable-next-line no-alert
+      alert(`Error removing file: ${error.message}`);
+    }
+  }
 }
