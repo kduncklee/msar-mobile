@@ -3,7 +3,7 @@ import type { calloutGetLogResponse, loginResponse, tokenValidationResponse } fr
 import type { callout } from '@/types/callout';
 import type { patrol } from '@/types/patrol';
 import * as Application from 'expo-application';
-import * as FileSystem from 'expo-file-system';
+import { Directory, File, Paths } from 'expo-file-system';
 import { Platform } from 'react-native';
 import { calloutFromResponse } from '@/types/callout';
 
@@ -169,8 +169,12 @@ export class Api {
   async downloadWithCredentials(url: string, destination: string) {
     const options = {
       headers: { Authorization: this.#authorizationHeader() },
+      idempotent: true,
     };
-    return FileSystem.downloadAsync(url, destination, options);
+    const d = new Directory(Paths.document);
+    console.log('downloadWithCredentials', url, destination, d.exists);
+    d.create({ idempotent: true, intermediates: true });
+    return File.downloadFileAsync(url, new File(Paths.document, destination), options);
   }
 
   async login(server: string, username: string, password: string): Promise<loginResponse> {

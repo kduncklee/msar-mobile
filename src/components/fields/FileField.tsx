@@ -60,7 +60,7 @@ function FileField({ file }: FileFieldProps) {
   const [storedUri, setStoredUri] = useLocalDataFilePath(file.id);
 
   const download = async () => {
-    return downloadFile(api, file.id, localFullUri).then((uri) => {
+    return downloadFile(api, file.id, localFilename).then((uri) => {
       setStoredUri(localFilename);
       return uri;
     });
