@@ -6,6 +6,7 @@ import { usePushNotificationsOuter } from '@utility/pushNotifications';
 import { Slot, useNavigationContainerRef } from 'expo-router';
 import { useEffect } from 'react';
 import { RootSiblingParent } from 'react-native-root-siblings';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { queryClient, useReactQueryAppStateRefresh } from 'utility/reactQuery';
 import { AuthProvider } from '@/components/AuthProvider';
 
@@ -38,9 +39,11 @@ function Layout() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <RootSiblingParent>
-          <Slot />
-        </RootSiblingParent>
+        <SafeAreaProvider>
+          <RootSiblingParent>
+            <Slot />
+          </RootSiblingParent>
+        </SafeAreaProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

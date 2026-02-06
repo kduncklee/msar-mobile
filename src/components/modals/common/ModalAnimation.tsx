@@ -58,8 +58,8 @@ function ModalAnimation({
   const showModal = () => {
     console.log('showModal');
     translateY.value = withSpring(0 - safeAreaInsets.bottom, {
-      damping: 20,
-      stiffness: 100,
+      duration: 1000,
+      dampingRatio: 0.6,
     });
     opacity.value = withTiming(0.8, { duration: ANIMATION_DURATION });
   };
