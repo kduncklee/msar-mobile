@@ -1,9 +1,11 @@
+import type { IMultiSelectRef } from '@carlos3g/element-dropdown';
 import type { LabelValue } from '@/utility/reactForm';
+import { MultiSelect } from '@carlos3g/element-dropdown';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
-import React from 'react';
+import React, { useRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { MultiSelect } from 'react-native-element-dropdown';
+import { emptyComponent } from '@/components/inputs/DropdownCommon';
 
 export interface DropdownMultiselectCommonProps<
   TOption extends LabelValue,
@@ -11,24 +13,28 @@ export interface DropdownMultiselectCommonProps<
   title?: string;
   options: TOption[];
   placeholder: string;
+  search?: boolean;
+  addItemText?: string;
 };
 
 interface DropdownMultiselectProps<
   TOption extends LabelValue,
 > extends DropdownMultiselectCommonProps<TOption> {
-  selectedValues?: string[];
+  selectedValues: string[];
   onSelect: (values: any) => void;
 };
 
 function DropdownMultiselect<
   TOption extends LabelValue,
->({ title, options, placeholder, selectedValues, onSelect }: DropdownMultiselectProps<TOption>) {
+>({ title, options, placeholder, search, addItemText, selectedValues, onSelect }: DropdownMultiselectProps<TOption>) {
+  const ref = useRef<IMultiSelectRef>(null);
   return (
     <View style={styles.container}>
       {!!title
         && <Text style={elements.fieldTitle}>{title}</Text>}
       <View style={[elements.inputContainer, { flexDirection: 'column', paddingHorizontal: 8 }]}>
         <MultiSelect
+          ref={ref as React.RefObject<IMultiSelectRef>}
           style={[styles.dropdown]}
           placeholderStyle={elements.fieldPlaceholder}
           selectedTextStyle={elements.fieldText}
@@ -44,9 +50,9 @@ function DropdownMultiselect<
           activeColor={colors.selectionBg}
           itemTextStyle={{ color: colors.primaryText }}
           selectedStyle={styles.selectedStyle}
-          onChange={(item) => {
-            onSelect(item);
-          }}
+          onChange={onSelect}
+          search={search}
+          renderEmpty={emptyComponent(addItemText, ref, (s: string) => onSelect([s, ...selectedValues]))}
         />
       </View>
     </View>

@@ -1,14 +1,18 @@
+import type { IDropdownRef } from '@carlos3g/element-dropdown';
 import type { ImageRequireSource } from 'react-native';
+import { Dropdown } from '@carlos3g/element-dropdown';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
-import React from 'react';
+import React, { useRef } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
+import { emptyComponent } from '@/components/inputs/DropdownCommon';
 
 export interface DropdownSelectorCommonProps {
   title?: string;
   options: any[];
   placeholder: string;
+  search?: boolean;
+  addItemText?: string;
   rightButton?: ImageRequireSource;
   onRightPress?: (value: any) => void;
 };
@@ -18,13 +22,15 @@ interface DropdownSelectorProps extends DropdownSelectorCommonProps {
   onSelect: (values: any) => void;
 };
 
-function DropdownSelector({ title, options, placeholder, selectedValue, rightButton, onRightPress, onSelect }: DropdownSelectorProps) {
+function DropdownSelector({ title, options, placeholder, search, addItemText, selectedValue, rightButton, onRightPress, onSelect }: DropdownSelectorProps) {
+  const ref = useRef<IDropdownRef>(null);
   return (
     <View style={styles.container}>
       {!!title
         && <Text style={elements.fieldTitle}>{title}</Text>}
       <View style={elements.inputContainer}>
         <Dropdown
+          ref={ref as React.RefObject<IDropdownRef>}
           style={[styles.dropdown]}
           placeholderStyle={elements.fieldPlaceholder}
           selectedTextStyle={elements.fieldText}
@@ -41,6 +47,8 @@ function DropdownSelector({ title, options, placeholder, selectedValue, rightBut
           itemTextStyle={{ color: colors.primaryText }}
           onChange={onSelect}
           testID={title}
+          search={search}
+          renderEmpty={emptyComponent(addItemText, ref, (s: string) => onSelect({ value: s }))}
         />
         {!!onRightPress
           && (

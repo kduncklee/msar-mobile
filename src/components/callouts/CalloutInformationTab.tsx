@@ -84,7 +84,7 @@ function CalloutInformationTab({ callout }: CalloutInformationTabProps) {
         {!!callout.radio_channel
           && (
             <InformationField
-              title="Tactical Talkgroup"
+              title="Primary SAR Frequency"
               value={callout.radio_channel}
             />
           )}

@@ -396,9 +396,11 @@ function Page() {
               name="radioFrequency"
               children={field => (
                 <field.FormDropdownSelector
-                  title="Tactical Talkgroup"
+                  title="Primary SAR Frequency"
                   options={primaryRadioChannelsAvailable}
                   placeholder="Select Frequency"
+                  search
+                  addItemText="Add frequency"
                 />
               )}
             />
@@ -410,6 +412,8 @@ function Page() {
                   title="Other Radio Channels"
                   options={additionalRadioChannelsAvailable}
                   placeholder="Select Frequencies"
+                  search
+                  addItemText="Add frequency"
                 />
               )}
             />
