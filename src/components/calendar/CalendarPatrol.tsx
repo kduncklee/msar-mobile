@@ -2,9 +2,8 @@ import type { patrol } from '@/types/patrol';
 import { toDateId } from '@marceloterreiro/flash-calendar';
 import InformationField from '@/components/fields/InformationField';
 import InformationTray from '@/components/fields/InformationTray';
-import useAuth from '@/hooks/useAuth';
 import { textColorForBackground } from '@/styles/colors';
-import { isUserSelf, userToString } from '@/types/user';
+import { userToString } from '@/types/user';
 import { getDateTimeRangeString } from '@/utility/dateHelper';
 
 interface CalendarPatrolProps {
@@ -13,10 +12,8 @@ interface CalendarPatrolProps {
 }
 
 function CalendarPatrol({ patrol, onEditPress }: CalendarPatrolProps) {
-  const { username } = useAuth();
   const textColor = textColorForBackground(patrol?.color);
   const time = getDateTimeRangeString(patrol.start_at, patrol.finish_at);
-  const isSelf = isUserSelf(patrol.member, username);
 
   console.log(patrol.start_at, toDateId(patrol.start_at), patrol.finish_at, 'time', time);
   return (
@@ -24,7 +21,7 @@ function CalendarPatrol({ patrol, onEditPress }: CalendarPatrolProps) {
       title={userToString(patrol.member)}
       titleBarColor={patrol.color}
       titleTextColor={textColor}
-      editButton={isSelf}
+      editButton={true}
       onEditPress={onEditPress}
     >
       {!!time && (

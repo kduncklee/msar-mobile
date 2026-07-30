@@ -34,7 +34,8 @@ export const elements = StyleSheet.create({
     alignItems: 'stretch',
     alignSelf: 'center',
     margin: 20,
-    height: 60,
+    height: 'auto',
+    minHeight: 60,
     width: '100%',
   },
   capsuleButton: {

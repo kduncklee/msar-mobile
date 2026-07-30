@@ -19,12 +19,11 @@ interface CalendarDayModalProps {
 
 function CalendarDayModal({ dateID, events, patrols, onCancel }: CalendarDayModalProps) {
   const [selectedPatrolDate, setSelectedPatrolDate] = useState<string>('');
+  const [selectedPatrolId, setSelectedPatrolId] = useState<number>(-1);
   const { username } = useAuth();
 
   const userPatrol = patrols?.find(p => isUserSelf(p.member, username));
-  // patrols?.filter(p => isUserSelf(p.member, username));
-
-  console.log(events, patrols);
+  const selectedPatrol = patrols?.find(p => p.id === selectedPatrolId);
 
   function createEvent() {
     Alert.alert(
@@ -33,12 +32,20 @@ function CalendarDayModal({ dateID, events, patrols, onCancel }: CalendarDayModa
     );
   }
 
-  function createOrEditPatrol() {
+  function createPatrol() {
+    setSelectedPatrolDate(dateID);
+    setSelectedPatrolId(-1);
+  }
+
+  function editPatrol(patrol) {
+    console.log('editPatrol', patrol);
+    setSelectedPatrolId(patrol.id);
     setSelectedPatrolDate(dateID);
   }
 
   const closePatrolModal = () => {
     setSelectedPatrolDate('');
+    setSelectedPatrolId(-1);
   };
 
   return (
@@ -60,7 +67,7 @@ function CalendarDayModal({ dateID, events, patrols, onCancel }: CalendarDayModa
           {patrols?.length ? 'Patrols:' : 'No patrols for this day.'}
         </Text>
         {patrols?.map(patrol => (
-          <CalendarPatrol patrol={patrol} key={patrol.id} onEditPress={createOrEditPatrol} />
+          <CalendarPatrol patrol={patrol} key={patrol.id} onEditPress={editPatrol.bind(null, patrol)} />
         ))}
 
       </ScrollView>
@@ -70,21 +77,32 @@ function CalendarDayModal({ dateID, events, patrols, onCancel }: CalendarDayModa
           style={[elements.capsuleButton, elements.splitButton]}
           onPress={createEvent}
         >
-          <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>
+          <Text style={[elements.whiteButtonText, styles.bottomButtonText]}>
             Create Event
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={0.8}
           style={[elements.capsuleButton, elements.splitButton]}
-          onPress={createOrEditPatrol}
+          onPress={createPatrol}
         >
-          <Text style={[elements.whiteButtonText, { fontSize: 18 }]}>
-            {userPatrol ? 'Edit Patrol' : 'Create Patrol'}
+          <Text style={[elements.whiteButtonText, styles.bottomButtonText]}>
+            Create Patrol
           </Text>
         </TouchableOpacity>
+        {userPatrol && (
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={[elements.capsuleButton, elements.splitButton]}
+            onPress={editPatrol.bind(null, userPatrol)}
+          >
+            <Text style={[elements.whiteButtonText, styles.bottomButtonText]}>
+              Edit Patrol
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
-      {!!selectedPatrolDate && <CalendarPatrolModal dateID={selectedPatrolDate} patrol={userPatrol} onCancel={closePatrolModal} />}
+      {!!selectedPatrolDate && <CalendarPatrolModal dateID={selectedPatrolDate} patrol={selectedPatrol} onCancel={closePatrolModal} />}
     </ModalFade>
   );
 }
@@ -114,6 +132,11 @@ const styles = StyleSheet.create({
   patrol: {
     fontSize: 14,
     fontWeight: 'bold',
+  },
+  bottomButtonText: {
+    fontSize: 18,
+    flex: 1,
+    textAlign: 'center',
   },
 });
 

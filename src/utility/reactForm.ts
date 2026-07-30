@@ -1,6 +1,6 @@
 export interface LabelValue {
   label: string;
-  value: string | undefined;
+  value: string | number | undefined;
 };
 
 export function labelValueItem(name: string): LabelValue {

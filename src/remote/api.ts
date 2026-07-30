@@ -326,16 +326,14 @@ export class Api {
   }
 
   async apiCreatePatrol(patrol: patrol): Promise<any> {
-    const modified_patrol = { ...patrol, member: patrol.member?.id };
-    return this.#fetchJsonWithCredentials(this.#patrolsEndpoint(), 'POST', modified_patrol);
+    return this.#fetchJsonWithCredentials(this.#patrolsEndpoint(), 'POST', patrol);
   }
 
   async apiUpdatePatrol(id: number, patrol: patrol): Promise<any> {
-    const modified_patrol = { ...patrol, member: patrol.member?.id };
     return this.#fetchJsonWithCredentials(
       `${(this.#patrolsEndpoint()) + id}/`,
       'PUT',
-      modified_patrol,
+      patrol,
     );
   }
 

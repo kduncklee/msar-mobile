@@ -1,4 +1,5 @@
 import type { patrol } from '@/types/patrol';
+import type { LabelValue } from '@/utility/reactForm';
 import { fromDateId } from '@marceloterreiro/flash-calendar';
 import { useStore } from '@tanstack/react-form';
 import React from 'react';
@@ -6,8 +7,11 @@ import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import KeyboardAvoidingCustomView from '@/components/KeyboardAvoidingCustomView';
 import ModalFade from '@/components/modals/common/ModalFade';
 import { useAppForm } from '@/hooks/form';
+import useAuth from '@/hooks/useAuth';
 import { usePatrolCreateMutation, usePatrolRemoveMutation, usePatrolUpdateMutation } from '@/remote/mutation';
+import { useMemberListQuery } from '@/remote/query';
 import { elements } from '@/styles/elements';
+import { isUserSelf } from '@/types/user';
 
 interface CalendarPatrolModalProps {
   dateID: string;
@@ -19,12 +23,30 @@ function CalendarPatrolModal({ dateID, patrol, onCancel }: CalendarPatrolModalPr
   const patrolCreateMutation = usePatrolCreateMutation();
   const patrolUpdateMutation = usePatrolUpdateMutation();
   const patrolRemoveMutation = usePatrolRemoveMutation();
+  const { username } = useAuth();
+
+  const query = useMemberListQuery();
+  const sortKey = 'username';
+  const memberList = query.data
+    ? [...query.data].filter(item => item.is_patrol_eligible).sort((a, b) => {
+        return a[sortKey] < b[sortKey] ? -1 : 1;
+      })
+    : [];
+  const members: LabelValue[] = memberList.map((item) => {
+    return {
+      label: `${item.username} - ${item.full_name}`,
+      value: item.id,
+    };
+  });
+  const userMember = memberList?.find(m => isUserSelf(m, username));
 
   console.log('CalendarPatrolModal', dateID, patrol);
+  // console.log('my member id:', userMember?.id);
 
   const form = useAppForm({
     defaultValues: {
       id: patrol?.id,
+      member_id: patrol?.member?.id ?? userMember?.id,
       all_day: !patrol?.finish_at,
       start_at: patrol?.start_at ?? fromDateId(dateID),
       finish_at: patrol?.finish_at,
@@ -44,6 +66,7 @@ function CalendarPatrolModal({ dateID, patrol, onCancel }: CalendarPatrolModalPr
         start_at: value.start_at,
         finish_at: value.all_day ? undefined : value.finish_at,
         description: value.description,
+        member: memberList?.find(m => m.id === value.member_id),
       };
 
       if (value.id) {
@@ -89,6 +112,17 @@ function CalendarPatrolModal({ dateID, patrol, onCancel }: CalendarPatrolModalPr
     >
       <KeyboardAvoidingCustomView>
         <ScrollView style={styles.dataContainer}>
+
+          <form.AppField
+            name="member_id"
+            children={field => (
+              <field.FormDropdownSelector
+                title="Member"
+                options={members}
+                placeholder="Select member"
+              />
+            )}
+          />
 
           <form.AppField
             name="all_day"
