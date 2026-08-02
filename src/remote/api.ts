@@ -235,19 +235,19 @@ export class Api {
   }
 
   async apiGetNotificationsAvailable(): Promise<any> {
-    return this.#fetchJsonWithCredentials(this.#notificationsAvailableEndpoint());
+    return this.#fetchJsonWithCredentials(`${this.#notificationsAvailableEndpoint()}?ordering=-position`);
   }
 
   async apiGetRadioChannelsAvailable(): Promise<any> {
-    return this.#fetchJsonWithCredentials(this.#radioChannelsAvailableEndpoint());
+    return this.#fetchJsonWithCredentials(`${this.#radioChannelsAvailableEndpoint()}?ordering=-position`);
   }
 
   async apiGetOperationTypesAvailable(): Promise<any> {
-    return this.#fetchJsonWithCredentials(this.#operationTypesAvailableEndpoint());
+    return this.#fetchJsonWithCredentials(`${this.#operationTypesAvailableEndpoint()}?ordering=-position`);
   }
 
   async apiGetCalloutResponsesAvailable(): Promise<any> {
-    return this.#fetchJsonWithCredentials(this.#calloutResponsesAvailableEndpoint());
+    return this.#fetchJsonWithCredentials(`${this.#calloutResponsesAvailableEndpoint()}?ordering=-position`);
   }
 
   async apiGetCallouts(status?: string): Promise<any> {
