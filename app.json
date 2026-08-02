@@ -17,7 +17,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "org.malibusar.app",
-      "buildNumber": "85",
+      "buildNumber": "86",
       "icon": "./src/assets/icon.png",
       "googleServicesFile": "./GoogleService-Info.plist",
       "config": {
@@ -36,7 +36,7 @@
         "backgroundColor": "#2B3038"
       },
       "package": "org.malibusar.app",
-      "versionCode": 96,
+      "versionCode": 97,
       "googleServicesFile": "./google-services.json"
     },
     "web": {

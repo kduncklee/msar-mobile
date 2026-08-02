@@ -35,7 +35,7 @@ function CalendarPatrolModal({ dateID, patrol, onCancel }: CalendarPatrolModalPr
   const members: LabelValue[] = memberList.map((item) => {
     return {
       label: `${item.username} - ${item.full_name}`,
-      value: item.id,
+      value: item.id?.toString(),
     };
   });
   const userMember = memberList?.find(m => isUserSelf(m, username));
