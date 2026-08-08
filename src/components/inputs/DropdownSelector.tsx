@@ -40,7 +40,7 @@ function DropdownSelector({ title, options, placeholder, search, addItemText, se
           labelField="label"
           valueField="value"
           placeholder={placeholder}
-          value={selectedValue}
+          value={selectedValue?.toString()}
           containerStyle={{ overflow: 'hidden', borderRadius: 8, borderColor: colors.grayText, borderWidth: 1, backgroundColor: colors.secondaryBg }}
           itemContainerStyle={{ backgroundColor: colors.primaryBg }}
           activeColor={colors.selectionBg}

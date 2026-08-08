@@ -6,8 +6,11 @@ import { labelValueItem } from '@/utility/reactForm';
 function FormDropdownSelector({ options, ...dropdownProps }: DropdownSelectorCommonProps) {
   const field = useFieldContext<string>();
   const expandedOptions = [...options];
-  if (field.state?.value && !expandedOptions.find(item => (item.value === field.state.value))) {
-    expandedOptions.push(labelValueItem(field.state.value));
+  const fieldValue = field.state?.value?.toString();
+  // console.log('FormDropdownSelector', options, fieldValue);
+  if (fieldValue && !expandedOptions.find(item => (item.value === fieldValue))) {
+    expandedOptions.push(labelValueItem(fieldValue));
+    console.log('FormDropdownSelector added');
   }
   return (
     <DropdownSelector

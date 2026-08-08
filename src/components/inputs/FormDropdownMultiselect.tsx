@@ -12,8 +12,9 @@ function FormDropdownSelector<
   const expandedOptions: LabelValue[] = [...options];
   if (field.state?.value) {
     field.state.value.forEach((name: string) => {
-      if (!expandedOptions.find(item => (item.label === name))) {
-        expandedOptions.push(labelValueItem(name));
+      const fieldValue = name?.toString();
+      if (!expandedOptions.find(item => (item.value === fieldValue))) {
+        expandedOptions.push(labelValueItem(fieldValue));
       }
     });
   }
