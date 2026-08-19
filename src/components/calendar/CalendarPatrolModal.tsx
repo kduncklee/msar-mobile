@@ -66,8 +66,9 @@ function CalendarPatrolModal({ dateID, patrol, onCancel }: CalendarPatrolModalPr
         start_at: value.start_at,
         finish_at: value.all_day ? undefined : value.finish_at,
         description: value.description,
-        member: memberList?.find(m => m.id === value.member_id),
+        member: memberList?.find(m => m.id.toString() === value.member_id?.toString()),
       };
+      console.log('form updated_patrol', updated_patrol);
 
       if (value.id) {
         patrolUpdateMutation.mutate({ idInt: value.id, patrol: updated_patrol }, {
