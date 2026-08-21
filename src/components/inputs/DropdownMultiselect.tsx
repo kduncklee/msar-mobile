@@ -38,12 +38,13 @@ function DropdownMultiselect<
           style={[styles.dropdown]}
           placeholderStyle={elements.fieldPlaceholder}
           selectedTextStyle={elements.fieldText}
+          inputSearchStyle={elements.fieldText}
           iconStyle={styles.iconStyle}
           data={options}
           maxHeight={300}
           labelField="label"
           valueField="value"
-          placeholder={placeholder}
+          placeholder={selectedValues?.length ? '' : placeholder}
           value={selectedValues}
           inverted={false}
           containerStyle={{ overflow: 'hidden', borderRadius: 8, borderColor: colors.grayText, borderWidth: 1, backgroundColor: colors.secondaryBg }}
