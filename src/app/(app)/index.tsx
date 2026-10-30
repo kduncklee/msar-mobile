@@ -70,6 +70,7 @@ function Page() {
   const iconSize = 30 * fontScale;
   const items: Items[] = [
     { text: 'Callouts', icon: 'car-emergency', url: '/callout-list', badge: numberActiveCallouts },
+    { text: 'Access Codes', icon: 'key-outline', url: '/access-codes' },
     { text: 'Messages', icon: 'forum-outline', url: '/chat', badge: chatHasUnread ? '!' : undefined },
     { text: 'Roster', icon: 'account-multiple-outline', url: '/roster' },
     { text: 'Certs', icon: 'certificate', url: '/certs' },

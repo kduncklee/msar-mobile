@@ -19,6 +19,22 @@ import { memberStatusTypeFromResponse, userDetailsFromResponse } from '@/types/u
 // React Query
 //////////////////////////////////////////////////////////////////////////////
 
+export function invalidateAccessCodeListQuery(queryClient: QueryClient) {
+  queryClient.invalidateQueries({ queryKey: ['accessCodes'] });
+}
+
+function accessCodeListQueryParams(api: Api) {
+  return {
+    queryKey: ['accessCodes'],
+    queryFn: () => api.apiGetAccessCodes(),
+  };
+}
+
+export function useAccessCodeListQuery() {
+  const { api } = useAuth();
+  return useQuery(accessCodeListQueryParams(api));
+}
+
 /// /// Notifications Available
 function notificationsAvailabletQueryParams(api: Api) {
   return {
