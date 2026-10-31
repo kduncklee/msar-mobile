@@ -2,7 +2,6 @@ import type { accessCode } from '@/types/accessCode';
 import Header from '@components/Header';
 import colors from '@styles/colors';
 import * as Location from 'expo-location';
-import { router } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -87,29 +86,31 @@ export default function NearbyAccessCodesPage() {
   return (
     <SafeAreaView style={styles.container}>
       <Header title="Nearby Access Codes" backButton />
-      {loadingLocation ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primaryText} />
-          <Text style={styles.loadingText}>Acquiring current GPS location...</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={nearbyCodes}
-          keyExtractor={({ item: codeItem }) => codeItem.id?.toString() ?? codeItem.name}
-          renderItem={({ item: { item: codeItem, distance } }) => (
-            <AccessCodeCell item={codeItem} distanceInMiles={distance} />
-          )}
-          ListEmptyComponent={(
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>
-                {!userLocation
-                  ? 'GPS Location unavailable. Please enable location permissions.'
-                  : 'No nearby access codes found.'}
-              </Text>
+      {loadingLocation
+        ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={colors.primaryText} />
+              <Text style={styles.loadingText}>Acquiring current GPS location...</Text>
             </View>
+          )
+        : (
+            <FlatList
+              data={nearbyCodes}
+              keyExtractor={({ item: codeItem }) => codeItem.id?.toString() ?? codeItem.name}
+              renderItem={({ item: { item: codeItem, distance } }) => (
+                <AccessCodeCell item={codeItem} distanceInMiles={distance} />
+              )}
+              ListEmptyComponent={(
+                <View style={styles.emptyContainer}>
+                  <Text style={styles.emptyText}>
+                    {!userLocation
+                      ? 'GPS Location unavailable. Please enable location permissions.'
+                      : 'No nearby access codes found.'}
+                  </Text>
+                </View>
+              )}
+            />
           )}
-        />
-      )}
     </SafeAreaView>
   );
 }

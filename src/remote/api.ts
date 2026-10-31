@@ -1,8 +1,8 @@
+import type { LabelValue } from '../utility/reactForm';
+import type { calloutGetLogResponse, loginResponse, tokenValidationResponse } from './responses';
 import type { accessCode } from '@/types/accessCode';
 import type { callout } from '@/types/callout';
 import type { patrol } from '@/types/patrol';
-import type { calloutGetLogResponse, loginResponse, tokenValidationResponse } from './responses';
-import type { LabelValue } from '../utility/reactForm';
 import * as Application from 'expo-application';
 import { Directory, File, Paths } from 'expo-file-system';
 import { Platform } from 'react-native';

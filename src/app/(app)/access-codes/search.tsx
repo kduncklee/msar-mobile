@@ -2,7 +2,6 @@ import type { accessCode } from '@/types/accessCode';
 import Header from '@components/Header';
 import { CustomTextInput } from '@components/inputs/CustomTextInput';
 import colors from '@styles/colors';
-import { router } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList, Platform, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';

@@ -6,17 +6,17 @@ import colors from '@styles/colors';
 import { elements } from '@styles/elements';
 import * as Location from 'expo-location';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-root-toast';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { getCachedAccessCodes, useAccessCodesLocal } from 'storage/mmkv';
 import { useAccessCodeDeleteMutation, useAccessCodeUpdateMutation } from '@/remote/mutation';
 import { useAccessCodeListQuery } from '@/remote/query';
 
 export default function EditAccessCodePage() {
   const { id } = useLocalSearchParams<{ id?: string }>();
-  const idInt = id ? Number.parseInt(id) : NaN;
+  const idInt = id ? Number.parseInt(id) : Number.NaN;
 
   const { data: serverCodes } = useAccessCodeListQuery();
   const [cachedCodes] = useAccessCodesLocal();
@@ -24,25 +24,15 @@ export default function EditAccessCodePage() {
   const currentCodeItem = (serverCodes ?? cachedCodes ?? getCachedAccessCodes())
     .find(item => item.id === idInt || item.id?.toString() === id || item.name === id);
 
-  const [name, setName] = useState('');
-  const [code, setCode] = useState('');
-  const [keywords, setKeywords] = useState('');
-  const [latitude, setLatitude] = useState('');
-  const [longitude, setLongitude] = useState('');
+  const [name, setName] = useState(currentCodeItem?.name ?? '');
+  const [code, setCode] = useState(currentCodeItem?.code ?? '');
+  const [keywords, setKeywords] = useState(currentCodeItem?.keywords ?? '');
+  const [latitude, setLatitude] = useState(currentCodeItem?.latitude?.toString() ?? '');
+  const [longitude, setLongitude] = useState(currentCodeItem?.longitude?.toString() ?? '');
   const [gettingLocation, setGettingLocation] = useState(false);
 
   const updateMutation = useAccessCodeUpdateMutation();
   const deleteMutation = useAccessCodeDeleteMutation();
-
-  useEffect(() => {
-    if (currentCodeItem) {
-      setName(currentCodeItem.name);
-      setCode(currentCodeItem.code);
-      setKeywords(currentCodeItem.keywords ?? '');
-      setLatitude(currentCodeItem.latitude.toString());
-      setLongitude(currentCodeItem.longitude.toString());
-    }
-  }, [currentCodeItem]);
 
   const handleUseCurrentLocation = async () => {
     setGettingLocation(true);

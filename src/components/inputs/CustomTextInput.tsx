@@ -1,9 +1,10 @@
+import type { TextInputProps } from 'react-native';
 import type { IconName } from '@/utility/icon';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
 import React from 'react';
-import { Keyboard, StyleSheet, Text, TextInput, type TextInputProps, TouchableOpacity, View } from 'react-native';
+import { Keyboard, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 interface CustomTextInputProps extends TextInputProps {
   title?: string;

@@ -101,7 +101,9 @@ export function AccessCodeCell({ item, distanceInMiles, onDelete }: AccessCodeCe
 
       {!!item.keywords && (
         <Text style={styles.keywordsText}>
-          Keywords: {item.keywords}
+          Keywords:
+          {' '}
+          {item.keywords}
         </Text>
       )}
 
@@ -112,7 +114,9 @@ export function AccessCodeCell({ item, distanceInMiles, onDelete }: AccessCodeCe
       >
         <MaterialCommunityIcons name="map-marker-outline" size={18} color={colors.secondaryYellow} />
         <Text style={[styles.locationText, styles.clickableLocation]}>
-          {(item?.latitude ?? 0).toFixed(5)}, {(item?.longitude ?? 0).toFixed(5)}
+          {(item?.latitude ?? 0).toFixed(5)}
+          ,
+          {(item?.longitude ?? 0).toFixed(5)}
         </Text>
         <MaterialCommunityIcons name="open-in-new" size={14} color={colors.secondaryYellow} style={{ marginLeft: 4 }} />
         {typeof distanceInMiles === 'number' && (
