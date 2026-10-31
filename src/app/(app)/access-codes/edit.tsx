@@ -54,9 +54,7 @@ export default function EditAccessCodePage() {
     }
     catch (error: any) {
       console.log('Location error:', error);
-      setLatitude('34.02591');
-      setLongitude('-118.77976');
-      Toast.show('Used default location', { duration: Toast.durations.SHORT });
+      Toast.show('Unable to acquire location', { duration: Toast.durations.SHORT });
     }
     finally {
       setGettingLocation(false);

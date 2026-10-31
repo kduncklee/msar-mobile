@@ -51,7 +51,7 @@ export default function NearbyAccessCodesPage() {
       catch (error) {
         console.log('Error acquiring position:', error);
         if (isMounted) {
-          setUserLocation({ latitude: 34.02591, longitude: -118.77976 });
+          setUserLocation(null);
         }
       }
       finally {

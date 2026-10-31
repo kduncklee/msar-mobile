@@ -24,7 +24,10 @@
         "usesNonExemptEncryption": false
       },
       "infoPlist": {
-        "com.apple.developer.usernotifications.critical-alerts": 1
+        "com.apple.developer.usernotifications.critical-alerts": 1,
+        "NSLocationWhenInUseUsageDescription": "Assisting with search and providing directions.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Assisting with search and providing directions.",
+        "NSLocationAlwaysUsageDescription": "Assisting with search and providing directions."
       },
       "entitlements": {
         "com.apple.developer.usernotifications.critical-alerts": true
@@ -67,6 +70,13 @@
         }
       ],
       "expo-router",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Assisting with search and providing directions.",
+          "locationAlwaysAndWhenInUsePermission": "Assisting with search and providing directions."
+        }
+      ],
       "@react-native-firebase/app",
       "@react-native-firebase/messaging",
       [
