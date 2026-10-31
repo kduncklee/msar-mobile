@@ -69,15 +69,34 @@ export default function NearbyAccessCodesPage() {
     if (!userLocation || accessCodesList.length === 0) {
       return [];
     }
-    const withDistance = accessCodesList.map((item) => {
-      const dist = calculateDistanceInMiles(
-        userLocation.latitude,
-        userLocation.longitude,
-        item.latitude,
-        item.longitude,
-      );
-      return { item, distance: dist };
-    });
+    const withDistance = accessCodesList
+      .map((item) => {
+        const locs = item.locations && item.locations.length > 0
+          ? item.locations
+          : (item.latitude !== undefined && item.longitude !== undefined && (item.latitude !== 0 || item.longitude !== 0)
+              ? [{ latitude: item.latitude, longitude: item.longitude }]
+              : []);
+
+        if (locs.length === 0) {
+          return null;
+        }
+
+        let minDist = Number.POSITIVE_INFINITY;
+        locs.forEach((loc) => {
+          const dist = calculateDistanceInMiles(
+            userLocation.latitude,
+            userLocation.longitude,
+            loc.latitude,
+            loc.longitude,
+          );
+          if (dist < minDist) {
+            minDist = dist;
+          }
+        });
+
+        return Number.isFinite(minDist) ? { item, distance: minDist } : null;
+      })
+      .filter((entry): entry is CodeWithDistance => entry !== null);
 
     withDistance.sort((a, b) => a.distance - b.distance);
     return withDistance.slice(0, 15);

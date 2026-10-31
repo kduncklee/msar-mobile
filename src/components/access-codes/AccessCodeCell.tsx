@@ -14,12 +14,27 @@ interface AccessCodeCellProps {
 }
 
 export function AccessCodeCell({ item, distanceInMiles, onDelete }: AccessCodeCellProps) {
+  const locationsList = item.locations && item.locations.length > 0
+    ? item.locations
+    : (item.latitude !== undefined && item.longitude !== undefined && (item.latitude !== 0 || item.longitude !== 0)
+        ? [{ latitude: item.latitude, longitude: item.longitude }]
+        : []);
+
   const copyCodeToClipboard = async () => {
     const lines = [
       `Name: ${item.name}`,
       `Code: ${item.code}`,
-      `Location: ${(item?.latitude ?? 0).toFixed(5)}, ${(item?.longitude ?? 0).toFixed(5)}`,
     ];
+    if (locationsList.length === 1) {
+      lines.push(`Location: ${locationsList[0].latitude.toFixed(5)}, ${locationsList[0].longitude.toFixed(5)}`);
+    }
+    else if (locationsList.length > 1) {
+      lines.push('Locations:');
+      locationsList.forEach((loc, index) => {
+        const labelStr = loc.label ? ` (${loc.label})` : '';
+        lines.push(`  ${index + 1}. ${loc.latitude.toFixed(5)}, ${loc.longitude.toFixed(5)}${labelStr}`);
+      });
+    }
     if (item.keywords) {
       lines.push(`Keywords: ${item.keywords}`);
     }
@@ -57,10 +72,8 @@ export function AccessCodeCell({ item, distanceInMiles, onDelete }: AccessCodeCe
     );
   };
 
-  const openMapApp = () => {
-    const lat = item?.latitude ?? 0;
-    const lon = item?.longitude ?? 0;
-    const label = encodeURIComponent(item?.name ?? 'Access Code Location');
+  const openMapApp = (lat: number, lon: number, labelName?: string) => {
+    const label = encodeURIComponent(labelName || item?.name || 'Access Code Location');
 
     if (Platform.OS === 'ios') {
       const url = `maps:0,0?q=${label}@${lat},${lon}`;
@@ -107,24 +120,29 @@ export function AccessCodeCell({ item, distanceInMiles, onDelete }: AccessCodeCe
         </Text>
       )}
 
-      <TouchableOpacity
-        activeOpacity={0.7}
-        onPress={openMapApp}
-        style={styles.locationRow}
-      >
-        <MaterialCommunityIcons name="map-marker-outline" size={18} color={colors.secondaryYellow} />
-        <Text style={[styles.locationText, styles.clickableLocation]}>
-          {(item?.latitude ?? 0).toFixed(5)}
-          ,
-          {(item?.longitude ?? 0).toFixed(5)}
-        </Text>
-        <MaterialCommunityIcons name="open-in-new" size={14} color={colors.secondaryYellow} style={{ marginLeft: 4 }} />
-        {typeof distanceInMiles === 'number' && (
-          <Text style={styles.distanceBadge}>
-            {distanceInMiles < 0.1 ? 'Right here' : `${distanceInMiles.toFixed(2)} mi away`}
+      {locationsList.map((loc, index) => (
+        <TouchableOpacity
+          key={loc.id ?? `${loc.latitude}-${loc.longitude}-${index}`}
+          activeOpacity={0.7}
+          onPress={() => openMapApp(loc.latitude, loc.longitude, loc.label)}
+          style={styles.locationRow}
+        >
+          <MaterialCommunityIcons name="map-marker-outline" size={18} color={colors.secondaryYellow} />
+          <Text style={[styles.locationText, styles.clickableLocation]}>
+            {loc.label ? `${loc.label}: ` : ''}
+            {loc.latitude.toFixed(5)}
+            ,
+            {' '}
+            {loc.longitude.toFixed(5)}
           </Text>
-        )}
-      </TouchableOpacity>
+          <MaterialCommunityIcons name="open-in-new" size={14} color={colors.secondaryYellow} style={{ marginLeft: 4 }} />
+          {index === 0 && typeof distanceInMiles === 'number' && (
+            <Text style={styles.distanceBadge}>
+              {distanceInMiles < 0.1 ? 'Right here' : `${distanceInMiles.toFixed(2)} mi away`}
+            </Text>
+          )}
+        </TouchableOpacity>
+      ))}
     </View>
   );
 }

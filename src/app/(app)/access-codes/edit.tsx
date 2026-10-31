@@ -2,6 +2,7 @@ import type { accessCode } from '@/types/accessCode';
 import Header from '@components/Header';
 import { CustomTextInput } from '@components/inputs/CustomTextInput';
 import SmallButton from '@components/inputs/SmallButton';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import colors from '@styles/colors';
 import { elements } from '@styles/elements';
 import * as Location from 'expo-location';
@@ -14,6 +15,13 @@ import { getCachedAccessCodes, useAccessCodesLocal } from 'storage/mmkv';
 import { useAccessCodeDeleteMutation, useAccessCodeUpdateMutation } from '@/remote/mutation';
 import { useAccessCodeListQuery } from '@/remote/query';
 
+interface FormLocationPoint {
+  key: string;
+  latitude: string;
+  longitude: string;
+  label: string;
+}
+
 export default function EditAccessCodePage() {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const idInt = id ? Number.parseInt(id) : Number.NaN;
@@ -24,15 +32,46 @@ export default function EditAccessCodePage() {
   const currentCodeItem = (serverCodes ?? cachedCodes ?? getCachedAccessCodes())
     .find(item => item.id === idInt || item.id?.toString() === id || item.name === id);
 
+  const initialLocations: FormLocationPoint[] = currentCodeItem?.locations && currentCodeItem.locations.length > 0
+    ? currentCodeItem.locations.map((loc, idx) => ({
+        key: loc.id?.toString() ?? `loc-${idx}-${loc.latitude}`,
+        latitude: loc.latitude.toString(),
+        longitude: loc.longitude.toString(),
+        label: loc.label ?? '',
+      }))
+    : (currentCodeItem?.latitude !== undefined && currentCodeItem?.longitude !== undefined && (currentCodeItem.latitude !== 0 || currentCodeItem.longitude !== 0)
+        ? [{
+            key: 'initial-primary',
+            latitude: currentCodeItem.latitude.toString(),
+            longitude: currentCodeItem.longitude.toString(),
+            label: '',
+          }]
+        : []);
+
   const [name, setName] = useState(currentCodeItem?.name ?? '');
   const [code, setCode] = useState(currentCodeItem?.code ?? '');
   const [keywords, setKeywords] = useState(currentCodeItem?.keywords ?? '');
-  const [latitude, setLatitude] = useState(currentCodeItem?.latitude?.toString() ?? '');
-  const [longitude, setLongitude] = useState(currentCodeItem?.longitude?.toString() ?? '');
+  const [locations, setLocations] = useState<FormLocationPoint[]>(initialLocations);
   const [gettingLocation, setGettingLocation] = useState(false);
 
   const updateMutation = useAccessCodeUpdateMutation();
   const deleteMutation = useAccessCodeDeleteMutation();
+
+  const handleAddBlankLocation = () => {
+    setLocations(prev => [...prev, { key: Math.random().toString(), latitude: '', longitude: '', label: '' }]);
+  };
+
+  const handleRemoveLocation = (index: number) => {
+    setLocations(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleUpdateLocation = (index: number, field: keyof FormLocationPoint, value: string) => {
+    setLocations((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
 
   const handleUseCurrentLocation = async () => {
     setGettingLocation(true);
@@ -47,9 +86,16 @@ export default function EditAccessCodePage() {
         loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Low });
       }
       if (loc) {
-        setLatitude(loc.coords.latitude.toString());
-        setLongitude(loc.coords.longitude.toString());
-        Toast.show('Location updated!', { duration: Toast.durations.SHORT });
+        setLocations(prev => [
+          ...prev,
+          {
+            key: Math.random().toString(),
+            latitude: loc.coords.latitude.toString(),
+            longitude: loc.coords.longitude.toString(),
+            label: '',
+          },
+        ]);
+        Toast.show('Current location added!', { duration: Toast.durations.SHORT });
       }
     }
     catch (error: any) {
@@ -71,16 +117,29 @@ export default function EditAccessCodePage() {
       return;
     }
 
-    const latNum = Number.parseFloat(latitude);
-    const lonNum = Number.parseFloat(longitude);
+    const parsedLocations = locations
+      .map((loc) => {
+        const lat = Number.parseFloat(loc.latitude);
+        const lon = Number.parseFloat(loc.longitude);
+        return {
+          latitude: Number.isNaN(lat) ? 0 : lat,
+          longitude: Number.isNaN(lon) ? 0 : lon,
+          label: loc.label.trim(),
+        };
+      })
+      .filter(loc => loc.latitude !== 0 || loc.longitude !== 0);
+
+    const primaryLat = parsedLocations.length > 0 ? parsedLocations[0].latitude : 0;
+    const primaryLon = parsedLocations.length > 0 ? parsedLocations[0].longitude : 0;
 
     const updatedCode: accessCode = {
       id: idInt,
       name: name.trim(),
       code: code.trim(),
       keywords: keywords.trim(),
-      latitude: Number.isNaN(latNum) ? 0 : latNum,
-      longitude: Number.isNaN(lonNum) ? 0 : lonNum,
+      locations: parsedLocations,
+      latitude: primaryLat,
+      longitude: primaryLon,
     };
 
     updateMutation.mutate(
@@ -155,31 +214,62 @@ export default function EditAccessCodePage() {
         <View style={styles.fieldBlock}>
           <View style={styles.locationHeaderRow}>
             <Text style={styles.label}>GPS Coordinates</Text>
-            <SmallButton
-              title={gettingLocation ? 'Fetching...' : 'Use Current Location'}
-              backgroundColor="rgba(255,255,255,0.15)"
-              textColor={colors.yellow}
-              onPress={handleUseCurrentLocation}
-            />
-          </View>
-          <View style={styles.coordsRow}>
-            <View style={styles.coordField}>
-              <CustomTextInput
-                value={latitude}
-                onChangeText={setLatitude}
-                placeholder="Latitude"
-                keyboardType="numeric"
+            <View style={styles.locationButtons}>
+              <SmallButton
+                title="+ Add Location"
+                backgroundColor="rgba(255,255,255,0.15)"
+                textColor={colors.yellow}
+                onPress={handleAddBlankLocation}
               />
-            </View>
-            <View style={styles.coordField}>
-              <CustomTextInput
-                value={longitude}
-                onChangeText={setLongitude}
-                placeholder="Longitude"
-                keyboardType="numeric"
+              <View style={{ width: 8 }} />
+              <SmallButton
+                title={gettingLocation ? 'Fetching...' : 'Use Current Location'}
+                backgroundColor="rgba(255,255,255,0.15)"
+                textColor={colors.yellow}
+                onPress={handleUseCurrentLocation}
               />
             </View>
           </View>
+
+          {locations.length === 0
+            ? (
+                <Text style={styles.noLocationText}>
+                  No GPS coordinates added. Tap '+ Add Location' or 'Use Current Location' above.
+                </Text>
+              )
+            : (
+                locations.map((loc, index) => (
+                  <View key={loc.key} style={styles.locationCard}>
+                    <View style={styles.locationCardHeader}>
+                      <Text style={styles.locationCardTitle}>
+                        Location #
+                        {index + 1}
+                      </Text>
+                      <TouchableOpacity onPress={() => handleRemoveLocation(index)} style={styles.deleteLocButton}>
+                        <MaterialCommunityIcons name="trash-can-outline" size={20} color="#E53935" />
+                      </TouchableOpacity>
+                    </View>
+                    <View style={styles.coordsRow}>
+                      <View style={styles.coordField}>
+                        <CustomTextInput
+                          value={loc.latitude}
+                          onChangeText={val => handleUpdateLocation(index, 'latitude', val)}
+                          placeholder="Latitude"
+                          keyboardType="numeric"
+                        />
+                      </View>
+                      <View style={styles.coordField}>
+                        <CustomTextInput
+                          value={loc.longitude}
+                          onChangeText={val => handleUpdateLocation(index, 'longitude', val)}
+                          placeholder="Longitude"
+                          keyboardType="numeric"
+                        />
+                      </View>
+                    </View>
+                  </View>
+                ))
+              )}
         </View>
 
         <View style={styles.buttonRow}>
@@ -218,10 +308,41 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   locationHeaderRow: {
+    flexDirection: 'column',
+    marginBottom: 8,
+  },
+  locationButtons: {
+    flexDirection: 'row',
+    marginTop: 6,
+    flexWrap: 'wrap',
+  },
+  noLocationText: {
+    fontSize: 14,
+    color: '#888',
+    fontStyle: 'italic',
+    marginTop: 6,
+  },
+  locationCard: {
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  locationCardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 4,
+  },
+  locationCardTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.secondaryYellow,
+  },
+  deleteLocButton: {
+    padding: 4,
   },
   coordsRow: {
     flexDirection: 'row',
