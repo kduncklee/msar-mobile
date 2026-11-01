@@ -89,6 +89,7 @@ async function registerForPushNotificationsAsync(api: Api) {
   }
   catch (error: any) {
     console.log('[PUSH] Messaging registration skipped:', error?.message ?? error);
+    Sentry.captureException(error);
   }
 }
 
@@ -359,6 +360,7 @@ export function setupPushNotificationsBackground() {
   }
   catch (error: any) {
     console.log('[PUSH] Background messaging handler setup skipped:', error?.message ?? error);
+    Sentry.captureException(error);
   }
 }
 
@@ -411,6 +413,7 @@ export function usePushNotificationsOuter() {
     }
     catch (error: any) {
       console.log('[PUSH] onNotificationOpenedApp setup skipped:', error?.message ?? error);
+      Sentry.captureException(error);
     }
 
     const notifeeOnForegroundUnsubscribe
@@ -464,6 +467,7 @@ export function usePushNotificationsInner() {
     }
     catch (error: any) {
       console.log('[PUSH] onMessage listener setup skipped:', error?.message ?? error);
+      Sentry.captureException(error);
     }
 
     return () => {

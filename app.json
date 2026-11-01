@@ -58,6 +58,7 @@
             "useFrameworks": "static",
             "deploymentTarget": "15.1",
             "forceStaticLinking": ["RNFBApp", "RNFBMessaging"],
+            // temporary workaround: https://github.com/expo/expo/issues/39607
             "buildReactNativeFromSource": true
           }
         }
