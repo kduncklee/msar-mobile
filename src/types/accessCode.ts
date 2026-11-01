@@ -17,20 +17,28 @@ export interface accessCode {
   updated_at?: string;
 }
 
+function parseCoord(val: any): number {
+  if (typeof val === 'number') {
+    return Number.isNaN(val) ? 0 : val;
+  }
+  const parsed = Number.parseFloat(val || '0');
+  return Number.isNaN(parsed) ? 0 : parsed;
+}
+
 export function accessCodeFromResponse(data: any): accessCode {
   let locations: LocationPoint[] = [];
 
   if (Array.isArray(data.locations)) {
     locations = data.locations.map((loc: any) => ({
       id: loc.id,
-      latitude: typeof loc.latitude === 'number' ? loc.latitude : Number.parseFloat(loc.latitude || '0'),
-      longitude: typeof loc.longitude === 'number' ? loc.longitude : Number.parseFloat(loc.longitude || '0'),
+      latitude: parseCoord(loc.latitude),
+      longitude: parseCoord(loc.longitude),
       label: loc.label ?? '',
     }));
   }
   else if (data.latitude !== undefined && data.longitude !== undefined) {
-    const lat = typeof data.latitude === 'number' ? data.latitude : Number.parseFloat(data.latitude || '0');
-    const lon = typeof data.longitude === 'number' ? data.longitude : Number.parseFloat(data.longitude || '0');
+    const lat = parseCoord(data.latitude);
+    const lon = parseCoord(data.longitude);
     if (lat !== 0 || lon !== 0) {
       locations = [{ latitude: lat, longitude: lon }];
     }

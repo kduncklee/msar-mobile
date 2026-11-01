@@ -67,8 +67,10 @@ export function AccessCodeForm({ mode }: AccessCodeFormProps) {
 
   const isPending = createMutation.isPending || updateMutation.isPending;
 
+  const generateUniqueKey = () => `${Date.now()}-${Math.random()}`;
+
   const handleAddBlankLocation = () => {
-    setLocations(prev => [...prev, { key: Math.random().toString(), latitude: '', longitude: '', label: '' }]);
+    setLocations(prev => [...prev, { key: generateUniqueKey(), latitude: '', longitude: '', label: '' }]);
   };
 
   const handleRemoveLocation = (index: number) => {
@@ -99,7 +101,7 @@ export function AccessCodeForm({ mode }: AccessCodeFormProps) {
         setLocations(prev => [
           ...prev,
           {
-            key: Math.random().toString(),
+            key: generateUniqueKey(),
             latitude: loc.coords.latitude.toString(),
             longitude: loc.coords.longitude.toString(),
             label: '',

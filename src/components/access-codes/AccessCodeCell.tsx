@@ -4,6 +4,7 @@ import colors from '@styles/colors';
 import { elements } from '@styles/elements';
 import * as Clipboard from 'expo-clipboard';
 import { router } from 'expo-router';
+import React, { memo } from 'react';
 import { Alert, Linking, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-root-toast';
 
@@ -13,7 +14,7 @@ interface AccessCodeCellProps {
   onDelete?: (id: number) => void;
 }
 
-export function AccessCodeCell({ item, distanceInMiles, onDelete }: AccessCodeCellProps) {
+function AccessCodeCellComponent({ item, distanceInMiles, onDelete }: AccessCodeCellProps) {
   const locationsList = item.locations && item.locations.length > 0
     ? item.locations
     : (item.latitude !== undefined && item.longitude !== undefined && (item.latitude !== 0 || item.longitude !== 0)
@@ -231,3 +232,5 @@ const styles = StyleSheet.create({
     marginLeft: 'auto',
   },
 });
+
+export const AccessCodeCell = memo(AccessCodeCellComponent);
