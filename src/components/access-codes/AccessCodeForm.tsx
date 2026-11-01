@@ -102,8 +102,8 @@ export function AccessCodeForm({ mode }: AccessCodeFormProps) {
           ...prev,
           {
             key: generateUniqueKey(),
-            latitude: loc.coords.latitude.toString(),
-            longitude: loc.coords.longitude.toString(),
+            latitude: loc.coords.latitude.toFixed(6),
+            longitude: loc.coords.longitude.toFixed(6),
             label: '',
           },
         ]);
