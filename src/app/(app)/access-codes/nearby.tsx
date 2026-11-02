@@ -105,6 +105,7 @@ export default function NearbyAccessCodesPage() {
   return (
     <SafeAreaView style={styles.container}>
       <Header title="Nearby Access Codes" backButton />
+      <Text style={styles.confidentialText}>Confidential, Team Use Only</Text>
       {loadingLocation
         ? (
             <View style={styles.loadingContainer}>
@@ -138,6 +139,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.primaryBg,
+  },
+  confidentialText: {
+    fontSize: 13,
+    fontStyle: 'italic',
+    color: colors.secondaryYellow,
+    textAlign: 'center',
+    marginVertical: 6,
   },
   loadingContainer: {
     padding: 32,

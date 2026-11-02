@@ -55,6 +55,7 @@ export default function SearchAccessCodesPage() {
           placeholder="Search by name, code or keyword..."
           icon="magnify"
         />
+        <Text style={styles.confidentialText}>Confidential, Team Use Only</Text>
       </View>
       <FlatList
         data={filteredCodes}
@@ -84,6 +85,14 @@ const styles = StyleSheet.create({
   searchContainer: {
     paddingHorizontal: 12,
     paddingVertical: 8,
+  },
+  confidentialText: {
+    fontSize: 13,
+    fontStyle: 'italic',
+    color: colors.secondaryYellow,
+    textAlign: 'center',
+    marginTop: 6,
+    marginBottom: 4,
   },
   emptyContainer: {
     padding: 24,
