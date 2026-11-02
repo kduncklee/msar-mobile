@@ -146,11 +146,11 @@ export function useChatOrCalloutLogMutation(idInt?: number) {
   let mutationFn;
   let queryKey;
   if (idInt) { // CalloutLog
-    mutationFn = (message: string) => api.apiPostCalloutLog(idInt, message);
+    mutationFn = (message: string, key: string) => api.apiPostCalloutLog(idInt, message, key);
     queryKey = ['calloutLog', idInt];
   }
   else { // Chat
-    mutationFn = (message: string) => api.apiPostChatLog(message);
+    mutationFn = (message: string, key: string) => api.apiPostChatLog(message, key);
     queryKey = ['chat'];
   }
   return useLogMutation(mutationFn, queryKey);
@@ -169,6 +169,7 @@ export function useLogMutation(mutationFn, queryKey) {
   interface LogVariables {
     id?: string;
     message: string;
+    key: string;
   };
 
   const updateItem = (prev, id, replacement) => {

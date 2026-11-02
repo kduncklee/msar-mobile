@@ -28,7 +28,7 @@ function LogMessageField({ id, callout_id, member, message, status, timestamp }:
   const isPublished = !status;
 
   const retrySending = async () => {
-    logMutation.mutate({ id, message });
+    logMutation.mutate({ id, message, key: Math.random().toString(36).slice(2) });
   };
 
   const contents = (

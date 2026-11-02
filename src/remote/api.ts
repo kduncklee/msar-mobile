@@ -322,19 +322,20 @@ export class Api {
     return this.#apiGetLogResponseFromUrl(this.#chatEndpoint(), pageParam);
   }
 
-  async #apiPostLogFromUrl(url: string, message: string): Promise<any> {
+  async #apiPostLogFromUrl(url: string, message: string, key: string): Promise<any> {
     return this.#fetchJsonWithCredentials(url, 'POST', {
       type: 'message',
       message,
+      key,
     });
   }
 
-  async apiPostCalloutLog(id: number, message: string): Promise<any> {
-    return this.#apiPostLogFromUrl(`${this.#calloutsEndpoint() + id}/log/`, message);
+  async apiPostCalloutLog(id: number, message: string, key: string): Promise<any> {
+    return this.#apiPostLogFromUrl(`${this.#calloutsEndpoint() + id}/log/`, message, key);
   }
 
-  async apiPostChatLog(message: string): Promise<any> {
-    return this.#apiPostLogFromUrl(this.#chatEndpoint(), message);
+  async apiPostChatLog(message: string, key: string): Promise<any> {
+    return this.#apiPostLogFromUrl(this.#chatEndpoint(), message, key);
   }
 
   async apiGetEvents(args: string): Promise<any> {

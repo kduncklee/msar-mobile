@@ -21,7 +21,7 @@ function Page() {
 
   const submitLogMessage = async () => {
     const logMessage: string = logMessageText;
-    chatLogMutation.mutate({ message: logMessage });
+    chatLogMutation.mutate({ message: logMessage, key: Math.random().toString(36).slice(2) });
     setLogMessageText('');
   };
 
