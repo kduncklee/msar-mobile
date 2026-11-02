@@ -1,8 +1,19 @@
 import type { Api } from '@/remote/api';
 import messaging from '@react-native-firebase/messaging';
+import * as Sentry from '@sentry/react-native';
 
 async function getPushToken() {
-  return messaging().getToken();
+  try {
+    return await messaging().getToken();
+  }
+  catch (error: any) {
+    console.log('[PUSH TOKEN] Firebase token unavailable:', error?.message ?? error);
+    Sentry.captureException(error);
+    if (__DEV__) {
+      return 'dev-dummy-push-token-12345';
+    }
+    return '';
+  }
 }
 
 export async function updatePushToken(api: Api) {

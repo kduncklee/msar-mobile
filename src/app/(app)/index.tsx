@@ -74,6 +74,7 @@ function Page() {
     { text: 'Roster', icon: 'account-multiple-outline', url: '/roster' },
     { text: 'Certs', icon: 'certificate', url: '/certs' },
     { text: 'Calendar', icon: 'calendar', url: '/calendar' },
+    { text: 'Access Codes', icon: 'key-outline', url: '/access-codes' },
     { text: 'Settings', icon: 'cog', url: '/settings' },
     { text: snoozeTitle, icon: 'alarm-snooze', key: 'snooze', onPress: () => setSnoozeModalVisible(true) },
   ];

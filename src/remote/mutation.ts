@@ -1,10 +1,11 @@
+import type { accessCode } from '@/types/accessCode';
 import type { callout } from '@/types/callout';
 import type { patrol } from '@/types/patrol';
 import * as Sentry from '@sentry/react-native';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Toast from 'react-native-root-toast';
 import useAuth from '@/hooks/useAuth';
-import { invalidatePatrolListQuery } from '@/remote/query';
+import { invalidateAccessCodeListQuery, invalidatePatrolListQuery } from '@/remote/query';
 import { logStatusType, logType } from '@/types/enums';
 import { logEntryFromRespsonse } from '@/types/logEntry';
 import { messageSuccessNotification } from '@/utility/pushNotifications';
@@ -26,6 +27,59 @@ export function useCalloutUpdateMutation() {
   return useMutation({
     mutationFn: ({ idInt, callout }: { idInt: number; callout: callout }) =>
       api.apiUpdateCallout(idInt, callout),
+  });
+}
+
+/// /// Access Code Mutations
+export function useAccessCodeCreateMutation() {
+  const { api } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (code: accessCode) => api.apiCreateAccessCode(code),
+    onSuccess: () => {
+      invalidateAccessCodeListQuery(queryClient);
+    },
+    onError: (error: any) => {
+      Sentry.captureException(error);
+      Toast.show(`Unable to create access code: ${error.message}`, {
+        duration: Toast.durations.LONG,
+      });
+    },
+  });
+}
+
+export function useAccessCodeUpdateMutation() {
+  const { api } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ idInt, code }: { idInt: number; code: accessCode }) =>
+      api.apiUpdateAccessCode(idInt, code),
+    onSuccess: () => {
+      invalidateAccessCodeListQuery(queryClient);
+    },
+    onError: (error: any) => {
+      Sentry.captureException(error);
+      Toast.show(`Unable to update access code: ${error.message}`, {
+        duration: Toast.durations.LONG,
+      });
+    },
+  });
+}
+
+export function useAccessCodeDeleteMutation() {
+  const { api } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (idInt: number) => api.apiRemoveAccessCode(idInt),
+    onSuccess: () => {
+      invalidateAccessCodeListQuery(queryClient);
+    },
+    onError: (error: any) => {
+      Sentry.captureException(error);
+      Toast.show(`Unable to delete access code: ${error.message}`, {
+        duration: Toast.durations.LONG,
+      });
+    },
   });
 }
 
