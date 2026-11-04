@@ -6,9 +6,10 @@ import { getDateRangeString, getDateTimeRangeString, getTimeString } from '@/uti
 
 interface CalendarEventProps {
   event: event;
+  onEditPress?: () => void;
 }
 
-function CalendarEvent({ event }: CalendarEventProps) {
+function CalendarEvent({ event, onEditPress }: CalendarEventProps) {
   const time = event.all_day
     ? (getDateRangeString(event.start_at, event.finish_at) || 'All day')
     : (getDateTimeRangeString(event.start_at, event.finish_at) || getTimeString(event.start_at));
@@ -16,11 +17,14 @@ function CalendarEvent({ event }: CalendarEventProps) {
     <InformationTray
       title={event.title}
       titleBarColor={colors.green}
+      editButton={!!onEditPress}
+      onEditPress={onEditPress}
     >
       {time && <InformationField title="Time" value={time} />}
-      <InformationField title="Location" value={event.location} />
       <InformationField title="Type" value={event.type} />
-      <InformationField title="Description" value={event.description} />
+      {!!event.leaders && <InformationField title="Leaders" value={event.leaders} />}
+      {!!event.location && <InformationField title="Location" value={event.location} />}
+      {!!event.description && <InformationField title="Description" value={event.description} />}
     </InformationTray>
   );
 }

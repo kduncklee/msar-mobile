@@ -1,8 +1,9 @@
 import type { event } from '@/types/event';
 import type { patrol } from '@/types/patrol';
 import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import CalendarEvent from '@/components/calendar/CalendarEvent';
+import CalendarEventModal from '@/components/calendar/CalendarEventModal';
 import CalendarPatrol from '@/components/calendar/CalendarPatrol';
 import CalendarPatrolModal from '@/components/calendar/CalendarPatrolModal';
 import ModalFade from '@/components/modals/common/ModalFade';
@@ -20,27 +21,45 @@ interface CalendarDayModalProps {
 function CalendarDayModal({ dateID, events, patrols, onCancel }: CalendarDayModalProps) {
   const [selectedPatrolDate, setSelectedPatrolDate] = useState<string>('');
   const [selectedPatrolId, setSelectedPatrolId] = useState<number>(-1);
+
+  const [selectedEventDate, setSelectedEventDate] = useState<string>('');
+  const [selectedEventId, setSelectedEventId] = useState<number>(-1);
+
   const { username } = useAuth();
 
   const userPatrol = patrols?.find(p => isUserSelf(p.member, username));
   const selectedPatrol = patrols?.find(p => p.id === selectedPatrolId);
+  const selectedEvent = events?.find(e => e.id === selectedEventId);
 
   function createEvent() {
-    Alert.alert(
-      'Not implemented yet',
-      'Use the website to create events.',
-    );
+    setSelectedEventDate(dateID);
+    setSelectedEventId(-1);
   }
+
+  function editEvent(eventItem: event) {
+    console.log('editEvent', eventItem);
+    if (eventItem.id != null) {
+      setSelectedEventId(eventItem.id);
+      setSelectedEventDate(dateID);
+    }
+  }
+
+  const closeEventModal = () => {
+    setSelectedEventDate('');
+    setSelectedEventId(-1);
+  };
 
   function createPatrol() {
     setSelectedPatrolDate(dateID);
     setSelectedPatrolId(-1);
   }
 
-  function editPatrol(patrol) {
-    console.log('editPatrol', patrol);
-    setSelectedPatrolId(patrol.id);
-    setSelectedPatrolDate(dateID);
+  function editPatrol(patrolItem: patrol) {
+    console.log('editPatrol', patrolItem);
+    if (patrolItem.id != null) {
+      setSelectedPatrolId(patrolItem.id);
+      setSelectedPatrolDate(dateID);
+    }
   }
 
   const closePatrolModal = () => {
@@ -60,14 +79,14 @@ function CalendarDayModal({ dateID, events, patrols, onCancel }: CalendarDayModa
           {events?.length ? 'Events:' : 'No events for this day.'}
         </Text>
         {events?.map(event => (
-          <CalendarEvent event={event} key={event.id} />
+          <CalendarEvent event={event} key={event.id} onEditPress={() => editEvent(event)} />
         ))}
 
         <Text style={[elements.mediumText, styles.sectionHeader]}>
           {patrols?.length ? 'Patrols:' : 'No patrols for this day.'}
         </Text>
         {patrols?.map(patrol => (
-          <CalendarPatrol patrol={patrol} key={patrol.id} onEditPress={editPatrol.bind(null, patrol)} />
+          <CalendarPatrol patrol={patrol} key={patrol.id} onEditPress={() => editPatrol(patrol)} />
         ))}
 
       </ScrollView>
@@ -94,7 +113,7 @@ function CalendarDayModal({ dateID, events, patrols, onCancel }: CalendarDayModa
           <TouchableOpacity
             activeOpacity={0.8}
             style={[elements.capsuleButton, elements.splitButton]}
-            onPress={editPatrol.bind(null, userPatrol)}
+            onPress={() => editPatrol(userPatrol)}
           >
             <Text style={[elements.whiteButtonText, styles.bottomButtonText]}>
               Edit Patrol
@@ -102,6 +121,7 @@ function CalendarDayModal({ dateID, events, patrols, onCancel }: CalendarDayModa
           </TouchableOpacity>
         )}
       </View>
+      {!!selectedEventDate && <CalendarEventModal dateID={selectedEventDate} event={selectedEvent} onCancel={closeEventModal} />}
       {!!selectedPatrolDate && <CalendarPatrolModal dateID={selectedPatrolDate} patrol={selectedPatrol} onCancel={closePatrolModal} />}
     </ModalFade>
   );
@@ -117,21 +137,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginLeft: 20,
     marginRight: 20,
-  },
-  common: {
-    fontStyle: 'italic',
-    textAlign: 'center',
-    borderRadius: 10,
-    backgroundColor: '#68a0cf',
-    margin: 1,
-  },
-  event: {
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  patrol: {
-    fontSize: 14,
-    fontWeight: 'bold',
   },
   bottomButtonText: {
     fontSize: 18,

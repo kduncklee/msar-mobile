@@ -1,11 +1,13 @@
 import type { LabelValue } from '../utility/reactForm';
 import type { calloutGetLogResponse, loginResponse, tokenValidationResponse } from './responses';
 import type { callout } from '@/types/callout';
+import type { event } from '@/types/event';
 import type { patrol } from '@/types/patrol';
 import * as Application from 'expo-application';
 import { Directory, File, Paths } from 'expo-file-system';
 import { Platform } from 'react-native';
 import { calloutFromResponse } from '@/types/callout';
+import { eventFromResponse } from '@/types/event';
 
 const scv_server: string = 'https://app.scvrescue.com';
 const countywide_server: string = 'https://countywide.app.malibusarhours.org';
@@ -101,7 +103,7 @@ export class Api {
   }
 
   #eventsEndpoint(): string {
-    return `${this.#server()}/api/events/?is_operation=false`;
+    return `${this.#server()}/api/events/`;
   }
 
   #patrolsEndpoint(): string {
@@ -318,7 +320,40 @@ export class Api {
   }
 
   async apiGetEvents(args: string): Promise<any> {
-    return this.#fetchJsonWithCredentials(this.#eventsEndpoint() + args);
+    const query = args ? (args.startsWith('?') ? args : `?is_operation=false${args}`) : '?is_operation=false';
+    return this.#fetchJsonWithCredentials(this.#eventsEndpoint() + query);
+  }
+
+  async apiGetEvent(id: number): Promise<event> {
+    return this.#fetchJsonWithCredentials(`${this.#eventsEndpoint()}${id}/`).then((data) => {
+      return eventFromResponse(data);
+    });
+  }
+
+  async apiCreateEvent(eventData: event): Promise<any> {
+    return this.#fetchJsonWithCredentials(this.#eventsEndpoint(), 'POST', eventData);
+  }
+
+  async apiUpdateEvent(id: number, eventData: event): Promise<any> {
+    return this.#fetchJsonWithCredentials(
+      `${this.#eventsEndpoint()}${id}/`,
+      'PUT',
+      eventData,
+    );
+  }
+
+  async apiRemoveEvent(id: number): Promise<any> {
+    try {
+      const data = await this.#fetchWithCredentials(
+        `${this.#eventsEndpoint()}${id}/`,
+        'DELETE',
+      );
+      console.log(`removed event: ${JSON.stringify(data)}`);
+      return data;
+    }
+    catch (error: any) {
+      console.log(error);
+    }
   }
 
   async apiGetPatrols(args: string): Promise<any> {
