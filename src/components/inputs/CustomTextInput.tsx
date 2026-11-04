@@ -32,19 +32,27 @@ export function CustomTextInput({
     }
   };
 
+  const isMultiline = inputProps.multiline;
+  const containerHeightStyle = isMultiline ? { minHeight: 100, height: 'auto' as const } : { height: 50 };
+
   return (
     <View style={styles.container}>
       {!!title && <Text style={elements.fieldTitle}>{title}</Text>}
-      <View style={[elements.inputContainer, { height: 50 }]}>
+      <View style={[elements.inputContainer, containerHeightStyle]}>
         {!!icon && (
           <View style={elements.fieldIcon}>
             <MaterialCommunityIcons name={icon} size={22} color="white" />
           </View>
         )}
         <TextInput
-          style={[elements.fieldText, { flex: 1, padding: 8 }, style]}
-          returnKeyType="done"
-          onSubmitEditing={handleDone}
+          style={[
+            elements.fieldText,
+            { flex: 1, padding: 8 },
+            isMultiline && { textAlignVertical: 'top', paddingTop: 10 },
+            style,
+          ]}
+          returnKeyType={isMultiline ? 'default' : 'done'}
+          onSubmitEditing={isMultiline ? undefined : handleDone}
           placeholder={placeholder ?? title}
           placeholderTextColor={colors.grayText}
           autoCorrect

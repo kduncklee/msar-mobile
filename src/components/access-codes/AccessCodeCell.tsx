@@ -4,9 +4,12 @@ import colors from '@styles/colors';
 import { elements } from '@styles/elements';
 import * as Clipboard from 'expo-clipboard';
 import { router } from 'expo-router';
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { Alert, Linking, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-root-toast';
+import ModalFade from '@/components/modals/common/ModalFade';
+import { useAccessCodeUpdateMutation } from '@/remote/mutation';
+import { getPaddedDateString } from '@/utility/dateHelper';
 
 interface AccessCodeCellProps {
   item: accessCode;
@@ -15,6 +18,9 @@ interface AccessCodeCellProps {
 }
 
 function AccessCodeCellComponent({ item, distanceInMiles, onDelete }: AccessCodeCellProps) {
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const updateMutation = useAccessCodeUpdateMutation();
+
   const locationsList = item.locations && item.locations.length > 0
     ? item.locations
     : (item.latitude !== undefined && item.longitude !== undefined && (item.latitude !== 0 || item.longitude !== 0)
@@ -26,6 +32,9 @@ function AccessCodeCellComponent({ item, distanceInMiles, onDelete }: AccessCode
       `Name: ${item.name}`,
       `Code: ${item.code}`,
     ];
+    if (item.notes) {
+      lines.push(`Notes: ${item.notes}`);
+    }
     if (locationsList.length === 1) {
       lines.push(`Location: ${locationsList[0].latitude.toFixed(5)}, ${locationsList[0].longitude.toFixed(5)}`);
     }
@@ -35,9 +44,6 @@ function AccessCodeCellComponent({ item, distanceInMiles, onDelete }: AccessCode
         const labelStr = loc.label ? ` (${loc.label})` : '';
         lines.push(`  ${index + 1}. ${loc.latitude.toFixed(5)}, ${loc.longitude.toFixed(5)}${labelStr}`);
       });
-    }
-    if (item.keywords) {
-      lines.push(`Keywords: ${item.keywords}`);
     }
     const textToCopy = lines.join('\n');
 
@@ -51,6 +57,17 @@ function AccessCodeCellComponent({ item, distanceInMiles, onDelete }: AccessCode
     router.push({
       pathname: '/access-codes/edit',
       params: { id: (item.id ?? item.name)?.toString() },
+    });
+  };
+
+  const openNotes = () => {
+    router.push({
+      pathname: '/access-codes/accesscodenotes',
+      params: {
+        id: (item.id ?? item.name)?.toString(),
+        name: item.name,
+        notes: item.notes,
+      },
     });
   };
 
@@ -73,6 +90,28 @@ function AccessCodeCellComponent({ item, distanceInMiles, onDelete }: AccessCode
     );
   };
 
+  const handleVerify = (isGood: boolean) => {
+    if (item.id === undefined) {
+      return;
+    }
+    const updatedCode: accessCode = {
+      ...item,
+      verified_good: isGood,
+      last_verified_at: new Date().toISOString(),
+    };
+    updateMutation.mutate(
+      { idInt: item.id, code: updatedCode },
+      {
+        onSuccess: () => {
+          Toast.show(isGood ? 'Marked as Verified Good!' : 'Marked as Unverified / Issue', {
+            duration: Toast.durations.SHORT,
+          });
+          setShowVerifyModal(false);
+        },
+      },
+    );
+  };
+
   const openMapApp = (lat: number, lon: number, labelName?: string) => {
     const label = encodeURIComponent(labelName || item?.name || 'Access Code Location');
 
@@ -88,10 +127,26 @@ function AccessCodeCellComponent({ item, distanceInMiles, onDelete }: AccessCode
     }
   };
 
+  const isBad = item.verified_good === false;
+  const verifiedDate = item.last_verified_at ? new Date(item.last_verified_at) : null;
+  const verifiedLabel = verifiedDate
+    ? getPaddedDateString(verifiedDate, false)
+    : 'Verify';
+
   return (
-    <View style={[elements.tray, styles.container]}>
+    <View style={[elements.tray, styles.container, isBad && styles.badContainer]}>
       <View style={styles.headerRow}>
         <Text style={styles.nameText} numberOfLines={1}>{item.name}</Text>
+        <TouchableOpacity onPress={() => setShowVerifyModal(true)} style={styles.verifiedBadgeButton}>
+          <MaterialCommunityIcons
+            name={isBad ? 'close-circle-outline' : 'check-circle-outline'}
+            size={14}
+            color={isBad ? '#FF6B6B' : colors.secondaryYellow}
+          />
+          <Text style={[styles.verifiedBadgeText, isBad && styles.badVerifiedText]}>
+            {verifiedLabel}
+          </Text>
+        </TouchableOpacity>
         <View style={styles.actionIcons}>
           <TouchableOpacity onPress={handleEdit} style={styles.iconButton}>
             <MaterialCommunityIcons name="pencil" size={20} color={colors.primaryText} />
@@ -107,6 +162,12 @@ function AccessCodeCellComponent({ item, distanceInMiles, onDelete }: AccessCode
       <View style={styles.codeRow}>
         <Text style={styles.codeLabel}>Code:</Text>
         <Text style={styles.codeValue} selectable>{item.code}</Text>
+        {!!item.notes?.trim() && (
+          <TouchableOpacity onPress={openNotes} style={styles.notesButton}>
+            <MaterialCommunityIcons name="notebook-outline" size={16} color={colors.secondaryYellow} />
+            <Text style={styles.notesLinkText}>Notes</Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity onPress={copyCodeToClipboard} style={styles.copyButton}>
           <MaterialCommunityIcons name="content-copy" size={18} color={colors.primaryText} />
           <Text style={styles.copyText}>Copy</Text>
@@ -144,6 +205,37 @@ function AccessCodeCellComponent({ item, distanceInMiles, onDelete }: AccessCode
           )}
         </TouchableOpacity>
       ))}
+
+      {showVerifyModal && (
+        <ModalFade
+          modalVisible={showVerifyModal}
+          onCancel={() => setShowVerifyModal(false)}
+          headerTitle="Verify Access Code"
+        >
+          <View style={styles.modalBody}>
+            <Text style={styles.modalTitle}>{item.name}</Text>
+            <Text style={styles.modalSubtitle}>Is this access code working correctly?</Text>
+
+            <View style={styles.thumbsContainer}>
+              <TouchableOpacity
+                style={[styles.thumbButton, styles.thumbUpButton]}
+                onPress={() => handleVerify(true)}
+              >
+                <MaterialCommunityIcons name="thumb-up" size={36} color="#FFFFFF" />
+                <Text style={styles.thumbButtonText}>Working / Good</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.thumbButton, styles.thumbDownButton]}
+                onPress={() => handleVerify(false)}
+              >
+                <MaterialCommunityIcons name="thumb-down" size={36} color="#FFFFFF" />
+                <Text style={styles.thumbButtonText}>Issue / Bad Code</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ModalFade>
+      )}
     </View>
   );
 }
@@ -153,6 +245,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 12,
     marginVertical: 6,
     padding: 12,
+  },
+  badContainer: {
+    backgroundColor: 'rgba(110, 25, 25, 0.85)',
+    borderColor: 'rgba(230, 70, 70, 0.6)',
+    borderWidth: 1.5,
   },
   headerRow: {
     flexDirection: 'row',
@@ -164,6 +261,24 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.primaryText,
     flex: 1,
+  },
+  verifiedBadgeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderRadius: 12,
+    marginHorizontal: 6,
+  },
+  verifiedBadgeText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.secondaryYellow,
+    marginLeft: 4,
+  },
+  badVerifiedText: {
+    color: '#FF6B6B',
   },
   actionIcons: {
     flexDirection: 'row',
@@ -191,6 +306,21 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.primaryText,
     flex: 1,
+  },
+  notesButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderRadius: 4,
+    marginRight: 6,
+  },
+  notesLinkText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.secondaryYellow,
+    marginLeft: 3,
   },
   copyButton: {
     flexDirection: 'row',
@@ -230,6 +360,47 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFD700',
     marginLeft: 'auto',
+  },
+  modalBody: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: colors.primaryText,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  modalSubtitle: {
+    fontSize: 16,
+    color: '#CCC',
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  thumbsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+  },
+  thumbButton: {
+    width: '45%',
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  thumbUpButton: {
+    backgroundColor: '#2E7D32',
+  },
+  thumbDownButton: {
+    backgroundColor: '#C62828',
+  },
+  thumbButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginTop: 8,
   },
 });
 
