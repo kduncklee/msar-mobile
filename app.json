@@ -112,7 +112,10 @@
           "organization": "msar"
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "@sentry/react-native",
+      "expo-asset",
+      "expo-font"
     ],
     "scheme": "msar",
     "extra": {
