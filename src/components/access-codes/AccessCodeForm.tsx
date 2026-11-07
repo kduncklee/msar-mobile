@@ -13,6 +13,7 @@ import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import Toast from 'react-native-root-toast';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getCachedAccessCodes, useAccessCodesLocal } from 'storage/mmkv';
+import KeyboardAvoidingCustomView from '@/components/KeyboardAvoidingCustomView';
 import { useAccessCodeCreateMutation, useAccessCodeDeleteMutation, useAccessCodeUpdateMutation } from '@/remote/mutation';
 import { useAccessCodeListQuery } from '@/remote/query';
 
@@ -216,132 +217,134 @@ export function AccessCodeForm({ mode }: AccessCodeFormProps) {
         rightButtonIcon={isEdit ? 'trash-can-outline' : undefined}
         onRightPressed={isEdit ? handleDelete : undefined}
       />
-      <ScrollView style={styles.formContent} keyboardShouldPersistTaps="handled">
-        <View style={styles.fieldBlock}>
-          <Text style={styles.label}>Access Code Name *</Text>
-          <CustomTextInput
-            value={name}
-            onChangeText={setName}
-            placeholder="e.g. Gate 4 Trailhead"
-          />
-        </View>
-
-        <View style={styles.fieldBlock}>
-          <Text style={styles.label}>Access Code Value *</Text>
-          <CustomTextInput
-            value={code}
-            onChangeText={setCode}
-            placeholder="e.g. 4821# or Keybox 2"
-          />
-        </View>
-
-        <View style={styles.fieldBlock}>
-          <Text style={styles.label}>Notes (Optional)</Text>
-          <CustomTextInput
-            value={notes}
-            onChangeText={setNotes}
-            placeholder="Optional: detailed notes, on-site instructions.."
-            multiline
-            numberOfLines={4}
-            style={styles.notesInput}
-          />
-        </View>
-
-        <View style={styles.fieldBlock}>
-          <Text style={styles.label}>Additional Search Keywords (Optional)</Text>
-          <CustomTextInput
-            value={keywords}
-            onChangeText={setKeywords}
-            placeholder="e.g. gate, water tower, north"
-          />
-        </View>
-
-        <View style={styles.fieldBlock}>
-          <Checkbox
-            title="Verified Working / Good"
-            checked={verifiedGood}
-            onToggle={setVerifiedGood}
-          />
-        </View>
-
-        <View style={styles.fieldBlock}>
-          <View style={styles.locationHeaderRow}>
-            <Text style={styles.label}>GPS Coordinates</Text>
-            <View style={styles.locationButtons}>
-              <SmallButton
-                title="+ Add Location"
-                backgroundColor="rgba(255,255,255,0.15)"
-                textColor={colors.yellow}
-                onPress={handleAddBlankLocation}
-              />
-              <View style={{ width: 8 }} />
-              <SmallButton
-                title={gettingLocation ? 'Fetching...' : 'Use Current Location'}
-                backgroundColor="rgba(255,255,255,0.15)"
-                textColor={colors.yellow}
-                onPress={handleUseCurrentLocation}
-              />
-            </View>
+      <KeyboardAvoidingCustomView>
+        <ScrollView style={styles.formContent} keyboardShouldPersistTaps="handled">
+          <View style={styles.fieldBlock}>
+            <Text style={styles.label}>Access Code Name *</Text>
+            <CustomTextInput
+              value={name}
+              onChangeText={setName}
+              placeholder="e.g. Gate 4 Trailhead"
+            />
           </View>
 
-          {locations.length === 0
-            ? (
-                <Text style={styles.noLocationText}>
-                  No GPS coordinates added. Tap '+ Add Location' or 'Use Current Location' above.
-                </Text>
-              )
-            : (
-                locations.map((loc, index) => (
-                  <View key={loc.key} style={styles.locationCard}>
-                    <View style={styles.locationCardHeader}>
-                      <Text style={styles.locationCardTitle}>
-                        Location #
-                        {index + 1}
-                      </Text>
-                      <TouchableOpacity onPress={() => handleRemoveLocation(index)} style={styles.deleteLocButton}>
-                        <MaterialCommunityIcons name="trash-can-outline" size={20} color="#E53935" />
-                      </TouchableOpacity>
-                    </View>
-                    <View style={styles.coordsRow}>
-                      <View style={styles.coordField}>
-                        <CustomTextInput
-                          value={loc.latitude}
-                          onChangeText={val => handleUpdateLocation(index, 'latitude', val)}
-                          placeholder="Latitude"
-                          keyboardType="numeric"
-                        />
-                      </View>
-                      <View style={styles.coordField}>
-                        <CustomTextInput
-                          value={loc.longitude}
-                          onChangeText={val => handleUpdateLocation(index, 'longitude', val)}
-                          placeholder="Longitude"
-                          keyboardType="numeric"
-                        />
-                      </View>
-                    </View>
-                  </View>
-                ))
-              )}
-        </View>
+          <View style={styles.fieldBlock}>
+            <Text style={styles.label}>Access Code Value *</Text>
+            <CustomTextInput
+              value={code}
+              onChangeText={setCode}
+              placeholder="e.g. 4821# or Keybox 2"
+            />
+          </View>
 
-        <View style={styles.buttonRow}>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            style={[elements.capsuleButton, styles.saveButton]}
-            onPress={handleSave}
-            disabled={isPending}
-          >
-            <Text style={styles.buttonText}>
-              {isPending
-                ? 'Saving...'
-                : isEdit
-                  ? 'Update Access Code'
-                  : 'Save Access Code'}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+          <View style={styles.fieldBlock}>
+            <Text style={styles.label}>Notes (Optional)</Text>
+            <CustomTextInput
+              value={notes}
+              onChangeText={setNotes}
+              placeholder="Optional: detailed notes, on-site instructions.."
+              multiline
+              numberOfLines={4}
+              style={styles.notesInput}
+            />
+          </View>
+
+          <View style={styles.fieldBlock}>
+            <Text style={styles.label}>Additional Search Keywords (Optional)</Text>
+            <CustomTextInput
+              value={keywords}
+              onChangeText={setKeywords}
+              placeholder="e.g. gate, water tower, north"
+            />
+          </View>
+
+          <View style={styles.fieldBlock}>
+            <Checkbox
+              title="Verified Working / Good"
+              checked={verifiedGood}
+              onToggle={setVerifiedGood}
+            />
+          </View>
+
+          <View style={styles.fieldBlock}>
+            <View style={styles.locationHeaderRow}>
+              <Text style={styles.label}>GPS Coordinates</Text>
+              <View style={styles.locationButtons}>
+                <SmallButton
+                  title="+ Add Location"
+                  backgroundColor="rgba(255,255,255,0.15)"
+                  textColor={colors.yellow}
+                  onPress={handleAddBlankLocation}
+                />
+                <View style={{ width: 8 }} />
+                <SmallButton
+                  title={gettingLocation ? 'Fetching...' : 'Use Current Location'}
+                  backgroundColor="rgba(255,255,255,0.15)"
+                  textColor={colors.yellow}
+                  onPress={handleUseCurrentLocation}
+                />
+              </View>
+            </View>
+
+            {locations.length === 0
+              ? (
+                  <Text style={styles.noLocationText}>
+                    No GPS coordinates added. Tap '+ Add Location' or 'Use Current Location' above.
+                  </Text>
+                )
+              : (
+                  locations.map((loc, index) => (
+                    <View key={loc.key} style={styles.locationCard}>
+                      <View style={styles.locationCardHeader}>
+                        <Text style={styles.locationCardTitle}>
+                          Location #
+                          {index + 1}
+                        </Text>
+                        <TouchableOpacity onPress={() => handleRemoveLocation(index)} style={styles.deleteLocButton}>
+                          <MaterialCommunityIcons name="trash-can-outline" size={20} color="#E53935" />
+                        </TouchableOpacity>
+                      </View>
+                      <View style={styles.coordsRow}>
+                        <View style={styles.coordField}>
+                          <CustomTextInput
+                            value={loc.latitude}
+                            onChangeText={val => handleUpdateLocation(index, 'latitude', val)}
+                            placeholder="Latitude"
+                            keyboardType="numeric"
+                          />
+                        </View>
+                        <View style={styles.coordField}>
+                          <CustomTextInput
+                            value={loc.longitude}
+                            onChangeText={val => handleUpdateLocation(index, 'longitude', val)}
+                            placeholder="Longitude"
+                            keyboardType="numeric"
+                          />
+                        </View>
+                      </View>
+                    </View>
+                  ))
+                )}
+          </View>
+
+          <View style={styles.buttonRow}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={[elements.capsuleButton, styles.saveButton]}
+              onPress={handleSave}
+              disabled={isPending}
+            >
+              <Text style={styles.buttonText}>
+                {isPending
+                  ? 'Saving...'
+                  : isEdit
+                    ? 'Update Access Code'
+                    : 'Save Access Code'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingCustomView>
     </SafeAreaView>
   );
 }
