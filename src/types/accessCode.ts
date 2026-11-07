@@ -9,10 +9,13 @@ export interface accessCode {
   id?: number;
   name: string;
   code: string;
+  notes?: string;
   keywords?: string;
   locations: LocationPoint[];
   latitude?: number;
   longitude?: number;
+  last_verified_at?: string | null;
+  verified_good?: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -51,10 +54,13 @@ export function accessCodeFromResponse(data: any): accessCode {
     id: data.id,
     name: data.name ?? '',
     code: data.code ?? data.value ?? '',
+    notes: data.notes ?? '',
     keywords: data.keywords ?? '',
     locations,
     latitude: primaryLat,
     longitude: primaryLon,
+    last_verified_at: data.last_verified_at ?? null,
+    verified_good: data.verified_good ?? true,
     created_at: data.created_at,
     updated_at: data.updated_at,
   };

@@ -1,5 +1,6 @@
 import type { accessCode } from '@/types/accessCode';
 import Header from '@components/Header';
+import Checkbox from '@components/inputs/Checkbox';
 import { CustomTextInput } from '@components/inputs/CustomTextInput';
 import SmallButton from '@components/inputs/SmallButton';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -57,7 +58,9 @@ export function AccessCodeForm({ mode }: AccessCodeFormProps) {
 
   const [name, setName] = useState(currentCodeItem?.name ?? '');
   const [code, setCode] = useState(currentCodeItem?.code ?? '');
+  const [notes, setNotes] = useState(currentCodeItem?.notes ?? '');
   const [keywords, setKeywords] = useState(currentCodeItem?.keywords ?? '');
+  const [verifiedGood, setVerifiedGood] = useState(currentCodeItem?.verified_good ?? true);
   const [locations, setLocations] = useState<FormLocationPoint[]>(initialLocations);
   const [gettingLocation, setGettingLocation] = useState(false);
 
@@ -144,14 +147,22 @@ export function AccessCodeForm({ mode }: AccessCodeFormProps) {
     const primaryLat = parsedLocations.length > 0 ? parsedLocations[0].latitude : 0;
     const primaryLon = parsedLocations.length > 0 ? parsedLocations[0].longitude : 0;
 
+    let lastVerifiedAt = currentCodeItem?.last_verified_at ?? null;
+    if (verifiedGood) {
+      lastVerifiedAt = new Date().toISOString();
+    }
+
     const accessCodeData: accessCode = {
       ...(isEdit ? { id: idInt } : {}),
       name: name.trim(),
       code: code.trim(),
+      notes: notes.trim(),
       keywords: keywords.trim(),
       locations: parsedLocations,
       latitude: primaryLat,
       longitude: primaryLon,
+      verified_good: verifiedGood,
+      last_verified_at: lastVerifiedAt,
     };
 
     if (isEdit) {
@@ -225,11 +236,31 @@ export function AccessCodeForm({ mode }: AccessCodeFormProps) {
         </View>
 
         <View style={styles.fieldBlock}>
-          <Text style={styles.label}>Additional Keywords (Optional)</Text>
+          <Text style={styles.label}>Notes (Optional)</Text>
+          <CustomTextInput
+            value={notes}
+            onChangeText={setNotes}
+            placeholder="Optional: detailed notes, on-site instructions.."
+            multiline
+            numberOfLines={4}
+            style={styles.notesInput}
+          />
+        </View>
+
+        <View style={styles.fieldBlock}>
+          <Text style={styles.label}>Additional Search Keywords (Optional)</Text>
           <CustomTextInput
             value={keywords}
             onChangeText={setKeywords}
             placeholder="e.g. gate, water tower, north"
+          />
+        </View>
+
+        <View style={styles.fieldBlock}>
+          <Checkbox
+            title="Verified Working / Good"
+            checked={verifiedGood}
+            onToggle={setVerifiedGood}
           />
         </View>
 
@@ -332,6 +363,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.primaryText,
     marginBottom: 6,
+  },
+  notesInput: {
+    minHeight: 100,
+    textAlignVertical: 'top',
   },
   locationHeaderRow: {
     flexDirection: 'column',
