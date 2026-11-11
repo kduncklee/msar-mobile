@@ -19,6 +19,12 @@ export function useCalloutCreateMutation() {
   const { api } = useAuth();
   return useMutation({
     mutationFn: (callout: callout) => api.apiCreateCallout(callout),
+    onError: (error, _variables, _context) => {
+      Sentry.captureException(error);
+      Toast.show(`Unable to create callout: ${error.message}`, {
+        duration: Toast.durations.LONG,
+      });
+    },
   });
 }
 
@@ -27,6 +33,12 @@ export function useCalloutUpdateMutation() {
   return useMutation({
     mutationFn: ({ idInt, callout }: { idInt: number; callout: callout }) =>
       api.apiUpdateCallout(idInt, callout),
+    onError: (error, _variables, _context) => {
+      Sentry.captureException(error);
+      Toast.show(`Unable to update callout: ${error.message}`, {
+        duration: Toast.durations.LONG,
+      });
+    },
   });
 }
 
@@ -255,7 +267,8 @@ export function useLogMutation(mutationFn, queryKey) {
       messageSuccessNotification(result.message);
     },
 
-    onError: (_error, _variables, context) => {
+    onError: (error, _variables, context) => {
+      Sentry.captureException(error);
       // Remove optimistic message from the list
       queryClient.setQueryData(queryKey, (old) => {
         console.log('e id, old', context?.id, old);

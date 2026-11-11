@@ -3,6 +3,7 @@ import type { calloutGetLogResponse, loginResponse, tokenValidationResponse } fr
 import type { callout } from '@/types/callout';
 import type { event } from '@/types/event';
 import type { patrol } from '@/types/patrol';
+import * as Sentry from '@sentry/react-native';
 import * as Application from 'expo-application';
 import { Directory, File, Paths } from 'expo-file-system';
 import { Platform } from 'react-native';
@@ -353,6 +354,7 @@ export class Api {
     }
     catch (error: any) {
       console.log(error);
+      Sentry.captureException(error);
     }
   }
 
@@ -380,8 +382,9 @@ export class Api {
       );
       console.log(`removed patrol: ${JSON.stringify(data)}`);
     }
-    catch (error) {
+    catch (error: any) {
       console.log(error);
+      Sentry.captureException(error);
       // eslint-disable-next-line no-alert
       alert(`Error removing patrol: ${error.message}`);
     }
