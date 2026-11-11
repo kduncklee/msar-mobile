@@ -2,7 +2,7 @@
   "expo": {
     "name": "Malibu SAR",
     "slug": "msar-mobile",
-    "version": "1.25.1",
+    "version": "1.25.2",
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
     "userInterfaceStyle": "light",
@@ -17,7 +17,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "org.malibusar.app",
-      "buildNumber": "91",
+      "buildNumber": "92",
       "icon": "./src/assets/icon.png",
       "googleServicesFile": "./GoogleService-Info.plist",
       "config": {
@@ -39,7 +39,7 @@
         "backgroundColor": "#2B3038"
       },
       "package": "org.malibusar.app",
-      "versionCode": 103,
+      "versionCode": 104,
       "googleServicesFile": "./google-services.json"
     },
     "web": {
@@ -56,10 +56,10 @@
           },
           "ios": {
             "useFrameworks": "static",
-            "deploymentTarget": "15.1",
+            "deploymentTarget": "16.0", // Update withIosDeploymentTarget when changing this
             "forceStaticLinking": ["RNFBApp", "RNFBMessaging"],
             // temporary workaround: https://github.com/expo/expo/issues/39607
-            "buildReactNativeFromSource": true
+            "buildReactNativeFromSource": false
           }
         }
       ],
@@ -67,6 +67,7 @@
         "notification-service-expo-plugin",
         {
           "devTeam": "UJDB5NH948",
+          "iPhoneDeploymentTarget": "16.0",
           "iosNSEFilePath": "./src/assets/native/NotificationService.m"
         }
       ],
@@ -113,9 +114,9 @@
         }
       ],
       "expo-secure-store",
-      "@sentry/react-native",
       "expo-asset",
-      "expo-font"
+      "expo-font",
+      "./withIosDeploymentTarget"
     ],
     "scheme": "msar",
     "extra": {
