@@ -2,7 +2,7 @@
   "expo": {
     "name": "Malibu SAR",
     "slug": "msar-mobile",
-    "version": "1.24.3",
+    "version": "1.25.1",
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
     "userInterfaceStyle": "light",
@@ -17,14 +17,17 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "org.malibusar.app",
-      "buildNumber": "90",
+      "buildNumber": "91",
       "icon": "./src/assets/icon.png",
       "googleServicesFile": "./GoogleService-Info.plist",
       "config": {
         "usesNonExemptEncryption": false
       },
       "infoPlist": {
-        "com.apple.developer.usernotifications.critical-alerts": 1
+        "com.apple.developer.usernotifications.critical-alerts": 1,
+        "NSLocationWhenInUseUsageDescription": "Assisting with search and providing directions.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Assisting with search and providing directions.",
+        "NSLocationAlwaysUsageDescription": "Assisting with search and providing directions."
       },
       "entitlements": {
         "com.apple.developer.usernotifications.critical-alerts": true
@@ -36,7 +39,7 @@
         "backgroundColor": "#2B3038"
       },
       "package": "org.malibusar.app",
-      "versionCode": 101,
+      "versionCode": 103,
       "googleServicesFile": "./google-services.json"
     },
     "web": {
@@ -68,6 +71,13 @@
         }
       ],
       "expo-router",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Assisting with search and providing directions.",
+          "locationAlwaysAndWhenInUsePermission": "Assisting with search and providing directions."
+        }
+      ],
       "@react-native-firebase/app",
       "@react-native-firebase/messaging",
       [
@@ -102,7 +112,10 @@
           "organization": "msar"
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "@sentry/react-native",
+      "expo-asset",
+      "expo-font"
     ],
     "scheme": "msar",
     "extra": {

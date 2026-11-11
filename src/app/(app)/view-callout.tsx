@@ -175,7 +175,7 @@ function Page() {
   };
 
   const submitLogMessage = async () => {
-    calloutLogMutation.mutate({ message: logMessageText }, {
+    calloutLogMutation.mutate({ message: logMessageText, key: Math.random().toString(36).slice(2) }, {
       onSuccess: () => {
         // Additionally refresh the callout data to update badge.
         queryClient.invalidateQueries({ queryKey: calloutQueryKey(idInt) });

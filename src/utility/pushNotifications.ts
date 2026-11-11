@@ -81,11 +81,16 @@ async function registerForPushNotificationsAsync(api: Api) {
   // While this sometimes generates a warning that it is not required, leave
   // it here. In some cases, the device was not registered and getToken failed
   // below.
-  if (!messaging().isDeviceRegisteredForRemoteMessages) {
-    await messaging().registerDeviceForRemoteMessages();
+  try {
+    if (!messaging().isDeviceRegisteredForRemoteMessages) {
+      await messaging().registerDeviceForRemoteMessages();
+    }
+    updatePushToken(api);
   }
-
-  updatePushToken(api);
+  catch (error: any) {
+    console.log('[PUSH] Messaging registration skipped:', error?.message ?? error);
+    Sentry.captureException(error);
+  }
 }
 
 async function setupChannels() {
@@ -338,19 +343,25 @@ function doRedirect(notification) {
 
 export function setupPushNotificationsBackground() {
   console.log('setupPushNotificationsBackground');
-  messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-    console.log('Message handled in the background!', remoteMessage);
-    if (Platform.OS !== 'ios') { // iOS handled in Notification Service Extenstion
-      displayNotification(remoteMessage);
-    }
+  try {
+    messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+      console.log('Message handled in the background!', remoteMessage);
+      if (Platform.OS !== 'ios') { // iOS handled in Notification Service Extenstion
+        displayNotification(remoteMessage);
+      }
 
-    const creds = await getCredentials();
-    const server = await getServer();
-    if (creds.token && server) {
-      const api = new Api(server, creds.token);
-      prefetch(api, remoteMessage);
-    }
-  });
+      const creds = await getCredentials();
+      const server = await getServer();
+      if (creds.token && server) {
+        const api = new Api(server, creds.token);
+        prefetch(api, remoteMessage);
+      }
+    });
+  }
+  catch (error: any) {
+    console.log('[PUSH] Background messaging handler setup skipped:', error?.message ?? error);
+    Sentry.captureException(error);
+  }
 }
 
 async function doInitialRedirect() {
@@ -393,11 +404,17 @@ export function usePushNotificationsOuter() {
       }
     }
 
-    const onNotificationOpenedAppUnsubscribe
-      = messaging().onNotificationOpenedApp(async (remoteMessage) => {
+    let onNotificationOpenedAppUnsubscribe = () => {};
+    try {
+      onNotificationOpenedAppUnsubscribe = messaging().onNotificationOpenedApp(async (remoteMessage) => {
         console.log('onNotificationOpenedApp', remoteMessage);
         doRedirect(remoteMessage);
       });
+    }
+    catch (error: any) {
+      console.log('[PUSH] onNotificationOpenedApp setup skipped:', error?.message ?? error);
+      Sentry.captureException(error);
+    }
 
     const notifeeOnForegroundUnsubscribe
       = notifee.onForegroundEvent(notifeeOnEvent);
@@ -437,14 +454,21 @@ export function usePushNotificationsInner() {
   }, [signedIn, api]);
 
   useEffect(() => {
-    const onMessageUnsubscribe = messaging().onMessage(
-      async (remoteMessage) => {
-        console.log('onMessage', remoteMessage);
-        // Display for iOS too: NSE does not run for foreground notifications.
-        displayNotification(remoteMessage);
-        prefetch(api, remoteMessage);
-      },
-    );
+    let onMessageUnsubscribe = () => {};
+    try {
+      onMessageUnsubscribe = messaging().onMessage(
+        async (remoteMessage) => {
+          console.log('onMessage', remoteMessage);
+          // Display for iOS too: NSE does not run for foreground notifications.
+          displayNotification(remoteMessage);
+          prefetch(api, remoteMessage);
+        },
+      );
+    }
+    catch (error: any) {
+      console.log('[PUSH] onMessage listener setup skipped:', error?.message ?? error);
+      Sentry.captureException(error);
+    }
 
     return () => {
       onMessageUnsubscribe();

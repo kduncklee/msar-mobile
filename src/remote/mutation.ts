@@ -1,3 +1,4 @@
+import type { accessCode } from '@/types/accessCode';
 import type { callout } from '@/types/callout';
 import type { event } from '@/types/event';
 import type { patrol } from '@/types/patrol';
@@ -5,7 +6,7 @@ import * as Sentry from '@sentry/react-native';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Toast from 'react-native-root-toast';
 import useAuth from '@/hooks/useAuth';
-import { invalidateEventListQuery, invalidatePatrolListQuery } from '@/remote/query';
+import { invalidateAccessCodeListQuery, invalidateEventListQuery, invalidatePatrolListQuery } from '@/remote/query';
 import { logStatusType, logType } from '@/types/enums';
 import { logEntryFromRespsonse } from '@/types/logEntry';
 import { messageSuccessNotification } from '@/utility/pushNotifications';
@@ -36,6 +37,59 @@ export function useCalloutUpdateMutation() {
     onError: (error, _variables, _context) => {
       Sentry.captureException(error);
       Toast.show(`Unable to update callout: ${error.message}`, {
+        duration: Toast.durations.LONG,
+      });
+    },
+  });
+}
+
+/// /// Access Code Mutations
+export function useAccessCodeCreateMutation() {
+  const { api } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (code: accessCode) => api.apiCreateAccessCode(code),
+    onSuccess: () => {
+      invalidateAccessCodeListQuery(queryClient);
+    },
+    onError: (error: any) => {
+      Sentry.captureException(error);
+      Toast.show(`Unable to create access code: ${error.message}`, {
+        duration: Toast.durations.LONG,
+      });
+    },
+  });
+}
+
+export function useAccessCodeUpdateMutation() {
+  const { api } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ idInt, code }: { idInt: number; code: accessCode }) =>
+      api.apiUpdateAccessCode(idInt, code),
+    onSuccess: () => {
+      invalidateAccessCodeListQuery(queryClient);
+    },
+    onError: (error: any) => {
+      Sentry.captureException(error);
+      Toast.show(`Unable to update access code: ${error.message}`, {
+        duration: Toast.durations.LONG,
+      });
+    },
+  });
+}
+
+export function useAccessCodeDeleteMutation() {
+  const { api } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (idInt: number) => api.apiRemoveAccessCode(idInt),
+    onSuccess: () => {
+      invalidateAccessCodeListQuery(queryClient);
+    },
+    onError: (error: any) => {
+      Sentry.captureException(error);
+      Toast.show(`Unable to delete access code: ${error.message}`, {
         duration: Toast.durations.LONG,
       });
     },
@@ -161,11 +215,11 @@ export function useChatOrCalloutLogMutation(idInt?: number) {
   let mutationFn;
   let queryKey;
   if (idInt) { // CalloutLog
-    mutationFn = (message: string) => api.apiPostCalloutLog(idInt, message);
+    mutationFn = (message: string, key: string) => api.apiPostCalloutLog(idInt, message, key);
     queryKey = ['calloutLog', idInt];
   }
   else { // Chat
-    mutationFn = (message: string) => api.apiPostChatLog(message);
+    mutationFn = (message: string, key: string) => api.apiPostChatLog(message, key);
     queryKey = ['chat'];
   }
   return useLogMutation(mutationFn, queryKey);
@@ -184,6 +238,7 @@ export function useLogMutation(mutationFn, queryKey) {
   interface LogVariables {
     id?: string;
     message: string;
+    key: string;
   };
 
   const updateItem = (prev, id, replacement) => {

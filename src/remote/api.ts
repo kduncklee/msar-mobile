@@ -1,5 +1,6 @@
 import type { LabelValue } from '../utility/reactForm';
 import type { calloutGetLogResponse, loginResponse, tokenValidationResponse } from './responses';
+import type { accessCode } from '@/types/accessCode';
 import type { callout } from '@/types/callout';
 import type { event } from '@/types/event';
 import type { patrol } from '@/types/patrol';
@@ -7,6 +8,7 @@ import * as Sentry from '@sentry/react-native';
 import * as Application from 'expo-application';
 import { Directory, File, Paths } from 'expo-file-system';
 import { Platform } from 'react-native';
+import { accessCodeFromResponse } from '@/types/accessCode';
 import { calloutFromResponse } from '@/types/callout';
 import { eventFromResponse } from '@/types/event';
 
@@ -99,6 +101,10 @@ export class Api {
     return `${this.#server()}/api/callouts/`;
   }
 
+  #accessCodesEndpoint(): string {
+    return `${this.#server()}/api/access_codes/`;
+  }
+
   #chatEndpoint(): string {
     return `${this.#server()}/api/announcement/log/`;
   }
@@ -187,28 +193,42 @@ export class Api {
   }
 
   async #apiGetToken(username: string, password: string): Promise<loginResponse> {
-    return fetch(this.#tokenEndpoint(), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username,
-        password,
-      }),
-    })
-      .then(response => response.json())
-      .then((data) => {
-        return data;
-      })
-      .catch((error) => {
-        console.log(error);
+    try {
+      const response = await fetch(this.#tokenEndpoint(), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+      });
+
+      const rawText = await response.text();
+      console.log('[LOGIN DEBUG] Status:', response.status);
+      console.log('[LOGIN DEBUG] Raw Response Body:', rawText);
+
+      try {
+        return JSON.parse(rawText);
+      }
+      catch (e) {
+        console.log('[LOGIN DEBUG] Failed to parse response as JSON:', e);
         return {
           non_field_errors: [
-            'Server Error',
+            `Server returned HTTP ${response.status}: ${rawText.substring(0, 150)}`,
           ],
         };
-      });
+      }
+    }
+    catch (error: any) {
+      console.log('[LOGIN DEBUG] Fetch Error:', error);
+      return {
+        non_field_errors: [
+          `Network Error: ${error.message}`,
+        ],
+      };
+    }
   }
 
   async apiValidateToken(): Promise<tokenValidationResponse> {
@@ -305,19 +325,20 @@ export class Api {
     return this.#apiGetLogResponseFromUrl(this.#chatEndpoint(), pageParam);
   }
 
-  async #apiPostLogFromUrl(url: string, message: string): Promise<any> {
+  async #apiPostLogFromUrl(url: string, message: string, key: string): Promise<any> {
     return this.#fetchJsonWithCredentials(url, 'POST', {
       type: 'message',
       message,
+      key,
     });
   }
 
-  async apiPostCalloutLog(id: number, message: string): Promise<any> {
-    return this.#apiPostLogFromUrl(`${this.#calloutsEndpoint() + id}/log/`, message);
+  async apiPostCalloutLog(id: number, message: string, key: string): Promise<any> {
+    return this.#apiPostLogFromUrl(`${this.#calloutsEndpoint() + id}/log/`, message, key);
   }
 
-  async apiPostChatLog(message: string): Promise<any> {
-    return this.#apiPostLogFromUrl(this.#chatEndpoint(), message);
+  async apiPostChatLog(message: string, key: string): Promise<any> {
+    return this.#apiPostLogFromUrl(this.#chatEndpoint(), message, key);
   }
 
   async apiGetEvents(args: string): Promise<any> {
@@ -507,5 +528,31 @@ export class Api {
       // eslint-disable-next-line no-alert
       alert(`Error removing file: ${error.message}`);
     }
+  }
+
+  async apiGetAccessCodes(): Promise<accessCode[]> {
+    return this.#fetchJsonWithCredentials(this.#accessCodesEndpoint()).then((data) => {
+      const results = Array.isArray(data) ? data : (data.results ?? []);
+      return results.map(accessCodeFromResponse);
+    });
+  }
+
+  async apiCreateAccessCode(code: accessCode): Promise<accessCode> {
+    return this.#fetchJsonWithCredentials(this.#accessCodesEndpoint(), 'POST', code).then(accessCodeFromResponse);
+  }
+
+  async apiUpdateAccessCode(id: number, code: accessCode): Promise<accessCode> {
+    return this.#fetchJsonWithCredentials(
+      `${this.#accessCodesEndpoint() + id}/`,
+      'PUT',
+      code,
+    ).then(accessCodeFromResponse);
+  }
+
+  async apiRemoveAccessCode(id: number) {
+    return this.#fetchWithCredentials(
+      `${this.#accessCodesEndpoint() + id}/`,
+      'DELETE',
+    );
   }
 }

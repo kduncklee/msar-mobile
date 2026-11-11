@@ -57,7 +57,7 @@ export function AuthProvider({
       return response.non_field_errors.join('\n');
     }
 
-    if (response.token) {
+    if (response.token != null && !!response.token) {
       setUsername(server_username);
       setToken(response.token);
       console.log('storing', server_username, response.token);

@@ -1,3 +1,4 @@
+import type { accessCode } from '@/types/accessCode';
 import type { location } from '@/types/location';
 import { getData, removeData } from '@storage/storage';
 import * as SecureStore from 'expo-secure-store';
@@ -55,6 +56,26 @@ export const clientStorage = {
 
 export function useEditingLocation() {
   return useMMKVObject<location>('edit_location', storage);
+}
+
+export function useAccessCodesLocal() {
+  return useMMKVObject<accessCode[]>('access_codes_cache', storage);
+}
+
+export function getCachedAccessCodes(): accessCode[] {
+  const json = storage.getString('access_codes_cache');
+  if (!json)
+    return [];
+  try {
+    return JSON.parse(json);
+  }
+  catch {
+    return [];
+  }
+}
+
+export function storeCachedAccessCodes(codes: accessCode[]) {
+  storage.set('access_codes_cache', JSON.stringify(codes));
 }
 
 export function useLocalDataFilePath(id: number) {
