@@ -1,11 +1,12 @@
 import type { accessCode } from '@/types/accessCode';
 import type { callout } from '@/types/callout';
+import type { event } from '@/types/event';
 import type { patrol } from '@/types/patrol';
 import * as Sentry from '@sentry/react-native';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Toast from 'react-native-root-toast';
 import useAuth from '@/hooks/useAuth';
-import { invalidateAccessCodeListQuery, invalidatePatrolListQuery } from '@/remote/query';
+import { invalidateAccessCodeListQuery, invalidateEventListQuery, invalidatePatrolListQuery } from '@/remote/query';
 import { logStatusType, logType } from '@/types/enums';
 import { logEntryFromRespsonse } from '@/types/logEntry';
 import { messageSuccessNotification } from '@/utility/pushNotifications';
@@ -19,6 +20,12 @@ export function useCalloutCreateMutation() {
   const { api } = useAuth();
   return useMutation({
     mutationFn: (callout: callout) => api.apiCreateCallout(callout),
+    onError: (error, _variables, _context) => {
+      Sentry.captureException(error);
+      Toast.show(`Unable to create callout: ${error.message}`, {
+        duration: Toast.durations.LONG,
+      });
+    },
   });
 }
 
@@ -27,6 +34,12 @@ export function useCalloutUpdateMutation() {
   return useMutation({
     mutationFn: ({ idInt, callout }: { idInt: number; callout: callout }) =>
       api.apiUpdateCallout(idInt, callout),
+    onError: (error, _variables, _context) => {
+      Sentry.captureException(error);
+      Toast.show(`Unable to update callout: ${error.message}`, {
+        duration: Toast.durations.LONG,
+      });
+    },
   });
 }
 
@@ -133,6 +146,62 @@ export function usePatrolRemoveMutation() {
     onError: (error, _variables, _context) => {
       Sentry.captureException(error);
       Toast.show(`Unable to delete patrol: ${error.message}`, {
+        duration: Toast.durations.LONG,
+      });
+    },
+  });
+}
+
+/// /// Event Mutations
+export function useEventCreateMutation() {
+  const { api } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (eventData: event) => api.apiCreateEvent(eventData),
+    onSuccess: (data, _variables, _context) => {
+      console.log('event created', data);
+      invalidateEventListQuery(queryClient);
+    },
+    onError: (error: any, _variables, _context) => {
+      Sentry.captureException(error);
+      Toast.show(`Unable to create event: ${error.message}`, {
+        duration: Toast.durations.LONG,
+      });
+    },
+  });
+}
+
+export function useEventUpdateMutation() {
+  const { api } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ idInt, event }: { idInt: number; event: event }) =>
+      api.apiUpdateEvent(idInt, event),
+    onSuccess: (data, _variables, _context) => {
+      console.log('event updated', data);
+      invalidateEventListQuery(queryClient);
+    },
+    onError: (error: any, _variables, _context) => {
+      Sentry.captureException(error);
+      Toast.show(`Unable to update event: ${error.message}`, {
+        duration: Toast.durations.LONG,
+      });
+    },
+  });
+}
+
+export function useEventRemoveMutation() {
+  const { api } = useAuth();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (idInt: number) => api.apiRemoveEvent(idInt),
+    onSuccess: (data, _variables, _context) => {
+      console.log('event deleted', data);
+      invalidateEventListQuery(queryClient);
+    },
+    onError: (error: any, _variables, _context) => {
+      Sentry.captureException(error);
+      Toast.show(`Unable to delete event: ${error.message}`, {
         duration: Toast.durations.LONG,
       });
     },
@@ -253,7 +322,8 @@ export function useLogMutation(mutationFn, queryKey) {
       messageSuccessNotification(result.message);
     },
 
-    onError: (_error, _variables, context) => {
+    onError: (error, _variables, context) => {
+      Sentry.captureException(error);
       // Remove optimistic message from the list
       queryClient.setQueryData(queryKey, (old) => {
         console.log('e id, old', context?.id, old);

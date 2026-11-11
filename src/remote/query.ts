@@ -125,6 +125,10 @@ export async function prefetchEventListQuery(queryClient: QueryClient, api: Api)
   return queryClient.prefetchQuery(eventListQueryParams(api));
 }
 
+export function invalidateEventListQuery(queryClient: QueryClient) {
+  queryClient.invalidateQueries({ queryKey: eventListQueryKey });
+}
+
 export function useEventListQuery(startAt?: Date, finishAt?: Date) {
   const { api } = useAuth();
   return useQuery(eventListQueryParams(api, startAt, finishAt));
