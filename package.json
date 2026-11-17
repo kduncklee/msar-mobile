@@ -83,6 +83,7 @@
     "@antfu/eslint-config": "^5.4.1",
     "@babel/core": "^7.20.0",
     "@types/jest": "29.5.14",
+    "babel-preset-expo": "~54.0.10",
     "eslint": "^9.36.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
