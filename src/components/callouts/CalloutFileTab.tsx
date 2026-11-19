@@ -1,6 +1,7 @@
-import type { Api } from 'remote/api';
+import type { Api, UploadFileInput } from 'remote/api';
 import type { callout } from '@/types/callout';
 import FileField from '@components/fields/FileField';
+import * as Sentry from '@sentry/react-native';
 import { elements } from '@styles/elements';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
@@ -9,13 +10,19 @@ import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native
 import msarEventEmitter from 'utility/msarEventEmitter';
 import useAuth from '@/hooks/useAuth';
 
-async function uploadFile(api: Api, file: object, id: number) {
+async function uploadFile(api: Api, file: UploadFileInput, id: number) {
   const idText: string = id?.toString();
   console.log('file', file);
-  const result = await api.apiUploadFile(file, idText);
-  console.log('file result', result);
-  console.log(await result.json());
-  msarEventEmitter.emit('refreshCallout', { id });
+  try {
+    const result = await api.apiUploadFile(file, idText);
+    console.log('file result', result);
+    console.log(await result.json());
+    msarEventEmitter.emit('refreshCallout', { id });
+  }
+  catch (error) {
+    console.error('uploadFile Error', error);
+    Sentry.captureException(error);
+  }
 }
 
 async function pickUploadPhoto(api: Api, id?: number) {
@@ -32,14 +39,15 @@ async function pickUploadPhoto(api: Api, id?: number) {
   }
   console.log(picker.assets);
   const image = picker.assets[0];
-  const file = {
+  const file: UploadFileInput = {
     name: image.fileName,
     uri: image.uri,
     size: image.fileSize,
     mimeType: image.mimeType,
     type: image.mimeType,
+    file: image.file,
   };
-  uploadFile(api, file, id);
+  await uploadFile(api, file, id);
 }
 
 async function pickUploadFile(api: Api, id?: number) {
@@ -54,14 +62,15 @@ async function pickUploadFile(api: Api, id?: number) {
   console.log(document.assets);
   const doc = document.assets[0];
   console.log('doc', doc);
-  const file = {
+  const file: UploadFileInput = {
     name: doc.name,
     uri: doc.uri,
     size: doc.size,
     mimeType: doc.mimeType,
     type: doc.mimeType,
+    file: doc.file,
   };
-  uploadFile(api, file, id);
+  await uploadFile(api, file, id);
 }
 
 interface CalloutFileTabProps {

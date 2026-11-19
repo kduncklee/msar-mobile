@@ -24,6 +24,15 @@ interface Server extends LabelValue {
   logo: any;
 };
 
+export interface UploadFileInput {
+  uri: string;
+  name?: string | null;
+  type?: string | null;
+  mimeType?: string | null;
+  size?: number;
+  file?: Blob;
+}
+
 export const server_choices: Server[] = [
   { label: 'Malibu', value: 'prod', logo: require('@assets/logos/msar.png') },
   { label: 'Santa Clarita Valley', value: 'scv', logo: require('@assets/logos/scv.png') },
@@ -153,12 +162,15 @@ export class Api {
   }
 
   async #fetchWithCredentials(url: string, method: string = 'GET', body?: any, contentType?: string): Promise<any> {
+    const headers: Record<string, string> = {
+      Authorization: this.#authorizationHeader(),
+    };
+    if (!(body instanceof FormData)) {
+      headers['Content-Type'] = contentType || 'application/json';
+    }
     const options = {
       method,
-      headers: {
-        'Authorization': this.#authorizationHeader(),
-        'Content-Type': contentType || 'application/json',
-      },
+      headers,
       body: body || null,
     };
     const response = await fetch(url, options);
@@ -500,11 +512,25 @@ export class Api {
     );
   }
 
-  async apiUploadFile(file, id: string) {
+  async apiUploadFile(file: UploadFileInput | Blob, id: string) {
     const body = new FormData();
-    body.append('file', file);
+    if (file instanceof Blob) {
+      body.append('file', file);
+    }
+    else if (file.file instanceof Blob) {
+      body.append('file', file.file, file.name || undefined);
+    }
+    else {
+      const expoFile = new File(file.uri);
+      const formDataFile = {
+        name: file.name || expoFile.name,
+        type: file.type || file.mimeType || expoFile.type || 'application/octet-stream',
+        bytes: () => expoFile.bytes(),
+      };
+      body.append('file', formDataFile as unknown as Blob);
+    }
     body.append('event', id);
-    return this.#fetchWithCredentials(this.#filesEndpoint(), 'POST', body, 'multipart/form-data');
+    return this.#fetchWithCredentials(this.#filesEndpoint(), 'POST', body);
   }
 
   #apiGetDownloadFileUrl(id: number) {
