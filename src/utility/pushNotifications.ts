@@ -106,13 +106,14 @@ async function setupChannels() {
 
   for (const soundEnum of availableChannels) {
     const sound = soundEnum.value;
+    const channelSound = sound === 'default' ? {} : { sound: `${sound}.mp3` };
     Object.entries(vibrations).forEach(([vibration, pattern]) => {
       const channel = `${sound}-${vibration}`;
       Notifications.setNotificationChannelAsync(channel, {
         name: channel,
         groupId,
         importance,
-        sound: `${sound}.mp3`,
+        ...channelSound,
         vibrationPattern: pattern,
       });
 
@@ -120,7 +121,7 @@ async function setupChannels() {
         name: `${channel} - Alarm`,
         importance,
         groupId,
-        sound: `${sound}.mp3`,
+        ...channelSound,
         vibrationPattern: pattern,
         audioAttributes: {
           usage: Notifications.AndroidAudioUsage.ALARM,
@@ -193,7 +194,7 @@ async function displayNotification(remoteMessage) {
     return;
   }
   const silent = snoozed || (sound === SILENT);
-  const ios_sound = silent ? {} : { sound: `${sound}.mp3` };
+  const ios_sound = silent ? {} : { sound: sound === 'default' ? 'default' : `${sound}.mp3` };
   const vibration = vibrationForChannel[channel] ?? 'short';
   const android_override = (Platform.OS === 'android') && critical && getSoundOverride();
   console.log('overide', android_override, Platform.OS, critical, getSoundOverride());
