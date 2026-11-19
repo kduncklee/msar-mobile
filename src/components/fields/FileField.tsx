@@ -1,5 +1,6 @@
 import type { Api } from '@/remote/api';
 import type { dataFile } from '@/types/dataFile';
+import { MenuView } from '@react-native-menu/menu';
 import * as Sentry from '@sentry/react-native';
 import { useLocalDataFilePath } from '@storage/mmkv';
 import colors from '@styles/colors';
@@ -11,7 +12,6 @@ import * as IntentLauncher from 'expo-intent-launcher';
 import * as Sharing from 'expo-sharing';
 import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import FileViewer from 'react-native-file-viewer';
-import * as ContextMenu from 'zeego/context-menu';
 import useAuth from '@/hooks/useAuth';
 import { isUserSelf } from '@/types/user';
 
@@ -120,65 +120,75 @@ function FileField({ file }: FileFieldProps) {
     // Having a onLongPressed ensures that onPressed does not fire on a long press.
   };
 
+  const menuActions = [
+    { id: 'download', title: 'Download' },
+    { id: 'open', title: 'Open' },
+    { id: 'share', title: 'Share' },
+    ...(isUserSelf(file.member, username)
+      ? [{ id: 'delete', title: 'Delete', attributes: { destructive: true } }]
+      : []),
+  ];
+
+  const handleMenuAction = (actionId: string) => {
+    switch (actionId) {
+      case 'download':
+        downloadPressed();
+        break;
+      case 'open':
+        openPressed();
+        break;
+      case 'share':
+        sharePressed();
+        break;
+      case 'delete':
+        deletePressed();
+        break;
+    }
+  };
+
   return (
-    <ContextMenu.Root>
-      <ContextMenu.Trigger>
-        <TouchableOpacity
-          activeOpacity={0.5}
-          onPress={cellPressed}
-          onLongPress={cellLongPressed}
-        >
-          <View style={[elements.tray, styles.container]}>
-            <View style={styles.sideBar}>
+    <MenuView
+      shouldOpenOnLongPress
+      actions={menuActions}
+      onPressAction={({ nativeEvent }) => handleMenuAction(nativeEvent.event)}
+    >
+      <TouchableOpacity
+        activeOpacity={0.5}
+        onPress={cellPressed}
+        onLongPress={cellLongPressed}
+      >
+        <View style={[elements.tray, styles.container]}>
+          <View style={styles.sideBar}>
+            <Image
+              source={require('@assets/icons/copy.png')}
+              style={styles.sideBarImage}
+            />
+          </View>
+          <View style={styles.contentBar}>
+            <View style={styles.contentTop}>
+              <Text style={styles.fileNameText}>{file.name}</Text>
+            </View>
+            <View style={styles.contentMiddle}>
+              <Text style={styles.memberNameText}>{file.member.full_name}</Text>
               <Image
-                source={require('@assets/icons/copy.png')}
-                style={styles.sideBarImage}
+                source={require('@assets/icons/forward_narrow.png')}
+                style={styles.arrowImage}
               />
             </View>
-            <View style={styles.contentBar}>
-              <View style={styles.contentTop}>
-                <Text style={styles.fileNameText}>{file.name}</Text>
+            <View style={styles.contentBottom}>
+              <View style={[elements.capsule]}>
+                <Text style={elements.smallYellowText}>
+                  {getConditionalTimeString(file.created_at)}
+                </Text>
               </View>
-              <View style={styles.contentMiddle}>
-                <Text style={styles.memberNameText}>{file.member.full_name}</Text>
-                <Image
-                  source={require('@assets/icons/forward_narrow.png')}
-                  style={styles.arrowImage}
-                />
-              </View>
-              <View style={styles.contentBottom}>
-                <View style={[elements.capsule]}>
-                  <Text style={elements.smallYellowText}>
-                    {getConditionalTimeString(file.created_at)}
-                  </Text>
-                </View>
-                <View style={[elements.capsule]}>
-                  <Text style={elements.smallYellowText}>{size_text}</Text>
-                </View>
+              <View style={[elements.capsule]}>
+                <Text style={elements.smallYellowText}>{size_text}</Text>
               </View>
             </View>
           </View>
-        </TouchableOpacity>
-      </ContextMenu.Trigger>
-
-      <ContextMenu.Content>
-        <ContextMenu.Item key="download" onSelect={downloadPressed}>
-          <ContextMenu.ItemTitle>Download</ContextMenu.ItemTitle>
-        </ContextMenu.Item>
-        <ContextMenu.Item key="open" onSelect={openPressed}>
-          <ContextMenu.ItemTitle>Open</ContextMenu.ItemTitle>
-        </ContextMenu.Item>
-        <ContextMenu.Item key="share" onSelect={sharePressed}>
-          <ContextMenu.ItemTitle>Share</ContextMenu.ItemTitle>
-        </ContextMenu.Item>
-        {isUserSelf(file.member, username) && (
-          <ContextMenu.Item key="delete" onSelect={deletePressed}>
-            <ContextMenu.ItemTitle>Delete</ContextMenu.ItemTitle>
-          </ContextMenu.Item>
-        )}
-      </ContextMenu.Content>
-
-    </ContextMenu.Root>
+        </View>
+      </TouchableOpacity>
+    </MenuView>
   );
 }
 

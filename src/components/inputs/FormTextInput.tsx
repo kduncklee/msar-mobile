@@ -1,4 +1,4 @@
-import type { ReturnKeyType, TextInputProps } from 'react-native';
+import type { ReturnKeyTypeOptions, TextInputProps } from 'react-native';
 import type { IconName } from '@/utility/icon';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import colors from '@styles/colors';
@@ -13,7 +13,7 @@ interface FormTextInputProps extends TextInputProps {
   icon?: IconName;
   placeholder?: string;
   rightButton?: IconName;
-  returnKey?: ReturnKeyType;
+  returnKey?: ReturnKeyTypeOptions;
   onSubmit?: () => void;
   onRightPress?: (value: any) => void;
 };
@@ -29,7 +29,7 @@ function FormTextInput({ title, placeholder, icon, rightButton, onRightPress, re
     }
   };
 
-  let returnKeyType: ReturnKeyType = 'done';
+  let returnKeyType: ReturnKeyTypeOptions = 'done';
   if (returnKey != null) {
     returnKeyType = returnKey;
   }

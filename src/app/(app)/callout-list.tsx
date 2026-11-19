@@ -10,7 +10,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import msarEventEmitter from '@utility/msarEventEmitter';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Platform, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import useStatusBarColor from '@/hooks/useStatusBarColor';
 import { useCalloutListQuery } from '@/remote/query';
@@ -34,15 +34,6 @@ function Page() {
       badgeColor: colors.red,
     },
   ];
-
-  useEffect(() => {
-    if (Platform.OS === 'ios') {
-      StatusBar.setBarStyle('light-content');
-    }
-    else if (Platform.OS === 'android') {
-      StatusBar.setBackgroundColor(colors.primaryBg);
-    }
-  }, []);
 
   useEffect(() => {
     msarEventEmitter.on('refreshCallout', refreshReceived);

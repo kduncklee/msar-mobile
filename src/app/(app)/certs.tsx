@@ -1,3 +1,4 @@
+import type { ComponentRef } from 'react';
 import type { display_cert, member_cert_summary_ext } from '@/types/cert';
 import type { user_detail } from '@/types/user';
 import type { LabelValue } from '@/utility/reactForm';
@@ -33,7 +34,7 @@ function Page() {
   const allColumns = useMemo(() => certColumns ? fixedColumns.concat(certColumns) : fixedColumns, [certColumns, fixedColumns]);
   const minColumnWidth = 15;
   const [columnWidths, setColumnWidths] = useState(() => allColumns.map(_ => minColumnWidth));
-  const cellRefs = useRef<(Text | View)[][]>([]);
+  const cellRefs = useRef<(ComponentRef<typeof Text> | ComponentRef<typeof View>)[][]>([]);
 
   const unsortedData: member_cert_summary_ext[] = [];
   certQuery.data?.forEach((item) => {
@@ -120,7 +121,7 @@ function Page() {
     }
   }, [allColumns, columnWidths, setColumnWidths]);
 
-  const updateRef = (el: Text | View | null, rowIndex, columnIndex) => {
+  const updateRef = (el: ComponentRef<typeof Text> | ComponentRef<typeof View> | null, rowIndex, columnIndex) => {
     if (!cellRefs.current[rowIndex]) {
       cellRefs.current[rowIndex] = [];
     }
@@ -227,7 +228,7 @@ function Page() {
           <FlatList
             contentContainerStyle={{ paddingBottom: 100 }}
             data={tableData}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item.id.toString()}
             ListHeaderComponent={renderTableHeader(allColumns)}
             stickyHeaderIndices={[0]}
             renderItem={renderRow}

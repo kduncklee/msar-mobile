@@ -84,7 +84,6 @@ function Page() {
     StatusBar.setBarStyle('dark-content');
   }
   else if (Platform.OS === 'android') {
-    StatusBar.setBackgroundColor(colors.primaryBg);
     StatusBar.setBarStyle('light-content');
   }
 

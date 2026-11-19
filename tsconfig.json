@@ -2,17 +2,19 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "jsx": "react-jsx",
-    "baseUrl": "./src/",
     "paths": {
-      "@/*": ["./*"],
-      "@modules/*": ["../modules/*"],
-      "@assets/*": ["./assets/*"],
-      "@components/*": ["./components/*"],
-      "@remote/*": ["./remote/*"],
-      "@storage/*": ["./storage/*"],
-      "@styles/*": ["./styles/*"],
-      "@utility/*": ["./utility/*"]
+      "@/*": ["./src/*"],
+      "@modules/*": ["./modules/*"],
+      "@assets/*": ["./src/assets/*"],
+      "@components/*": ["./src/components/*"],
+      "@remote/*": ["./src/remote/*"],
+      "@storage/*": ["./src/storage/*"],
+      "@styles/*": ["./src/styles/*"],
+      "@utility/*": ["./src/utility/*"],
+      "*": ["./src/*"]
     },
+    "types": ["jest"],
+    "strict": false,
     "strictNullChecks": true
   },
   "exclude": [

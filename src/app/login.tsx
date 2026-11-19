@@ -1,3 +1,4 @@
+import type { ComponentRef } from 'react';
 import SmallButton from '@components/inputs/SmallButton';
 import ActivityModal from '@components/modals/ActivityModal';
 import colors from '@styles/colors';
@@ -14,7 +15,7 @@ import useAuth from '@/hooks/useAuth';
 import { logo_for_server, server_choices } from '@/remote/api';
 
 function Page() {
-  const scrollViewRef = useRef<ScrollView>(null);
+  const scrollViewRef = useRef<ComponentRef<typeof ScrollView>>(null);
   const [showSpinner, setShowSpinner] = useState(false);
   const { login } = useAuth();
   let topMargin = 0;
@@ -64,7 +65,6 @@ function Page() {
     StatusBar.setBarStyle('dark-content');
   }
   else if (Platform.OS === 'android') {
-    StatusBar.setBackgroundColor(colors.primaryBg);
     StatusBar.setBarStyle('light-content');
     topMargin = (StatusBar.currentHeight ?? 0) + 20;
   }

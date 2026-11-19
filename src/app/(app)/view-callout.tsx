@@ -15,7 +15,7 @@ import msarEventEmitter from '@utility/msarEventEmitter';
 import CalloutFileTab from 'components/callouts/CalloutFileTab';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Platform, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-root-toast';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import KeyboardAvoidingCustomView from '@/components/KeyboardAvoidingCustomView';
@@ -117,18 +117,8 @@ function Page() {
   };
 
   useEffect(() => {
-    if (Platform.OS === 'ios') {
-      StatusBar.setBarStyle('light-content');
-    }
-    else if (Platform.OS === 'android') {
-      StatusBar.setBackgroundColor(headerBackground);
-    }
-    return () => {
-      if (Platform.OS === 'android') {
-        StatusBar.setBackgroundColor(colors.primaryBg);
-      }
-    };
-  }, [headerBackground]);
+    StatusBar.setBarStyle('light-content');
+  }, []);
 
   useEffect(() => {
     msarEventEmitter.on('refreshCallout', refreshReceived);

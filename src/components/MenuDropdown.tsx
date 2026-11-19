@@ -1,4 +1,4 @@
-import * as DropdownMenu from 'zeego/dropdown-menu';
+import { MenuView } from '@react-native-menu/menu';
 
 export interface MenuDropdownItem {
   name: string;
@@ -11,26 +11,18 @@ interface MenuDropdownProps {
 
 function MenuDropdown({ children, items }: MenuDropdownProps) {
   return (
-    <DropdownMenu.Root>
-      <DropdownMenu.Trigger>
-        {children}
-      </DropdownMenu.Trigger>
-
-      <DropdownMenu.Content>
-        <>
-          {items.map(item => (
-            <DropdownMenu.Item
-              key={item.name}
-              onSelect={item.onSelect}
-            >
-              <DropdownMenu.ItemTitle>
-                {item.name}
-              </DropdownMenu.ItemTitle>
-            </DropdownMenu.Item>
-          ))}
-        </>
-      </DropdownMenu.Content>
-    </DropdownMenu.Root>
+    <MenuView
+      actions={items.map(item => ({
+        id: item.name,
+        title: item.name,
+      }))}
+      onPressAction={({ nativeEvent }) => {
+        const selected = items.find(item => item.name === nativeEvent.event);
+        selected?.onSelect?.();
+      }}
+    >
+      {children}
+    </MenuView>
   );
 }
 

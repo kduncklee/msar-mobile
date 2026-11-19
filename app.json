@@ -6,11 +6,6 @@
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
     "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./src/assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -56,7 +51,7 @@
           },
           "ios": {
             "useFrameworks": "static",
-            "deploymentTarget": "16.0", // Update withIosDeploymentTarget when changing this
+            "deploymentTarget": "16.4", // Update withIosDeploymentTarget when changing this
             "forceStaticLinking": ["RNFBApp", "RNFBMessaging"],
             // temporary workaround: https://github.com/expo/expo/issues/39607
             "buildReactNativeFromSource": false
@@ -67,7 +62,7 @@
         "notification-service-expo-plugin",
         {
           "devTeam": "UJDB5NH948",
-          "iPhoneDeploymentTarget": "16.0",
+          "iPhoneDeploymentTarget": "16.4",
           "iosNSEFilePath": "./src/assets/native/NotificationService.m"
         }
       ],
@@ -114,6 +109,14 @@
         }
       ],
       "expo-secure-store",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./src/assets/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ],
       "expo-asset",
       "expo-font",
       "./withIosDeploymentTarget"
