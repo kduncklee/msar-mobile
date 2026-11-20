@@ -119,7 +119,8 @@
       ],
       "expo-asset",
       "expo-font",
-      "./withIosDeploymentTarget"
+      "./withIosDeploymentTarget",
+      "./withAndroidOptionalFeatures"
     ],
     "scheme": "msar",
     "extra": {
