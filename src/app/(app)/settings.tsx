@@ -158,6 +158,10 @@ function Page() {
           <Text style={elements.mediumText}>Version</Text>
           <Text style={[elements.mediumText, styles.userText]}>
             {Application.nativeApplicationVersion}
+            {' '}
+            (
+            {Application.nativeBuildVersion}
+            )
           </Text>
         </View>
         <HorrizontalLine />
