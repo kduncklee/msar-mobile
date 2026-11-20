@@ -34,7 +34,7 @@
         "backgroundColor": "#2B3038"
       },
       "package": "org.malibusar.app",
-      "versionCode": 106,
+      "versionCode": 107,
       "googleServicesFile": "./google-services.json"
     },
     "web": {
@@ -45,6 +45,7 @@
         "expo-build-properties",
         {
           "android": {
+            "extraProguardRules": "-keep class * extends androidx.room.RoomDatabase { <init>(); }\n-keep class * extends androidx.work.InputMerger { <init>(); }",
             "extraMavenRepos": [
               "../../node_modules/@notifee/react-native/android/libs"
             ]
