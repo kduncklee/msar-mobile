@@ -10,7 +10,8 @@ import { Directory, File, Paths } from 'expo-file-system';
 import { Platform } from 'react-native';
 import { accessCodeFromResponse } from '@/types/accessCode';
 import { calloutFromResponse } from '@/types/callout';
-import { eventFromResponse } from '@/types/event';
+import { eventFromResponse, eventToRequest } from '@/types/event';
+import { patrolToRequest } from '@/types/patrol';
 
 const scv_server: string = 'https://app.scvrescue.com';
 const countywide_server: string = 'https://countywide.app.malibusarhours.org';
@@ -365,14 +366,14 @@ export class Api {
   }
 
   async apiCreateEvent(eventData: event): Promise<any> {
-    return this.#fetchJsonWithCredentials(this.#eventsEndpoint(), 'POST', eventData);
+    return this.#fetchJsonWithCredentials(this.#eventsEndpoint(), 'POST', eventToRequest(eventData));
   }
 
   async apiUpdateEvent(id: number, eventData: event): Promise<any> {
     return this.#fetchJsonWithCredentials(
       `${this.#eventsEndpoint()}${id}/`,
       'PUT',
-      eventData,
+      eventToRequest(eventData),
     );
   }
 
@@ -396,14 +397,14 @@ export class Api {
   }
 
   async apiCreatePatrol(patrol: patrol): Promise<any> {
-    return this.#fetchJsonWithCredentials(this.#patrolsEndpoint(), 'POST', patrol);
+    return this.#fetchJsonWithCredentials(this.#patrolsEndpoint(), 'POST', patrolToRequest(patrol));
   }
 
   async apiUpdatePatrol(id: number, patrol: patrol): Promise<any> {
     return this.#fetchJsonWithCredentials(
       `${(this.#patrolsEndpoint()) + id}/`,
       'PUT',
-      patrol,
+      patrolToRequest(patrol),
     );
   }
 

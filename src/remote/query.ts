@@ -7,13 +7,13 @@ import type { event } from '@/types/event';
 import type { patrol } from '@/types/patrol';
 import type { member_status_type, user_detail } from '@/types/user';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { formatISO } from 'date-fns';
 import useAuth from '@/hooks/useAuth';
 import { calloutSummaryFromResponse } from '@/types/calloutSummary';
 import { certFromResponse, memberCertSummaryFromResponse } from '@/types/cert';
 import { eventFromResponse } from '@/types/event';
 import { patrolFromResponse } from '@/types/patrol';
 import { memberStatusTypeFromResponse, userDetailsFromResponse } from '@/types/user';
+import { formatServerDate } from '@/utility/dateHelper';
 
 //////////////////////////////////////////////////////////////////////////////
 // React Query
@@ -101,10 +101,10 @@ function argsStartAtFinishAt(startAt: Date | undefined, finishAt: Date | undefin
   const finish_filter = isEvent ? 'finish_at' : 'start_at';
   let args = isEvent ? '&' : '?';
   if (startAt) {
-    args += `start_at_iso_after=${encodeURIComponent(formatISO(startAt))}`;
+    args += `start_at_iso_after=${encodeURIComponent(formatServerDate(startAt))}`;
   }
   if (finishAt) {
-    args += `${args ? '&' : '?'}${finish_filter}_iso_before=${encodeURIComponent(formatISO(finishAt))}`;
+    args += `${args ? '&' : '?'}${finish_filter}_iso_before=${encodeURIComponent(formatServerDate(finishAt))}`;
   }
   return args;
 }

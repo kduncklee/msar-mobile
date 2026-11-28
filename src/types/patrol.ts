@@ -1,5 +1,6 @@
 import type { user } from '@/types/user';
 import { userDetailsFromResponse } from '@/types/user';
+import { formatServerDate, parseServerDate } from '@/utility/dateHelper';
 
 export interface patrol {
   id?: number;
@@ -13,8 +14,16 @@ export interface patrol {
 export function patrolFromResponse(response: any): patrol {
   return {
     ...response,
-    start_at: new Date(response.start_at),
-    finish_at: response.finish_at ? new Date(response.finish_at) : null,
+    start_at: parseServerDate(response.start_at),
+    finish_at: response.finish_at ? parseServerDate(response.finish_at) : null,
     member: userDetailsFromResponse(response.member),
+  };
+}
+
+export function patrolToRequest(p: patrol) {
+  return {
+    ...p,
+    start_at: formatServerDate(p.start_at),
+    finish_at: p.finish_at ? formatServerDate(p.finish_at) : p.finish_at,
   };
 }

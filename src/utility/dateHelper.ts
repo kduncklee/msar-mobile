@@ -1,3 +1,45 @@
+const ISO_WALL_CLOCK_RE = /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2})(?:\.(\d+))?)?)?/;
+
+/**
+ * Parse an ISO-8601 datetime string from the server using its wall-clock
+ * components (ignoring any timezone offset) into a Date representing that
+ * server wall-clock date/time.
+ */
+export function parseServerDate(value: string | Date): Date {
+  if (value instanceof Date) {
+    return value;
+  }
+  const match = ISO_WALL_CLOCK_RE.exec(value.trim());
+  if (!match) {
+    return new Date(value);
+  }
+  const [, year, month, day, hour = '0', minute = '0', second = '0', frac = '0'] = match;
+  const ms = Number(frac.slice(0, 3).padEnd(3, '0'));
+  return new Date(
+    Number(year),
+    Number(month) - 1,
+    Number(day),
+    Number(hour),
+    Number(minute),
+    Number(second),
+    ms,
+  );
+}
+
+/**
+ * Format a wall-clock Date as a timezone-naive ISO-8601 string
+ * ("YYYY-MM-DDTHH:mm:ss") so the server interprets it in its own TIME_ZONE.
+ */
+export function formatServerDate(date: Date): string {
+  const year = date.getFullYear().toString().padStart(4, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const seconds = date.getSeconds().toString().padStart(2, '0');
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+}
+
 export function datePortionEqual(a: Date, b: Date): boolean {
   return (a && b
     && (a.getFullYear() === b.getFullYear())

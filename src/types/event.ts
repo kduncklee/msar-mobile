@@ -1,4 +1,5 @@
 import type { eventType } from '@/types/enums';
+import { formatServerDate, parseServerDate } from '@/utility/dateHelper';
 
 export interface event {
   id?: number;
@@ -19,7 +20,15 @@ export interface event {
 export function eventFromResponse(response: any): event {
   return {
     ...response,
-    start_at: response.start_at ? new Date(response.start_at) : undefined,
-    finish_at: response.finish_at ? new Date(response.finish_at) : undefined,
+    start_at: response.start_at ? parseServerDate(response.start_at) : undefined,
+    finish_at: response.finish_at ? parseServerDate(response.finish_at) : undefined,
+  };
+}
+
+export function eventToRequest(e: event) {
+  return {
+    ...e,
+    start_at: e.start_at ? formatServerDate(e.start_at) : e.start_at,
+    finish_at: e.finish_at ? formatServerDate(e.finish_at) : e.finish_at,
   };
 }
