@@ -6,7 +6,7 @@ export interface patrol {
   member?: user;
   description?: string;
   start_at: Date;
-  finish_at?: Date;
+  finish_at?: Date | null;
   color?: string;
 };
 

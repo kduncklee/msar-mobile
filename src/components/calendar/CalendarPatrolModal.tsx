@@ -63,8 +63,8 @@ function CalendarPatrolModal({ dateID, patrol, onCancel }: CalendarPatrolModalPr
     onSubmit: async ({ value }) => {
       console.log('form submit', value);
       const updated_patrol: patrol = {
-        start_at: value.start_at,
-        finish_at: value.all_day ? undefined : value.finish_at,
+        start_at: value.all_day ? fromDateId(dateID) : value.start_at,
+        finish_at: value.all_day ? null : value.finish_at,
         description: value.description,
         member: memberList?.find(m => m.id.toString() === value.member_id?.toString()),
       };

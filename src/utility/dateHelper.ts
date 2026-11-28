@@ -74,7 +74,7 @@ export function getDateRangeString(a?: Date, b?: Date): string {
   return `${getDateString(a)} - ${getDateString(b)}`;
 }
 
-export function getDateTimeRangeString(a?: Date, b?: Date): string {
+export function getDateTimeRangeString(a?: Date | null, b?: Date | null): string {
   if (!a || !b) {
     return '';
   }
